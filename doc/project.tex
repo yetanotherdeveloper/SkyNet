@@ -1,0 +1,58 @@
+%& --translate-file il2-t1
+\documentclass[a4paper,10pt]{article}
+%\usepackage[polish]{babel}
+%\usepackage{polski}
+\usepackage{makeidx}
+%\usepackage[utf-8]{inputenc}
+%\usepackage[T1]{fontenc}
+\usepackage[a4paper,left=2.5cm,right=2.0cm,top=1.5cm,bottom=1.5cm]{geometry}
+% Title Page
+\title{Project SkyNet design notes}
+\author{Jacek Czaja}
+\makeindex
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+SkyNet is to be testing platform for various algorithms. Including:
+\begin{itemize}
+\item Machine Learning (Neural Networks, Support Vector Machines, Perceptions)
+\item Artificial Intelligence (A* , Alpha-Beta )
+\item Quantum Computation (simulation of algorithms of Quantum computer)
+\end{itemize}
+
+Testing is meant to be functional (If generated data match reference data) and performance (time which takes for OpenCL based solution to do its computation)
+
+\section{Architecture Design}
+Architecture will have modular design.
+Main module will deliver interface for plugins.
+Plugins(Modules) will implement interface.
+Plugins will be independent to each other.
+Interface will be something like:
+\begin{verbatim}
+class ModuleInterface
+{
+    RunTest()
+    PrintDescription()
+};
+\end{verbatim}
+
+Main Module at the beginning will load all modules from directory where modules are kept.
+How Main Module is to determine what's inside of given module is  yet to be described.
+
+\section{Usage Interface}
+SkyNet can be operated from command line. Options:
+\begin{itemize}
+\item list (lists available modules)
+\item help (print info about usage of SkyNet)
+\item test (Run Tests from specific module)
+\end{itemize}
+
+Starting without parameters will run all possible tests of available modules.
+
+\end{document}
+
