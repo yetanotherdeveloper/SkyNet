@@ -54,5 +54,25 @@ SkyNet can be operated from command line. Options:
 
 Starting without parameters will run all possible tests of available modules.
 
+
+\section{Installation}
+\subsection{Building}
+\begin{verbatim}
+CXX='/home/jczaja/.vim/bundle/clang_complete/bin/cc_args.py g++'   cmake ../code/
+make VERBOSE=1
+\end{verbatim}
+
+\section{TODO}
+\begin{itemize}
+\item make a custom target: copy .clang\_complete files to their CMAKE\_CURRENT\_SOURCE\_DIR files
+\item Command Line parser (use gnuopt)
+\item Loading Modules
+\item coding standard fixes:
+\begin{enumerate}
+\item empty functions , braces in the same line
+\item ``=0''<++> -> ``= 0''
+\end{enumerate}
+\end{itemize}
+
 \end{document}
 
