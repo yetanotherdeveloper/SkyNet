@@ -1,7 +1,8 @@
+# Author Jacek Czaja. License: clang_complete license
 function(copy_clang_complete_files cur_dir)
     message("### Copying .clang_complete files: ###")
     file(GLOB_RECURSE items  RELATIVE ${cur_dir} ${cur_dir}/.clang_complete)
-    # Get relative paths , attach them to source dir 
+    # Get relative paths , attach them to SOURCE_DIR name (directory where project CMakeLists.txt is)
     # and copy .clang_complete files if possible
     foreach(item ${items})   
         string(REPLACE .clang_complete  "" rel_path ${item})

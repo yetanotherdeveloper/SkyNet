@@ -60,10 +60,12 @@ Starting without parameters will run all possible tests of available modules.
 \begin{verbatim}
 CXX='/home/jczaja/.vim/bundle/clang_complete/bin/cc_args.py g++'   cmake ../code/
 make VERBOSE=1
+make copy_clang_complete
 \end{verbatim}
 
 \section{TODO}
 \begin{itemize}
+\item Prasing subdirectories of given modules directory to get all *.so files
 \item Command Line parser (use gnuopt)
 \item Loading Modules
 \item coding standard fixes:
