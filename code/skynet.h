@@ -15,6 +15,7 @@ class SkyNet
 public:
     SkyNet(void);
     ~SkyNet();
+private:
     void LoadModules(std::string modulesDirectoryName);
 private:
     std::vector<classificationModule> m_classifiers;

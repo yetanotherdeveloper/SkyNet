@@ -44,6 +44,8 @@ class ModuleInterface
 Main Module at the beginning will load all modules from directory where modules are kept.
 How Main Module is to determine what's inside of given module is  yet to be described.
 
+SkyNet holds lists of diffrent types of modules eg. classifiers (PLA, SVM)
+
 \section{Usage Interface}
 SkyNet can be operated from command line. Options:
 \begin{itemize}
@@ -65,11 +67,9 @@ make copy_clang_complete
 
 \section{TODO}
 \begin{itemize}
-\item SkyNet holds lists of diffrent types of modules eg. classifiers (PLA, SVM)
 \item Modules are algorithms and Devices( hardware layer) are to be initialized in SkyNet core
 \item Prasing subdirectories of given modules directory to get all *.so files
 \item Command Line parser (use gnuopt)
-\item Loading Modules
 \item coding standard fixes:
 \begin{enumerate}
 \item empty functions , braces in the same line

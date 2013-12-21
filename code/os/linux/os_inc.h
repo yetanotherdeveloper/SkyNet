@@ -10,6 +10,9 @@
 #define SKYNET_DEBUG(...) 0
 #endif  //DEBUG
 
+
+#define SKYNET_INFO(...) printf( __VA_ARGS__ )
+
 #include <string>
 class ISkyNetClassificationProtocol;
 

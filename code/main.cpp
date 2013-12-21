@@ -1,17 +1,14 @@
-#include "protocol.h"
-//#include "os_inc.h"
-#include "skynet.h"
 #include <string>
-
+#include "protocol.h"
+#include "skynet.h"
+#include "os_inc.h"
 
 
 int main()
 {
-    SkyNet m_skynet;
     // Parse CommandLine
+    SkyNet m_skynet;
    
-    // Load Libraries 
-    m_skynet.LoadModules(std::string("./modules"));
     
     return 0;
 }

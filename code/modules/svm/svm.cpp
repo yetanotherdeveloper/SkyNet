@@ -6,8 +6,14 @@ extern "C" ISkyNetClassificationProtocol* CreateModule()
 }
 
 
+SupportVectorMachine::SupportVectorMachine() : m_about("Support Vector Machine")
+{
+
+}
 
 void SupportVectorMachine ::Run(){
 }
-void SupportVectorMachine ::About(){
+const std::string SupportVectorMachine::About() const
+{
+    return m_about;
 }

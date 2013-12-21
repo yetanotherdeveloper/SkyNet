@@ -6,7 +6,12 @@
 #include "os_inc.h"
 
 
-SkyNet::SkyNet(void){
+SkyNet::SkyNet(void)
+{
+    SKYNET_INFO("Skynet Initializing...\n\n");
+
+    SKYNET_INFO("Loading Modules:\n");
+    LoadModules(std::string("./modules"));
 }
 
 SkyNet::~SkyNet()
@@ -29,8 +34,9 @@ void SkyNet::LoadModules(std::string modulesDirectoryName)
     ISkyNetClassificationProtocol* module;
     void* libHandle;
     std::string id;
+    std::string info;
 
-    //TODO: Parse subdirectories to get list of *.so files (modules)
+
     modules_dir = opendir(modulesDirectoryName.c_str() );
     if(modules_dir != NULL) {
         while( (entry = readdir(modules_dir) ) != NULL) {
@@ -45,6 +51,8 @@ void SkyNet::LoadModules(std::string modulesDirectoryName)
                         id = module->Identify();
                         if(id.compare("ISkyNetClassificationProtocol") == 0) {
                             this->m_classifiers.push_back({module,libHandle}); 
+                            info = "    " + module->About() + " [OK]\n";        
+                            SKYNET_INFO(info.c_str());
                         }
                     }
                 break;
