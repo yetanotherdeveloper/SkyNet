@@ -1,0 +1,44 @@
+cmake_minimum_required(VERSION 2.8)
+project(SkyNet)
+macro(getsubdirlist result curdir)
+    file(GLOB items RELATIVE ${curdir} ${curdir}/modules/*)
+    set(dirlist "")
+    foreach(item ${items})
+        if(IS_DIRECTORY ${curdir}/${item})
+            set(dirlist ${dirlist} ${item})
+        endif()
+    endforeach(item)
+    set(${result} ${dirlist} )
+endmacro(getsubdirlist)
+
+
+
+
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+add_definitions(-DDEBUG)
+endif()
+
+set(SOURCE main.cpp skynet.cpp)
+include_directories(./)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES Linux)
+include_directories(./os/linux)
+list(APPEND SOURCE ./os/linux/os_inc.cpp)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES Windows)
+include_directories(./os/windows)
+list(APPEND SOURCE ./os/windows/os_inc.cpp)
+endif()
+
+add_definitions(-std=c++11)
+getsubdirlist(subdirs_list ${CMAKE_CURRENT_SOURCE_DIR})
+foreach(subdir ${subdirs_list})
+    #message("adding subdir: ${subdir}")
+    add_subdirectory(${subdir}) 
+endforeach(subdir)
+
+find_package(OpenCL)
+
+include(./cmake/copy_clang_complete.cmake)
+
+add_executable(SkyNet ${SOURCE})
+target_link_libraries(SkyNet dl)
