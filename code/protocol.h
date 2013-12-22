@@ -3,7 +3,7 @@
 #include <string>
 
 // Note: Module should export following function:
-//ISkyNetClassificationProtocol* CreateModule();
+//extern "C" ISkyNetClassificationProtocol* CreateModule()
 
 class ISkyNetClassificationProtocol
 {
