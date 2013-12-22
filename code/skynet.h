@@ -17,7 +17,9 @@ public:
     ~SkyNet();
 private:
     void LoadModules(std::string modulesDirectoryName);
+    void InitDevices();
 private:
     std::vector<classificationModule> m_classifiers;
+
 };
 #endif //__SKYNET__

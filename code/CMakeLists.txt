@@ -11,9 +11,6 @@ macro(getsubdirlist result curdir)
     set(${result} ${dirlist} )
 endmacro(getsubdirlist)
 
-
-
-
 if(${CMAKE_BUILD_TYPE} MATCHES Debug)
 add_definitions(-DDEBUG)
 endif()
@@ -38,7 +35,9 @@ endforeach(subdir)
 
 find_package(OpenCL)
 
-include(./cmake/copy_clang_complete.cmake)
+include(./cmake/copy_clang_complete.cmake )
+message("OpenCL incs: ${OPENCL_INCLUDE_DIRS}")
+include_directories(${OPENCL_INCLUDE_DIRS})
 
 add_executable(SkyNet ${SOURCE})
-target_link_libraries(SkyNet dl)
+target_link_libraries(SkyNet dl ${OPENCL_LIBRARIES})
