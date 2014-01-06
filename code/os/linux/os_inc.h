@@ -16,10 +16,15 @@
 #include <string>
 class ISkyNetClassificationProtocol;
 
+namespace cl
+{
+    class Device;
+}
+
 class SkyNetOS
 {
     public:
-        static ISkyNetClassificationProtocol* LoadModule(std::string moduleName, void** plibHandle); 
+        static ISkyNetClassificationProtocol* LoadModule(std::string moduleName, void** plibHandle,const cl::Device *const pdevice); 
         static void ReleaseModule(ISkyNetClassificationProtocol** pModule,void** pLibHandle);
 };
 

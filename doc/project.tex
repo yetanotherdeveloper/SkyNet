@@ -48,6 +48,9 @@ SkyNet holds lists of diffrent types of modules eg. classifiers (PLA, SVM)
 
 Tests for diffrent devices to be run on separate threads
 
+
+So, module will be given data and commandqueue to send kernel to, context and device that compilation is taking place against
+
 \section{Usage Interface}
 SkyNet can be operated from command line. Options:
 \begin{itemize}
@@ -70,9 +73,14 @@ make copy_clang_complete
 \section{TODO}
 \begin{itemize}
 \item Make a git branches: master and milestone(release)
+\item Write a report that clang complete works badly with C++ openCL
+\item each module should provide also CPU plain implementation of algorithm
 \item Modules are algorithms and Devices( hardware layer) are to be initialized in SkyNet core
 \item Command Line parser (use gnuopt)
-\item Getting Devices List
+\item Create Contexts assigned to given devices/platforms
+\item Pass command queue to given module and some entry data/output buffer to execute given task
+\item Mapping of errors(ints) to strings
+\item make a cmake scripts repo
 \item coding standard fixes:
 \begin{enumerate}
 \item empty functions , braces in the same line

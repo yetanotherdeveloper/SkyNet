@@ -2,7 +2,14 @@
 #define __SKYNET__
 #include <string>
 #include <vector>
+#include <CL/cl.hpp>
 #include "protocol.h"
+
+namespace cl
+{
+    class Context;
+    class CommandQueue;
+}
 
 class SkyNet
 {
@@ -20,6 +27,6 @@ private:
     void InitDevices();
 private:
     std::vector<classificationModule> m_classifiers;
-
+    std::vector<cl::Device> m_devices;
 };
 #endif //__SKYNET__

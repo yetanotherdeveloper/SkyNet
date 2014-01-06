@@ -3,7 +3,7 @@
 #include <string>
 
 // Note: Module should export following function:
-//extern "C" ISkyNetClassificationProtocol* CreateModule()
+//extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const pdevice)
 
 class ISkyNetClassificationProtocol
 {
