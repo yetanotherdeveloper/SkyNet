@@ -186,3 +186,14 @@ void SkyNet::LoadModules(std::string modulesDirectoryName)
     }
 }
 
+void SkyNet::RunTests()
+{
+    // Just run all tests
+    std::vector<classificationModule>::iterator it; 
+    for(it = m_classifiers.begin(); it != m_classifiers.end(); ++it) {
+        printf("Running OCL test against: %s\n",it->module->About().c_str());
+        it->module->Run();
+    }
+}
+
+

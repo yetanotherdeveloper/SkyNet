@@ -1,9 +1,9 @@
 #include "pla.h"
 #include <CL/cl.hpp>
 
-static std::string kernelSource = "__kernel void dodaj(__global float4 veciu) \
+static std::string kernelSource = "__kernel void dodaj(float veciu) \
                                    {  \
-                                            veciu = (float4)(1.0f,1.0f,1.0f,1.0f); \
+                                            veciu = 1.0f; \
                                    }";
 
 extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const pdevice)
@@ -79,15 +79,21 @@ PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const
 
 void PerceptronLearningAlgorithm::Run()
 {
+    float testValue = 0.0f;
+    m_plaKernel->setArg(0,&testValue);
+    m_queue->enqueueTask(*m_plaKernel);
 }
 
 const std::string PerceptronLearningAlgorithm::About() const
 {
+    // TODO: Return Also Device we are running for
     return m_about;
 }
 
 PerceptronLearningAlgorithm::~PerceptronLearningAlgorithm()
 {
+    delete m_plaKernel;
+    m_plaKernel = NULL;
     delete m_context;
     m_context = NULL;
     delete m_queue;

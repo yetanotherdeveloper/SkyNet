@@ -13,10 +13,10 @@ SupportVectorMachine::SupportVectorMachine(const cl::Device* const pdevice) : m_
 }
 SupportVectorMachine::~SupportVectorMachine()
 {
-    delete m_context;
-    m_context = NULL;
-    delete m_queue; 
-    m_queue = NULL;
+    //delete m_context;
+    //m_context = NULL;
+    //delete m_queue; 
+    //m_queue = NULL;
 }
 
 void SupportVectorMachine ::Run(){

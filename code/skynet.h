@@ -22,6 +22,7 @@ class SkyNet
 public:
     SkyNet(void);
     ~SkyNet();
+    void RunTests();
 private:
     void LoadModules(std::string modulesDirectoryName);
     void InitDevices();
