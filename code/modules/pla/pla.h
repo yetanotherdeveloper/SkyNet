@@ -24,6 +24,7 @@ class PerceptronLearningAlgorithm : public ISkyNetClassificationProtocol
         ~PerceptronLearningAlgorithm();
         void Run();
         const std::string About() const;
+        static std::string composeAboutString(const cl::Device* const pdevice);
 };
 #endif //__PLA__
 

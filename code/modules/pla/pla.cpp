@@ -14,7 +14,7 @@ extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const p
 /*! Build kernels , initialize data
  *
  */
-PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const pdevice) : m_about("Perceptron Learning Algorithm"), m_pdevice(pdevice)
+PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const pdevice) : m_about(PerceptronLearningAlgorithm::composeAboutString(pdevice) ), m_pdevice(pdevice)
 {
     cl_int err;
 
@@ -46,7 +46,7 @@ PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const
 
     // Create/build program, get kernels
 
-    cl::Program::Sources kern_sources(1, std::make_pair(kernelSource.c_str(), kernelSource.length() + 1));
+    cl::Program::Sources kern_sources(1, std::make_pair(kernelSource.c_str(), kernelSource.length() + 1) );
     cl::Program program(*m_context, kern_sources,&err);
     if( err != CL_SUCCESS )
     {
@@ -60,9 +60,9 @@ PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const
     {
         //SKYNET_INFO(" Error creating OpenCL command queue: %d\n",err);
         printf(" Error Building OpenCL program failed: %d\n",err);
-        std::string log; 
-        err =  program.getBuildInfo(*m_pdevice,CL_PROGRAM_BUILD_LOG,&log);
-        printf(" OpenCL program build log: %s\n",log.c_str());
+        std::string log;
+        err = program.getBuildInfo(*m_pdevice,CL_PROGRAM_BUILD_LOG,&log);
+        printf(" OpenCL program build log: %s\n",log.c_str() );
     }
 
     m_plaKernel = new cl::Kernel(program, "dodaj", &err);
@@ -76,6 +76,16 @@ PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const
     //TODO: error handling section
 
 }
+
+std::string PerceptronLearningAlgorithm::composeAboutString(const cl::Device* const pdevice)
+{
+    std::string aboutString;
+    pdevice->getInfo(CL_DEVICE_NAME, &aboutString);
+    aboutString.insert(0,"Perceptron Learning Algorithm (");
+    aboutString.append(")");
+    return aboutString;
+}
+
 
 void PerceptronLearningAlgorithm::Run()
 {
