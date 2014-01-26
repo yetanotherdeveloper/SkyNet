@@ -48,8 +48,16 @@ SkyNet holds lists of diffrent types of modules eg. classifiers (PLA, SVM)
 
 Tests for diffrent devices to be run on separate threads
 
-
 So, module will be given data and commandqueue to send kernel to, context and device that compilation is taking place against
+
+There will be a module handling OpenCL :
+\begin{itemize}
+\item creation of command queue
+\item program building/creating
+\item kernel creation
+\item handling or errors
+\end{itemize}
+
 
 \section{Usage Interface}
 SkyNet can be operated from command line. Options:
@@ -63,24 +71,31 @@ Starting without parameters will run all possible tests of available modules.
 
 
 \section{Installation}
-\subsection{Building}
+\subsection{Building with GCC for generation of clang\_complete\_config}
 \begin{verbatim}
 CXX='/home/jczaja/.vim/bundle/clang_complete/bin/cc_args.py g++'   cmake ../code/
 make VERBOSE=1
 make copy_clang_complete
 \end{verbatim}
+\subsection{Building with Clang}
+\begin{verbatim}
+CXX='/home/jczaja/.vim/bundle/clang_complete/bin/cc_args.py clang++'   cmake ../code/
+make VERBOSE=1
+make copy_clang_complete
+\end{verbatim}
+
+
 
 \section{TODO}
 \begin{itemize}
-\item Make a git branches: master and milestone(release)
 \item make common module handling init of opencl and kernel/program building
+\item Make a git branches: master and milestone(release)
 \item make/lear proper c++ exceptions usage to handle errors of OpenCL initialization
 \item Write a report that clang complete works badly with C++ openCL
 \item each module should provide also CPU plain implementation of algorithm
 \item Modules are algorithms and Devices( hardware layer) are to be initialized in SkyNet core
 \item Command Line parser (use gnuopt)
 \item Create Contexts assigned to given devices/platforms
-\item Pass command queue to given module and some entry data/output buffer to execute given task
 \item Mapping of errors(ints) to strings
 \item coding standard fixes:
 \begin{enumerate}

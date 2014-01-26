@@ -22,21 +22,12 @@ PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const
     // - create command queue
     // - build programs, make kernels
     // - store device, command queue, context
-
-
-    // make a context , command queue
-    m_context = new cl::Context(*m_pdevice,NULL,NULL,NULL,&err);
-
-    if( err != CL_SUCCESS )
-    {
-        //SKYNET_INFO(" Error creating OpenCL context: %d\n",err);
-        printf("Error creating OpenCL context for PLA module: %d\n",err);
-    }
+    m_pContext = SkyNetOpenCLHelper::createCLContext(pdevice);
 
     std::vector<cl::Device> context_devices;
-    m_context->getInfo(CL_CONTEXT_DEVICES,&context_devices);
+    m_pContext->getInfo(CL_CONTEXT_DEVICES,&context_devices);
 
-    m_queue = new cl::CommandQueue(*m_context,*m_pdevice,0,&err);
+    m_queue = new cl::CommandQueue(*m_pContext,*m_pdevice,0,&err);
 
     if( err != CL_SUCCESS )
     {
@@ -47,7 +38,7 @@ PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const
     // Create/build program, get kernels
 
     cl::Program::Sources kern_sources(1, std::make_pair(kernelSource.c_str(), kernelSource.length() + 1) );
-    cl::Program program(*m_context, kern_sources,&err);
+    cl::Program program(*m_pContext, kern_sources,&err);
     if( err != CL_SUCCESS )
     {
         //SKYNET_INFO(" Error creating OpenCL command queue: %d\n",err);
@@ -104,8 +95,6 @@ PerceptronLearningAlgorithm::~PerceptronLearningAlgorithm()
 {
     delete m_plaKernel;
     m_plaKernel = NULL;
-    delete m_context;
-    m_context = NULL;
     delete m_queue;
     m_queue = NULL;
 }
