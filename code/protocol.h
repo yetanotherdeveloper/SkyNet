@@ -22,6 +22,7 @@ class SkyNetOpenCLHelper
         static cl_int err;
     public:
         static std::unique_ptr<cl::Context> createCLContext(const cl::Device* pdevice);
+        static std::unique_ptr<cl::CommandQueue> createCLCommandQueue( const cl::Context& context, const cl::Device& device);
 };
 
 #endif //__SKYNET_PROTOCOL__

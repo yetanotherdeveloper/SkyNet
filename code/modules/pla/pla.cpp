@@ -27,14 +27,7 @@ PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const
     std::vector<cl::Device> context_devices;
     m_pContext->getInfo(CL_CONTEXT_DEVICES,&context_devices);
 
-    m_queue = new cl::CommandQueue(*m_pContext,*m_pdevice,0,&err);
-
-    if( err != CL_SUCCESS )
-    {
-        //SKYNET_INFO(" Error creating OpenCL command queue: %d\n",err);
-        printf(" Error creating OpenCL command queue: %d\n",err);
-    }
-
+    m_pCommandQueue = SkyNetOpenCLHelper::createCLCommandQueue( *m_pContext, *pdevice);
     // Create/build program, get kernels
 
     cl::Program::Sources kern_sources(1, std::make_pair(kernelSource.c_str(), kernelSource.length() + 1) );
@@ -82,7 +75,7 @@ void PerceptronLearningAlgorithm::Run()
 {
     float testValue = 0.0f;
     m_plaKernel->setArg(0,&testValue);
-    m_queue->enqueueTask(*m_plaKernel);
+    m_pCommandQueue->enqueueTask(*m_plaKernel);
 }
 
 const std::string PerceptronLearningAlgorithm::About() const
@@ -95,6 +88,4 @@ PerceptronLearningAlgorithm::~PerceptronLearningAlgorithm()
 {
     delete m_plaKernel;
     m_plaKernel = NULL;
-    delete m_queue;
-    m_queue = NULL;
 }

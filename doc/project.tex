@@ -51,6 +51,8 @@ Tests for diffrent devices to be run on separate threads
 So, module will be given data and commandqueue to send kernel to, context and device that compilation is taking place against
 
 There will be a module handling OpenCL :
+Implementing SkyNetOpenCLHelper module , which is opencl interacting routines to creat context, buildp rograms, kernels etc. and handling errors
+
 \begin{itemize}
 \item creation of command queue
 \item program building/creating
@@ -100,6 +102,7 @@ make copy_clang_complete
 \item coding standard fixes:
 \begin{enumerate}
 \item empty functions , braces in the same line
+\item force space removal in args of function call
 \end{enumerate}
 \end{itemize}
 
