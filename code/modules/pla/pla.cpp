@@ -28,33 +28,8 @@ PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const
     m_pContext->getInfo(CL_CONTEXT_DEVICES,&context_devices);
 
     m_pCommandQueue = SkyNetOpenCLHelper::createCLCommandQueue( *m_pContext, *pdevice);
-    // Create/build program, get kernels
 
-    cl::Program::Sources kern_sources(1, std::make_pair(kernelSource.c_str(), kernelSource.length() + 1) );
-    cl::Program program(*m_pContext, kern_sources,&err);
-    if( err != CL_SUCCESS )
-    {
-        //SKYNET_INFO(" Error creating OpenCL command queue: %d\n",err);
-        printf(" Error creating OpenCL program from source: %d\n",err);
-    }
-
-    std::vector<cl::Device> targetDevices(1,*m_pdevice);
-    err = program.build(targetDevices, "-cl-std=CL1.0");
-    if( err != CL_SUCCESS )
-    {
-        //SKYNET_INFO(" Error creating OpenCL command queue: %d\n",err);
-        printf(" Error Building OpenCL program failed: %d\n",err);
-        std::string log;
-        err = program.getBuildInfo(*m_pdevice,CL_PROGRAM_BUILD_LOG,&log);
-        printf(" OpenCL program build log: %s\n",log.c_str() );
-    }
-
-    m_plaKernel = new cl::Kernel(program, "dodaj", &err);
-    if( err != CL_SUCCESS )
-    {
-        //SKYNET_INFO(" Error creating OpenCL command queue: %d\n",err);
-        printf(" Error creating OpenCL PLA kernel : %d\n",err);
-    }
+    m_plaKernel = SkyNetOpenCLHelper::makeKernels(*m_pContext, *pdevice, kernelSource, "dodaj" );
 
 
     //TODO: error handling section
@@ -86,6 +61,4 @@ const std::string PerceptronLearningAlgorithm::About() const
 
 PerceptronLearningAlgorithm::~PerceptronLearningAlgorithm()
 {
-    delete m_plaKernel;
-    m_plaKernel = NULL;
 }

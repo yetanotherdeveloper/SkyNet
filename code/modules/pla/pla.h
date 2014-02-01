@@ -17,7 +17,7 @@ class PerceptronLearningAlgorithm : public ISkyNetClassificationProtocol
         std::string m_about;
         std::unique_ptr<cl::Context> m_pContext;
         std::unique_ptr<cl::CommandQueue> m_pCommandQueue; 
-        cl::Kernel* m_plaKernel;
+        std::unique_ptr<cl::Kernel> m_plaKernel;
         const cl::Device *const m_pdevice;
     public:
         PerceptronLearningAlgorithm(const cl::Device* const pdevice);
