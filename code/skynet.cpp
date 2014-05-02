@@ -196,4 +196,3 @@ void SkyNet::RunTests()
     }
 }
 
-
