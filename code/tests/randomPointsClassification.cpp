@@ -19,10 +19,23 @@ randomPointsClassification::randomPointsClassification(unsigned int N)
  */
 void randomPointsClassification::makeRandomFunction()
 {
-    // generate random points
-    // TODO: make sure clang complete C++11 works
-    nor
-    
+    std::uniform_real_distribution<float> ud(0.0f,1.0f);
+    std::random_device rd;
+
+    // First random point generation <min_x,rand_y>
+    float randval = ud(rd);
+    float r1x     = this->minX;
+    float r1y     = this->minY + (this->maxY - this->minY) * randval;
+
+    // second random point generation <max_x,rand_y>
+    randval = ud(rd);
+    float r2x = this->maxX;
+    float r2y = this->minY + (this->maxY - this->minY) * randval;
+
     // calculate A,B,C coefficients, where Ax + By + C = 0 
-    
+    // y = (y_2 - y_1)/(x_2 - x_1)*(x - x_1) <=>
+    // <=>  (x_2 - x_1)*y + (y_1 -y_2)*x + y_2*x_1 - y_1*x_1 = 0
+    this->A = r1y - r2y;
+    this->B = r2x - r1x;
+    this->C = r2y * r1x - r1y * r1x;
 }

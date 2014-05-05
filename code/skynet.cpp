@@ -5,7 +5,7 @@
 
 #include "skynet.h"
 #include "os_inc.h"
-
+#include "tests/randomPointsClassification.h"
 
 SkyNet::SkyNet(void)
 {
@@ -189,6 +189,7 @@ void SkyNet::LoadModules(std::string modulesDirectoryName)
 void SkyNet::RunTests()
 {
     // Just run all tests
+    randomPointsClassification rpc(100);
     std::vector<classificationModule>::iterator it; 
     for(it = m_classifiers.begin(); it != m_classifiers.end(); ++it) {
         printf("Running OCL test against: %s\n",it->module->About().c_str());

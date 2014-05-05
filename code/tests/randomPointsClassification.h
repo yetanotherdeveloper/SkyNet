@@ -8,7 +8,7 @@ class randomPointsClassification
     private:
         float minX,maxX;
         float minY,maxY;
-
+        float A,B,C;    //! Random line equation coefficients
     public:
         randomPointsClassification(unsigned int N);
     private:

@@ -15,7 +15,7 @@ if(${CMAKE_BUILD_TYPE} MATCHES Debug)
 add_definitions(-DDEBUG)
 endif()
 
-set(SOURCE main.cpp skynet.cpp)
+set(SOURCE main.cpp skynet.cpp tests/randomPointsClassification.cpp)
 include_directories(./)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES Linux)
