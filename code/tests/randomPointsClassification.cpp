@@ -34,6 +34,7 @@ randomPointsClassification::randomPointsClassification(unsigned int N)
         this->m_trainingSet.push_back(randPoint);
     }
 
+    initWeights();
 }
 
 /*! Idea is to take random two points on <min_x,rand_y> and <max_x,rand_y>
@@ -61,4 +62,14 @@ void randomPointsClassification::makeRandomFunction()
     m_C = r2y * r1x - r1y * r1x;
 
     SKYNET_DEBUG("Generated A=%f B=%f C=%f\n",m_A,m_B,m_C);
+}
+
+/*! Init weights
+ */
+void randomPointsClassification::initWeights()
+{
+    m_weights.w0 = 0.0f;
+    m_weights.w1 = 0.0f;
+    m_weights.w2 = 0.0f;
+    SKYNET_DEBUG("Initial weights: w0=%f w1=%f w2=%f\n",m_weights.w0,m_weights.w1,m_weights.w2);
 }

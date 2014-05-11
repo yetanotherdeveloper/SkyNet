@@ -62,6 +62,18 @@ compilation flags for building program are taken from device version passed to O
 \item handling or errors
 \end{itemize}
 
+There are modules delivering tests to be done and validating results.
+For example randomPointsClassification module. Its purpose is to:
+\begin{itemize}
+\item generated random input
+\item initalize weights
+\item validate generated weights eg. check if weights do well on testing example
+\item test generalization of selected hypothesis 
+\end{itemize}
+
+
+Where to deliver reference CPU implementation?
+
 
 \section{Usage Interface}
 SkyNet can be operated from command line. Options:
@@ -104,7 +116,9 @@ make copy_clang_complete
 \item Write points classification test
 \item Create Contexts assigned to given devices/platforms
 \item Mapping of errors(ints) to strings
-\item test clang\_complete corm changes to jump for declaration
+\item As for drawing animation out generated weights. We could make a global output buffer
+containing weights as they are being updated
+\item Create a module creating gnuplot charts/ generting scripts making a movie out of generated charts
 \item make gnuplot script generation of charts of learning steps , and make video out of it
 \item coding standard fixes:
 \begin{enumerate}
