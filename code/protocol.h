@@ -12,7 +12,8 @@ class ISkyNetClassificationProtocol
 public:
     virtual ~ISkyNetClassificationProtocol() {
     };
-    virtual void Run(void)                  = 0;
+    virtual void RunCL(void)                = 0;
+    virtual void RunRef(void)               = 0;
     virtual const std::string About() const = 0;
     std::string Identify()
     {

@@ -19,8 +19,15 @@ SupportVectorMachine::~SupportVectorMachine()
     //m_queue = NULL;
 }
 
-void SupportVectorMachine ::Run(){
+
+void SupportVectorMachine::RunCL(){
 }
+
+
+void SupportVectorMachine::RunRef(){
+}
+
+
 const std::string SupportVectorMachine::About() const
 {
     return m_about;

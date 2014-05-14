@@ -46,7 +46,11 @@ std::string PerceptronLearningAlgorithm::composeAboutString(const cl::Device* co
 }
 
 
-void PerceptronLearningAlgorithm::Run()
+void PerceptronLearningAlgorithm::RunRef()
+{
+}
+
+void PerceptronLearningAlgorithm::RunCL()
 {
     float testValue = 0.0f;
     m_plaKernel->setArg(0,&testValue);

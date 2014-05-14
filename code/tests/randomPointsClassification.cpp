@@ -16,6 +16,25 @@ randomPointsClassification::randomPointsClassification(unsigned int N)
 
     makeRandomFunction();
 
+    // Generate learning data
+    generateSet(m_trainingSet,N);
+    // Generate data for testing generalization
+    generateSet(m_testingSet,N);
+
+    initWeights();
+}
+
+
+const std::vector<point> & randomPointsClassification::getTrainingData()
+{
+    return m_trainingSet;
+}
+
+
+void randomPointsClassification::generateSet(std::vector<point> &set, unsigned int N)
+{
+    set.clear();
+
     // Get N random points
     std::uniform_real_distribution<float> randx(m_minX,m_maxX);
     std::uniform_real_distribution<float> randy(m_minY,m_maxY);
@@ -31,10 +50,9 @@ randomPointsClassification::randomPointsClassification(unsigned int N)
         // sign(A*x + B*y +C) where x,y are above chosen by random points
         randPoint.classification = (m_A * randPoint.x + m_B * randPoint.y + m_C >= 0.0f) ? 1 : -1;
         SKYNET_DEBUG("point[%d]: x=%f y=%f class=%d\n",i,randPoint.x,randPoint.y,randPoint.classification);
-        this->m_trainingSet.push_back(randPoint);
+        set.push_back(randPoint);
     }
 
-    initWeights();
 }
 
 /*! Idea is to take random two points on <min_x,rand_y> and <max_x,rand_y>

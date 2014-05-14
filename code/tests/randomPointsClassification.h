@@ -6,14 +6,15 @@
  *  tools to condact classification test of random data
  *
    !*/
+struct point {
+    float x;                        //! first coord of point
+    float y;                        //! second coord of point
+    int classification;             //! +1 or -1 meaning the classification area
+};
+
 class randomPointsClassification
 {
     private:
-        struct point {
-            float x;                //! first coord of point
-            float y;                //! second coord of point
-            int classification;     //! +1 or -1 meaning the classification area
-        };
         struct weights
         {
             float w0;
@@ -22,12 +23,15 @@ class randomPointsClassification
         };
         float              m_minX, m_maxX;
         float              m_minY, m_maxY;
-        float              m_A, m_B, m_C; //! Random line equation coefficients
-        weights            m_weights; 
+        float              m_A, m_B, m_C;     //! Random line equation coefficients
+        weights            m_weights;
         std::vector<point> m_trainingSet;
+        std::vector<point> m_testingSet;
     public:
         randomPointsClassification(unsigned int N);
+        const std::vector<point> & getTrainingData();
     private:
+        void generateSet(std::vector<point> &set, unsigned int N);
         void makeRandomFunction();
         void initWeights();
 };

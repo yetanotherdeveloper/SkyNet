@@ -193,7 +193,9 @@ void SkyNet::RunTests()
     std::vector<classificationModule>::iterator it; 
     for(it = m_classifiers.begin(); it != m_classifiers.end(); ++it) {
         printf("Running OCL test against: %s\n",it->module->About().c_str());
-        it->module->Run();
+        // Pass Input data , and initial weights to RunCL , RunRef functions 
+        //it->module->RunCL();
+        it->module->RunRef();
     }
 }
 
