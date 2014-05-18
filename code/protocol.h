@@ -7,14 +7,20 @@
 // Note: Module should export following function:
 //extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const pdevice)
 
+struct point {
+    float x;                        //! first coord of point
+    float y;                        //! second coord of point
+    int classification;             //! +1 or -1 meaning the classification area
+};
+
 class ISkyNetClassificationProtocol
 {
 public:
     virtual ~ISkyNetClassificationProtocol() {
     };
-    virtual void RunCL(void)                = 0;
-    virtual void RunRef(void)               = 0;
-    virtual const std::string About() const = 0;
+    virtual void RunCL(void)                         = 0;
+    virtual void RunRef(const std::vector<point> & ) = 0;
+    virtual const std::string About() const          = 0;
     std::string Identify()
     {
         return std::string("ISkyNetClassificationProtocol");

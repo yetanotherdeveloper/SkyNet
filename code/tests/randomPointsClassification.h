@@ -1,16 +1,12 @@
 #ifndef __RANDOM_POINTS_CLASSIFFICATION__
 #define __RANDOM_POINTS_CLASSIFFICATION__
 #include <vector>
+#include <protocol.h>
 /*! Object represting an instance of random point classification class
  *  that aims to deliver input, output data , verification and other
  *  tools to condact classification test of random data
  *
    !*/
-struct point {
-    float x;                        //! first coord of point
-    float y;                        //! second coord of point
-    int classification;             //! +1 or -1 meaning the classification area
-};
 
 class randomPointsClassification
 {

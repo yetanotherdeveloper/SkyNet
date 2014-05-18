@@ -24,7 +24,7 @@ void SupportVectorMachine::RunCL(){
 }
 
 
-void SupportVectorMachine::RunRef(){
+void SupportVectorMachine::RunRef(const std::vector<point> & trainingData){
 }
 
 

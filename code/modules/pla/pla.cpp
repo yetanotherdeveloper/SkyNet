@@ -45,10 +45,30 @@ std::string PerceptronLearningAlgorithm::composeAboutString(const cl::Device* co
     return aboutString;
 }
 
-
-void PerceptronLearningAlgorithm::RunRef()
+// routine to calculate classification and pick missclassiffied point
+point& PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point> & trainingData)
 {
+
 }
+
+
+// TODO: move this constant to some other area or make it derived based on number of training  points
+#define MAX_ITERATIONS 100000
+void PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData)
+{
+    // This is where learning takes place
+    
+    // w(k+1) = w(k) + y(j)x(j)
+    
+    for(int i=0; i< MAX_ITERATIONS ; ++i) {
+       // get random misclassified point 
+       // update weight
+
+    } 
+
+
+}
+
 
 void PerceptronLearningAlgorithm::RunCL()
 {

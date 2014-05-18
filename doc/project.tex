@@ -71,12 +71,12 @@ For example randomPointsClassification module. Its purpose is to:
 \item test generalization of selected hypothesis 
 \end{itemize}
 
-
 Where to deliver reference CPU implementation? I think good place for CPU reference implementation is module itself.
 So Protocol will be extended with method RunReferencePLA
 
 Classification test instance will give a reference to const training object 
-
+Next Step:
+Implement weights container
 
 \section{Usage Interface}
 SkyNet can be operated from command line. Options:
@@ -104,7 +104,6 @@ make copy_clang_complete
 \end{verbatim}
 
 
-
 \section{TODO}
 \begin{itemize}
 \item Make exceptions,errors handling for SKyNetOpenCLHelper module
@@ -112,6 +111,7 @@ make copy_clang_complete
 \item make common module handling init of opencl and kernel/program building
 \item Make a git branches: master and milestone(release)
 \item make/lear proper c++ exceptions usage to handle errors of OpenCL initialization
+\item add support for initializing weights to zero or random
 \item Write a report that clang complete works badly with C++ openCL
 \item each module should provide also CPU plain implementation of algorithm
 \item Modules are algorithms and Devices( hardware layer) are to be initialized in SkyNet core

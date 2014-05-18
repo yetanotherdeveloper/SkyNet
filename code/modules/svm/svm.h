@@ -21,7 +21,7 @@ class SupportVectorMachine : public ISkyNetClassificationProtocol
         SupportVectorMachine(const cl::Device* const pdevice);
         ~SupportVectorMachine();
         void RunCL();
-        void RunRef();
+        void RunRef(const std::vector<point> & trainingData);
         void About();
         const std::string About() const;
 };
