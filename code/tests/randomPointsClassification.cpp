@@ -86,8 +86,8 @@ void randomPointsClassification::makeRandomFunction()
  */
 void randomPointsClassification::initWeights()
 {
-    m_weights.w0 = 0.0f;
-    m_weights.w1 = 0.0f;
-    m_weights.w2 = 0.0f;
-    SKYNET_DEBUG("Initial weights: w0=%f w1=%f w2=%f\n",m_weights.w0,m_weights.w1,m_weights.w2);
+    m_weights.push_back(0.0f);  //w0
+    m_weights.push_back(0.0f);  //w1
+    m_weights.push_back(0.0f);  //w2
+    SKYNET_DEBUG("Initial weights: w0=%f w1=%f w2=%f\n",m_weights[0],m_weights[1],m_weights[2]);
 }

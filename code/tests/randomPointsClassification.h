@@ -11,16 +11,10 @@
 class randomPointsClassification
 {
     private:
-        struct weights
-        {
-            float w0;
-            float w1;
-            float w2;
-        };
         float              m_minX, m_maxX;
         float              m_minY, m_maxY;
         float              m_A, m_B, m_C;     //! Random line equation coefficients
-        weights            m_weights;
+        std::vector<float> m_weights;
         std::vector<point> m_trainingSet;
         std::vector<point> m_testingSet;
     public:

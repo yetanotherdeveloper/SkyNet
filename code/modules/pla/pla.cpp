@@ -45,28 +45,47 @@ std::string PerceptronLearningAlgorithm::composeAboutString(const cl::Device* co
     return aboutString;
 }
 
-// routine to calculate classification and pick missclassiffied point
-point& PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point> & trainingData)
-{
 
+int PerceptronLearningAlgorithm::classifyPoint(const point &rpoint, float &w0, float &w1, float &w2)
+{
+    return rpoint.x * w1 + w2 * rpoint.y + w0 >= 0.0f ? 1 : -1;
+}
+
+
+// routine to calculate classification and pick missclassiffied point
+bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point> & trainingData, float &w0, float &w1, float &w2, point* output)
+{
+    std::vector<point>::iterator it;
+    for(it = trainingData.begin(); it != trainingData.end(); ++it) {
+
+        if( classifyPoint( (*it),w0,w1,w2) * it->classification < 0)
+        {
+            output = &(*it);
+            return true;
+        }
+    }
+    return false;
 }
 
 
 // TODO: move this constant to some other area or make it derived based on number of training  points
-#define MAX_ITERATIONS 100000
-void PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData)
+void PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, float &w0, float &w1, float &w2)
 {
-    // This is where learning takes place
-    
     // w(k+1) = w(k) + y(j)x(j)
-    
-    for(int i=0; i< MAX_ITERATIONS ; ++i) {
-       // get random misclassified point 
-       // update weight
-
+    const int max_iterations = 1000*trainingData.size();
+    point misclassified;
+    int i=0;
+    bool finish = false;
+    while((i<MAX_ITERATIONS)&&(finish == false))  {
+        finish = !getMisclassifiedPoint(trainingData,w0,w1,w2,&misclassified);
+        if(finish == false) {
+            // update weights        
+            ++i;
+        }
     } 
-
-
+    if(finish == false) {
+        printf("Warning: Perceptron Learning alogorithm exhusted all iterations. This may mean that data is not lineary separable or not enough iterations is allowed!\n");
+    }
 }
 
 
