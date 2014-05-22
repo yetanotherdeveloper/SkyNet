@@ -195,7 +195,7 @@ void SkyNet::RunTests()
         printf("Running OCL test against: %s\n",it->module->About().c_str());
         // Pass Input data , and initial weights to RunCL , RunRef functions 
         //it->module->RunCL();
-        it->module->RunRef(rpc.getTrainingData());
+        it->module->RunRef(rpc.getTrainingData(),rpc.getWeights());
     }
 }
 

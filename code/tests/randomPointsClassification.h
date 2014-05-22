@@ -20,6 +20,7 @@ class randomPointsClassification
     public:
         randomPointsClassification(unsigned int N);
         const std::vector<point> & getTrainingData();
+        const std::vector<point> & getWeights();
     private:
         void generateSet(std::vector<point> &set, unsigned int N);
         void makeRandomFunction();

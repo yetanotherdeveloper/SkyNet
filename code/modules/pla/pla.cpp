@@ -46,19 +46,19 @@ std::string PerceptronLearningAlgorithm::composeAboutString(const cl::Device* co
 }
 
 
-int PerceptronLearningAlgorithm::classifyPoint(const point &rpoint, float &w0, float &w1, float &w2)
+int PerceptronLearningAlgorithm::classifyPoint(const point &rpoint)
 {
-    return rpoint.x * w1 + w2 * rpoint.y + w0 >= 0.0f ? 1 : -1;
+    return rpoint.x * m_weights[1] + m_weights[2] * rpoint.y + m_weights[0] >= 0.0f ? 1 : -1;
 }
 
 
 // routine to calculate classification and pick missclassiffied point
-bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point> & trainingData, float &w0, float &w1, float &w2, point* output)
+bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point> & trainingData, point* output)
 {
     std::vector<point>::iterator it;
     for(it = trainingData.begin(); it != trainingData.end(); ++it) {
 
-        if( classifyPoint( (*it),w0,w1,w2) * it->classification < 0)
+        if( classifyPoint(*it) * it->classification < 0)
         {
             output = &(*it);
             return true;
@@ -68,18 +68,26 @@ bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point>
 }
 
 
-// TODO: move this constant to some other area or make it derived based on number of training  points
-void PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, float &w0, float &w1, float &w2)
+// Update weights according the rule: w_k+1 <-- w_k + y_t*x_t
+void PerceptronLearningAlgorithm::updateWeights(point& rpoint)
 {
-    // w(k+1) = w(k) + y(j)x(j)
+   m_weights[0] = m_weights[0] + (float)rpoint.classification; 
+   m_weights[1] = m_weights[1] + (float)rpoint.classification*rpoint.x; 
+   m_weights[2] = m_weights[2] + (float)rpoint.classification*rpoint.y; 
+}
+
+// TODO: move this constant to some other area or make it derived based on number of training  points
+void PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights)              
+{
+    m_weights = initial_weights;
     const int max_iterations = 1000*trainingData.size();
-    point misclassified;
+    point* misclassified = nullptr;
     int i=0;
     bool finish = false;
-    while((i<MAX_ITERATIONS)&&(finish == false))  {
-        finish = !getMisclassifiedPoint(trainingData,w0,w1,w2,&misclassified);
+    while((i<max_iterations)&&(finish == false))  {
+        finish = !getMisclassifiedPoint(trainingData,misclassified);
         if(finish == false) {
-            // update weights        
+            updateWeights(misclassified);
             ++i;
         }
     } 

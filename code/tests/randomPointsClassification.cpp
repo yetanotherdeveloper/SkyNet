@@ -25,6 +25,12 @@ randomPointsClassification::randomPointsClassification(unsigned int N)
 }
 
 
+const std::vector<point> & randomPointsClassification::getWeights()
+{
+    return m_weights;
+}
+
+
 const std::vector<point> & randomPointsClassification::getTrainingData()
 {
     return m_trainingSet;
@@ -91,3 +97,4 @@ void randomPointsClassification::initWeights()
     m_weights.push_back(0.0f);  //w2
     SKYNET_DEBUG("Initial weights: w0=%f w1=%f w2=%f\n",m_weights[0],m_weights[1],m_weights[2]);
 }
+
