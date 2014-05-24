@@ -15,16 +15,18 @@ SupportVectorMachine::~SupportVectorMachine()
 {
     //delete m_context;
     //m_context = NULL;
-    //delete m_queue; 
+    //delete m_queue;
     //m_queue = NULL;
 }
 
 
-void SupportVectorMachine::RunCL(){
+void SupportVectorMachine::RunCL()
+{
 }
 
 
-void SupportVectorMachine::RunRef(const std::vector<point> & trainingData){
+const std::vector<float> & SupportVectorMachine::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights)
+{
 }
 
 

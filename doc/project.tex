@@ -76,7 +76,8 @@ So Protocol will be extended with method RunReferencePLA
 
 Classification test instance will give a reference to const training object 
 Next Step:
-updating weights
+consider unique pointer instead normal one
+Implement charts generation and dumping data
 
 \section{Usage Interface}
 SkyNet can be operated from command line. Options:
@@ -116,7 +117,6 @@ make copy_clang_complete
 \item each module should provide also CPU plain implementation of algorithm
 \item Modules are algorithms and Devices( hardware layer) are to be initialized in SkyNet core
 \item Command Line parser (use gnuopt)
-\item Write points classification test
 \item Create Contexts assigned to given devices/platforms
 \item Mapping of errors(ints) to strings
 \item As for drawing animation out generated weights. We could make a global output buffer
@@ -127,6 +127,7 @@ containing weights as they are being updated
 \begin{enumerate}
 \item empty functions , braces in the same line
 \item force space removal in args of function call
+\item brace after for loop is not moved to new line
 \end{enumerate}
 \end{itemize}
 

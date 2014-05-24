@@ -25,9 +25,49 @@ randomPointsClassification::randomPointsClassification(unsigned int N)
 }
 
 
-const std::vector<point> & randomPointsClassification::getWeights()
+const std::vector<float> & randomPointsClassification::getWeights()
 {
     return m_weights;
+}
+
+
+void randomPointsClassification::setWeights(const std::vector<float> &weights)
+{
+    m_weights = weights;
+}
+
+/// Validate input weights through training sets 
+unsigned int randomPointsClassification::validate()
+{
+    return getErrorRate(m_trainingSet,m_weights);
+}
+
+
+/*! Verification: calculate out of sample error eg. calculate error using 
+ *samples set not used for training
+*/
+unsigned int randomPointsClassification::verify()
+{
+    return getErrorRate(m_testingSet,m_weights);
+}
+
+/*!  Caluculate error of learning 
+ * by iterating through traiing set and comparing its learned classification with 
+ * the one used for learning. if they are diffrent then increase error rate
+ */
+unsigned int randomPointsClassification::getErrorRate(const std::vector<point> &samples, const std::vector<float> &weights)
+{
+    unsigned int                       error_rate = 0;
+    std::vector<point>::const_iterator it;
+
+    for(it = samples.begin(); it != samples.end(); ++it)
+    {
+        if( classifyPoint(*it,weights) != it->classification)
+        {
+            ++error_rate;
+        }
+    }
+    return error_rate;
 }
 
 
@@ -35,6 +75,14 @@ const std::vector<point> & randomPointsClassification::getTrainingData()
 {
     return m_trainingSet;
 }
+
+
+/// sign(A*x + B*y +C) where x,y are above chosen by random points
+int randomPointsClassification::classifyPoint(const point& sample, const std::vector<float> &weights)
+{
+    return (weights[1] * sample.x + weights[2] * sample.y + weights[0] >= 0.0f) ? 1 : -1;
+}
+
 
 
 void randomPointsClassification::generateSet(std::vector<point> &set, unsigned int N)
@@ -53,8 +101,7 @@ void randomPointsClassification::generateSet(std::vector<point> &set, unsigned i
         randPoint.x = randx(rd);
         randPoint.y = randy(rd);
         // get its classification value eg.
-        // sign(A*x + B*y +C) where x,y are above chosen by random points
-        randPoint.classification = (m_A * randPoint.x + m_B * randPoint.y + m_C >= 0.0f) ? 1 : -1;
+        randPoint.classification = classifyPoint(randPoint,m_fweights);
         SKYNET_DEBUG("point[%d]: x=%f y=%f class=%d\n",i,randPoint.x,randPoint.y,randPoint.classification);
         set.push_back(randPoint);
     }
@@ -81,11 +128,11 @@ void randomPointsClassification::makeRandomFunction()
     // calculate A,B,C coefficients, where Ax + By + C = 0
     // y = (y_2 - y_1)/(x_2 - x_1)*(x - x_1) <=>
     // <=>  (x_2 - x_1)*y + (y_1 -y_2)*x + y_2*x_1 - y_1*x_1 = 0
-    m_A = r1y - r2y;
-    m_B = r2x - r1x;
-    m_C = r2y * r1x - r1y * r1x;
+    m_fweights.push_back(r2y * r1x - r1y * r1x);    //C
+    m_fweights.push_back(r1y - r2y);                //A
+    m_fweights.push_back(r2x - r1x);                //B
 
-    SKYNET_DEBUG("Generated A=%f B=%f C=%f\n",m_A,m_B,m_C);
+    SKYNET_DEBUG("Generated (target) w0=%f w1=%f w2=%f\n",m_fweights[0],m_fweights[1],m_fweights[2]);
 }
 
 /*! Init weights

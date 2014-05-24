@@ -53,14 +53,14 @@ int PerceptronLearningAlgorithm::classifyPoint(const point &rpoint)
 
 
 // routine to calculate classification and pick missclassiffied point
-bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point> & trainingData, point* output)
+bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point> & trainingData, const point** output)
 {
-    std::vector<point>::iterator it;
+    std::vector<point>::const_iterator it;
     for(it = trainingData.begin(); it != trainingData.end(); ++it) {
 
         if( classifyPoint(*it) * it->classification < 0)
         {
-            output = &(*it);
+            *output = &(*it);
             return true;
         }
     }
@@ -69,7 +69,7 @@ bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point>
 
 
 // Update weights according the rule: w_k+1 <-- w_k + y_t*x_t
-void PerceptronLearningAlgorithm::updateWeights(point& rpoint)
+void PerceptronLearningAlgorithm::updateWeights(const point& rpoint)
 {
    m_weights[0] = m_weights[0] + (float)rpoint.classification; 
    m_weights[1] = m_weights[1] + (float)rpoint.classification*rpoint.x; 
@@ -77,23 +77,24 @@ void PerceptronLearningAlgorithm::updateWeights(point& rpoint)
 }
 
 // TODO: move this constant to some other area or make it derived based on number of training  points
-void PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights)              
+const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights)              
 {
     m_weights = initial_weights;
     const int max_iterations = 1000*trainingData.size();
-    point* misclassified = nullptr;
+    const point* misclassified = nullptr;
     int i=0;
     bool finish = false;
     while((i<max_iterations)&&(finish == false))  {
-        finish = !getMisclassifiedPoint(trainingData,misclassified);
+        finish = !getMisclassifiedPoint(trainingData,&misclassified);
         if(finish == false) {
-            updateWeights(misclassified);
+            updateWeights(*misclassified);
             ++i;
         }
     } 
     if(finish == false) {
         printf("Warning: Perceptron Learning alogorithm exhusted all iterations. This may mean that data is not lineary separable or not enough iterations is allowed!\n");
     }
+    return m_weights;
 }
 
 

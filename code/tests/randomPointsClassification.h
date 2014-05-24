@@ -13,17 +13,22 @@ class randomPointsClassification
     private:
         float              m_minX, m_maxX;
         float              m_minY, m_maxY;
-        float              m_A, m_B, m_C;     //! Random line equation coefficients
-        std::vector<float> m_weights;
+        std::vector<float> m_fweights;      /// target function weights
+        std::vector<float> m_weights;       /// hypotesis weights
         std::vector<point> m_trainingSet;
         std::vector<point> m_testingSet;
     public:
         randomPointsClassification(unsigned int N);
         const std::vector<point> & getTrainingData();
-        const std::vector<point> & getWeights();
+        const std::vector<float> & getWeights();
+        void setWeights(const std::vector<float> &weights);
+        unsigned int validate();
+        unsigned int verify();
     private:
+        unsigned int getErrorRate(const std::vector<point> &samples, const std::vector<float> &weights);
         void generateSet(std::vector<point> &set, unsigned int N);
         void makeRandomFunction();
         void initWeights();
+        int classifyPoint(const point& sample, const std::vector<float> &weights);
 };
 #endif //__RANDOM_POINTS_CLASSIFFICATION__

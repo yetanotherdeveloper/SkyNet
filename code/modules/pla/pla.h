@@ -24,13 +24,13 @@ class PerceptronLearningAlgorithm : public ISkyNetClassificationProtocol
         PerceptronLearningAlgorithm(const cl::Device* const pdevice);
         ~PerceptronLearningAlgorithm();
         void RunCL();
-        void RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights);              
+        const std::vector<float> & RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights);              
         const std::string About() const;
         static std::string composeAboutString(const cl::Device* const pdevice);
     private:
         int  classifyPoint(const point &rpoint);
-        void updateWeights(point& rpoint);
-        bool getMisclassifiedPoint(const std::vector<point> & trainingData, point* output);
+        void updateWeights(const point& rpoint);
+        bool getMisclassifiedPoint(const std::vector<point> & trainingData, const point** output);
 };
 #endif //__PLA__
 

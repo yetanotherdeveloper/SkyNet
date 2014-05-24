@@ -192,10 +192,11 @@ void SkyNet::RunTests()
     randomPointsClassification rpc(100);
     std::vector<classificationModule>::iterator it; 
     for(it = m_classifiers.begin(); it != m_classifiers.end(); ++it) {
-        printf("Running OCL test against: %s\n",it->module->About().c_str());
+        SKYNET_INFO("Running OCL test against: %s\n",it->module->About().c_str());
         // Pass Input data , and initial weights to RunCL , RunRef functions 
         //it->module->RunCL();
-        it->module->RunRef(rpc.getTrainingData(),rpc.getWeights());
+        rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),rpc.getWeights()));
+        SKYNET_INFO("In-sample error: %u Out-of-sample error: %u\n",rpc.validate(),rpc.verify()); 
     }
 }
 
