@@ -48,12 +48,28 @@ SkyNet holds lists of diffrent types of modules eg. classifiers (PLA, SVM)
 
 Tests for diffrent devices to be run on separate threads
 
+Test modules will conduct/implement testing scenarios like. randomClassification etc. Module will return training samples,
+performa validation, verification 
+
 So, module will be given data and commandqueue to send kernel to, context and device that compilation is taking place against
 
 There will be a module handling OpenCL :
 Implementing SkyNetOpenCLHelper module , which is opencl interacting routines to creat context, buildp rograms, kernels etc. and handling errors
 
+
+Charts module. Module to generate , dump data. Can also draw gnuplot script.
+Scheme of working:
+\begin{enumerate}
+\item Each module may have its instance
+\item Constructor to create directory: module about string + PID
+\item We put history of flags and for each weights that will be dumped and charts can be generated for them
+\item Generation of movie by script is also to be done
+\end{enumerate}
+
 compilation flags for building program are taken from device version passed to OpenCL Helper module
+
+
+
 
 \begin{itemize}
 \item creation of command queue
@@ -69,6 +85,8 @@ For example randomPointsClassification module. Its purpose is to:
 \item initalize weights
 \item validate generated weights eg. check if weights do well on testing example
 \item test generalization of selected hypothesis 
+\item Training Points can also be stored
+\item test module also to have Diagnostic class instance so to have picture of generalization
 \end{itemize}
 
 Where to deliver reference CPU implementation? I think good place for CPU reference implementation is module itself.

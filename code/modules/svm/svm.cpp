@@ -29,6 +29,9 @@ const std::vector<float> & SupportVectorMachine::RunRef(const std::vector<point>
 {
 }
 
+bool SupportVectorMachine::makeDiagnostic()
+{
+}
 
 const std::string SupportVectorMachine::About() const
 {

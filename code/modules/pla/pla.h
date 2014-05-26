@@ -20,6 +20,7 @@ class PerceptronLearningAlgorithm : public ISkyNetClassificationProtocol
         std::unique_ptr<cl::Kernel> m_plaKernel;
         const cl::Device *const m_pdevice;
         std::vector<float> m_weights;
+        std::unique_ptr<SkyNetDiagnostic> m_diagnostic;
     public:
         PerceptronLearningAlgorithm(const cl::Device* const pdevice);
         ~PerceptronLearningAlgorithm();
@@ -27,6 +28,7 @@ class PerceptronLearningAlgorithm : public ISkyNetClassificationProtocol
         const std::vector<float> & RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights);              
         const std::string About() const;
         static std::string composeAboutString(const cl::Device* const pdevice);
+        bool makeDiagnostic();
     private:
         int  classifyPoint(const point &rpoint);
         void updateWeights(const point& rpoint);

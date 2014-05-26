@@ -26,6 +26,8 @@ class SkyNetOS
     public:
         static ISkyNetClassificationProtocol* LoadModule(std::string moduleName, void** plibHandle,const cl::Device *const pdevice); 
         static void ReleaseModule(ISkyNetClassificationProtocol** pModule,void** pLibHandle);
+        static unsigned int getPID();
+        static bool CreateDirectory(const std::string& dirname);
 };
 
 

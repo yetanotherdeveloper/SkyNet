@@ -152,7 +152,7 @@ void SkyNet::LoadModules(std::string modulesDirectoryName)
     modules_dir = opendir(modulesDirectoryName.c_str() );
     if(modules_dir != NULL) {
         while( (entry = readdir(modules_dir) ) != NULL) {
-            SKYNET_DEBUG("Potential module: %s\n",entry->d_name);
+            //SKYNET_DEBUG("Potential module: %s\n",entry->d_name);
             switch(entry->d_type) {
             // regular file, check if this is DSO and load
             case DT_REG:
@@ -197,6 +197,7 @@ void SkyNet::RunTests()
         //it->module->RunCL();
         rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),rpc.getWeights()));
         SKYNET_INFO("In-sample error: %u Out-of-sample error: %u\n",rpc.validate(),rpc.verify()); 
+        it->module->makeDiagnostic();
     }
 }
 
