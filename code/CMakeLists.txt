@@ -17,6 +17,7 @@ endif()
 
 set(SOURCE main.cpp skynet.cpp tests/randomPointsClassification.cpp)
 include_directories(./)
+include_directories(./../)  # external headers (opencl) lies here
 
 if(${CMAKE_SYSTEM_NAME} MATCHES Linux)
 include_directories(./os/linux)
@@ -33,11 +34,13 @@ foreach(subdir ${subdirs_list})
     add_subdirectory(${subdir}) 
 endforeach(subdir)
 
-find_package(OpenCL)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+find_library(OPENCL_LIB OpenCL PATHS lib/opencl)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+find_library(OPENCL_LIB OpenCL PATHS /usr/lib)
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 include(./cmake/copy_clang_complete.cmake )
-message("OpenCL incs: ${OPENCL_INCLUDE_DIRS}")
-include_directories(${OPENCL_INCLUDE_DIRS})
 
 add_executable(SkyNet ${SOURCE})
-target_link_libraries(SkyNet dl ${OPENCL_LIBRARIES})
+target_link_libraries(SkyNet dl ${OPENCL_LIB})

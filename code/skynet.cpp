@@ -130,7 +130,13 @@ void SkyNet::InitDevices()
 
         if( plat_it->getDevices(CL_DEVICE_TYPE_GPU, &m_devices ) == CL_SUCCESS ) {
             (devices.begin())->getInfo(CL_DEVICE_NAME, &device_param_string_value);
-            SKYNET_INFO(" HARDCODED GPU DEVICE to be usoed (temporary)  Device: %s\n",device_param_string_value.c_str());
+            SKYNET_INFO(" HARDCODED GPU DEVICE to be used (temporary)  Device: %s\n",device_param_string_value.c_str());
+            return;
+        }
+
+        if( plat_it->getDevices(CL_DEVICE_TYPE_ALL, &m_devices ) == CL_SUCCESS ) {
+            (devices.begin())->getInfo(CL_DEVICE_NAME, &device_param_string_value);
+            SKYNET_INFO(" Chosen DEVICE to be used (temporary)  Device: %s\n",device_param_string_value.c_str());
             return;
         }
     }
@@ -195,7 +201,7 @@ void SkyNet::RunTests()
         SKYNET_INFO("Running OCL test against: %s\n",it->module->About().c_str());
         // Pass Input data , and initial weights to RunCL , RunRef functions 
         //it->module->RunCL();
-        rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),rpc.getWeights()));
+        rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),rpc.getInitialWeights()));
         SKYNET_INFO("In-sample error: %u Out-of-sample error: %u\n",rpc.validate(),rpc.verify()); 
         it->module->makeDiagnostic();
     }

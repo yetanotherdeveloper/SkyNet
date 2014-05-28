@@ -17,6 +17,7 @@ class SupportVectorMachine : public ISkyNetClassificationProtocol
         cl::Context *m_context;
         cl::CommandQueue *m_queue;
         const cl::Device *const m_pdevice;
+        std::vector<float> m_weights;
     public:
         SupportVectorMachine(const cl::Device* const pdevice);
         ~SupportVectorMachine();

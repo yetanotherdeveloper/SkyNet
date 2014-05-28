@@ -15,12 +15,14 @@ class randomPointsClassification
         float              m_minY, m_maxY;
         std::vector<float> m_fweights;      /// target function weights
         std::vector<float> m_weights;       /// hypotesis weights
+        std::vector<float> m_iweights;       /// initial weights (weights to start with)
         std::vector<point> m_trainingSet;
         std::vector<point> m_testingSet;
     public:
         randomPointsClassification(unsigned int N);
         const std::vector<point> & getTrainingData();
         const std::vector<float> & getWeights();
+        const std::vector<float> & getInitialWeights();
         void setWeights(const std::vector<float> &weights);
         unsigned int validate();
         unsigned int verify();
