@@ -63,10 +63,14 @@ bool SkyNetOS::CreateDirectory(const std::string& dirname)
     {
         SKYNET_DEBUG("Directory: %s created\n",dirname.c_str() );
         return true;
+    } else {
+        // If directory already exists then it is fine as well!
+        if(errno == EEXIST) {
+            SKYNET_DEBUG("Directory: %s already exists!\n",dirname.c_str() );
+            return true;
+        }
     }
-
     perror("Error creating directory: ");
     return false;
-
 }
 

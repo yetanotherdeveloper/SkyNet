@@ -194,6 +194,8 @@ void SkyNet::LoadModules(std::string modulesDirectoryName)
 
 void SkyNet::RunTests()
 {
+    // diagnostic results are stored in directory named after process ID
+    SkyNetDiagnostic diagnostic;
     // Just run all tests
     randomPointsClassification rpc(100);
     std::vector<classificationModule>::iterator it; 
@@ -201,9 +203,9 @@ void SkyNet::RunTests()
         SKYNET_INFO("Running OCL test against: %s\n",it->module->About().c_str());
         // Pass Input data , and initial weights to RunCL , RunRef functions 
         //it->module->RunCL();
-        rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),rpc.getInitialWeights()));
+        rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),rpc.getInitialWeights(),diagnostic));
         SKYNET_INFO("In-sample error: %u Out-of-sample error: %u\n",rpc.validate(),rpc.verify()); 
-        it->module->makeDiagnostic();
+        diagnostic.dumpWeights(it->module->About()); 
     }
 }
 

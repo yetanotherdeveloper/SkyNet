@@ -25,15 +25,12 @@ void SupportVectorMachine::RunCL()
 }
 
 
-const std::vector<float> & SupportVectorMachine::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights)
+const std::vector<float> & SupportVectorMachine::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,
+                                                        SkyNetDiagnostic &diagnostic)
 {
     return m_weights;
 }
 
-bool SupportVectorMachine::makeDiagnostic()
-{
-    return true;
-}
 
 const std::string SupportVectorMachine::About() const
 {

@@ -73,10 +73,9 @@ std::unique_ptr<cl::Kernel> SkyNetOpenCLHelper::makeKernels(const cl::Context &c
 }
 
 //---> SkyNetDiagnostic definitions
-SkyNetDiagnostic::SkyNetDiagnostic(const std::string &partialName)
+SkyNetDiagnostic::SkyNetDiagnostic()
 {
-    // Generate Full name <-- partialName + PID (process ID)
-    m_dumpDirName = partialName + std::string("_") + std::to_string(SkyNetOS::getPID() );
+    m_dumpDirName = std::to_string(SkyNetOS::getPID() );
 }
 
 
@@ -92,17 +91,21 @@ void SkyNetDiagnostic::storeWeights(const std::vector<float> &weights)
 
 
 // TODO: portable way of creating directories
-void SkyNetDiagnostic::dumpWeights()
+void SkyNetDiagnostic::dumpWeights(const std::string& dirName)
 {
     if(m_historyOfWeights.empty() )
     {
         printf("Error: There is no weights to be dumped\n");
         return;
     }
-    // create directory, do some check if this is allowed
+    // create PID directory, do some check if this is allowed
     SkyNetOS::CreateDirectory(m_dumpDirName);
+
+    // create PID directory, do some check if this is allowed
+    SkyNetOS::CreateDirectory(m_dumpDirName + "/" + dirName);
+
     // dump weights with proper comments ofcourse as a first line
-    std::ofstream dumpfile(m_dumpDirName + "/weights.txt", std::ios::trunc);
+    std::ofstream dumpfile(m_dumpDirName + "/" + dirName + "/weights.txt", std::ios::trunc);
     dumpfile << "#";
     // Knowing that weights history contains some entries
     // we check the first entry to see how many weights was there
@@ -123,6 +126,14 @@ void SkyNetDiagnostic::dumpWeights()
         }
         dumpfile << std::endl;
     }
+}
+
+
+void SkyNetDiagnostic::makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & trainingSet,
+                                            const std::vector<float> &targetWeights,const std::vector<float> &learnedweights)
+{
+    // Generate gnuplot script drawing a validation chart
+    // presenting points as well as target function and learned(trained) function
 }
 
 

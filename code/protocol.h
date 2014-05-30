@@ -14,21 +14,22 @@ struct point {
 };
 
 
-class ISkyNetClassificationProtocol
+class SkyNetDiagnostic
 {
+private:
+    std::vector<std::vector<float> > m_historyOfWeights;    /// Weights assuming that in chronological
+                                                            /// order First one is the oldest(earliest) iteration
+    std::string m_dumpDirName;                              /// Directory where gathered/generated data will be stored
 public:
-    virtual ~ISkyNetClassificationProtocol() {
-    };
-    virtual void RunCL(void)                                                                          = 0;
-    virtual const std::vector<float> & RunRef(const std::vector<point> &, const std::vector<float> &) = 0;
-    virtual const std::string About() const                                                           = 0;
-    virtual bool makeDiagnostic()                                                                     = 0;
-    std::string Identify()
-    {
-        return std::string("ISkyNetClassificationProtocol");
-    }
+    SkyNetDiagnostic();
+    ~SkyNetDiagnostic();
+    void storeWeights(const std::vector<float> &weights);
+    void dumpWeights(const std::string& dirName);
+    void makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & trainingSet,
+                              const std::vector<float> &targetWeights,const std::vector<float> &learnedweights);
 };
 
+typedef void (SkyNetDiagnostic::*fp_storeWeights)(const std::vector<float> &weights);
 
 class SkyNetOpenCLHelper
 {
@@ -41,17 +42,22 @@ public:
 };
 
 
-class SkyNetDiagnostic
+class ISkyNetClassificationProtocol
 {
 private:
     std::vector<std::vector<float> > m_historyOfWeights;    /// Weights assuming that in chronological
                                                             /// order First one is the oldest(earliest) iteration
     std::string m_dumpDirName;                              /// Directory where gathered/generated data will be stored
 public:
-    SkyNetDiagnostic(const std::string & partialName);
-    ~SkyNetDiagnostic();
-    void storeWeights(const std::vector<float> &weights);
-    void dumpWeights();
+    virtual ~ISkyNetClassificationProtocol() {
+    };
+    virtual void RunCL(void)                                                                                               = 0;
+    virtual const std::vector<float> & RunRef(const std::vector<point> &, const std::vector<float> &, SkyNetDiagnostic & ) = 0;
+    virtual const std::string About() const                                                                                = 0;
+    std::string Identify()
+    {
+        return std::string("ISkyNetClassificationProtocol");
+    }
 };
 #endif //__SKYNET_PROTOCOL__
 

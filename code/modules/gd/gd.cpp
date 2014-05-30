@@ -31,7 +31,6 @@ GradientDescent::GradientDescent(const cl::Device* const pdevice) : m_about(Grad
 
     m_plaKernel = SkyNetOpenCLHelper::makeKernels(*m_pContext, *pdevice, kernelSource, "dodaj" );
 
-    m_diagnostic =  std::unique_ptr<SkyNetDiagnostic>(new SkyNetDiagnostic(GradientDescent::composeAboutString(pdevice)));
     //TODO: error handling section
 
 }
@@ -73,16 +72,16 @@ bool GradientDescent::updateWeights(const std::vector<point> & trainingData)
 
 
 // TODO: move this constant to some other area or make it derived based on number of training  points
-const std::vector<float> & GradientDescent::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights)              
+const std::vector<float> & GradientDescent::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,SkyNetDiagnostic &diagnostic)              
 {
     m_weights = initial_weights;
     const int max_iterations = 1000*trainingData.size();
     int i=0;
     bool finish = false;
-    m_diagnostic->storeWeights(m_weights);
+    diagnostic.storeWeights(m_weights);
     while((i<max_iterations)&&(finish == false))  {
         finish = updateWeights(trainingData);
-        m_diagnostic->storeWeights(m_weights);
+        diagnostic.storeWeights(m_weights);
         if(finish == false) {
             ++i;
         }
@@ -99,12 +98,6 @@ void GradientDescent::RunCL()
     float testValue = 0.0f;
     m_plaKernel->setArg(0,&testValue);
     m_pCommandQueue->enqueueTask(*m_plaKernel);
-}
-
-
-bool GradientDescent::makeDiagnostic()
-{
-    m_diagnostic->dumpWeights();
 }
 
 

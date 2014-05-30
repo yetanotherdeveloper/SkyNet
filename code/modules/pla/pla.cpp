@@ -31,7 +31,6 @@ PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const
 
     m_plaKernel = SkyNetOpenCLHelper::makeKernels(*m_pContext, *pdevice, kernelSource, "dodaj" );
 
-    m_diagnostic =  std::unique_ptr<SkyNetDiagnostic>(new SkyNetDiagnostic(PerceptronLearningAlgorithm::composeAboutString(pdevice)));
     //TODO: error handling section
 
 }
@@ -77,19 +76,20 @@ void PerceptronLearningAlgorithm::updateWeights(const point& rpoint)
 }
 
 // TODO: move this constant to some other area or make it derived based on number of training  points
-const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights)              
+const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,
+                                                               SkyNetDiagnostic &diagnostic)              
 {
     m_weights = initial_weights;
     const int max_iterations = 1000*trainingData.size();
     const point* misclassified = nullptr;
     int i=0;
     bool finish = false;
-    m_diagnostic->storeWeights(m_weights);
+    diagnostic.storeWeights(m_weights);
     while((i<max_iterations)&&(finish == false))  {
         finish = !getMisclassifiedPoint(trainingData,&misclassified);
         if(finish == false) {
             updateWeights(*misclassified);
-            m_diagnostic->storeWeights(m_weights);
+            diagnostic.storeWeights(m_weights);
             ++i;
         }
     } 
@@ -108,10 +108,6 @@ void PerceptronLearningAlgorithm::RunCL()
 }
 
 
-bool PerceptronLearningAlgorithm::makeDiagnostic()
-{
-    m_diagnostic->dumpWeights();
-}
 
 
 const std::string PerceptronLearningAlgorithm::About() const
