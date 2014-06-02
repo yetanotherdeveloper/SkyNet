@@ -130,10 +130,44 @@ void SkyNetDiagnostic::dumpWeights(const std::string& dirName)
 
 
 void SkyNetDiagnostic::makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & trainingSet,
-                                            const std::vector<float> &targetWeights,const std::vector<float> &learnedweights)
+                                            const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights)
 {
+    if(learnedWeights.empty()) {
+        SKYNET_DEBUG("Warning: No learned weights send to makeTrainingAnalysis function\n");         
+        return;
+    }
+
+    // Dump training data into file
+    
+    // create PID directory, do some check if this is allowed
+    SkyNetOS::CreateDirectory(m_dumpDirName);
+
+    // create PID directory, do some check if this is allowed
+    SkyNetOS::CreateDirectory(m_dumpDirName + "/" + dirName);
+
+    // dump weights with proper comments ofcourse as a first line
+    std::ofstream dumpfile(m_dumpDirName + "/" + dirName + "/trainingData.txt", std::ios::trunc);
+    dumpfile << "#x y class" << std::endl;
+
+    for(unsigned int i=0; i < trainingSet.size(); ++i)
+    {
+        dumpfile << trainingSet[i].x << " " << trainingSet[i].y << " " << trainingSet[i].classification << std::endl;
+    }
     // Generate gnuplot script drawing a validation chart
     // presenting points as well as target function and learned(trained) function
+
+    // Make something like: plot "trainingData.txt" using 1:($3 == 1 ?  $2:1/0), "trainingData.txt" using 1:($3 == -1? $2:1/0)
+    std::ofstream script(m_dumpDirName + "/" + dirName + "/validation.plot", std::ios::trunc);
+    script << "set terminal png size 1280,960"<< std::endl;
+    script << "set output \"validation.png\" "<< std::endl;
+    script << "set title \"In-sample error (Validation)\"" << std::endl;
+    script << "plot \"trainingData.txt\" using 1:($3 == 1 ?  $2:1/0) title \"training set (class +1)\" , \
+             \"trainingData.txt\" using 1:($3 == -1? $2:1/0) title \"training set (class -1)\"";
+    
+    // Make transformation (assuming w2 <> 0) w0 + w1*x w2*y = 0 <=> y = -w1/w2 *x -w0/w2
+    script << "," << -(targetWeights[1]/targetWeights[2]) << "*x +" << -(targetWeights[0]/targetWeights[2]) << " title \"target function\"";
+    script << "," << -(learnedWeights[1]/learnedWeights[2]) << "*x +" << -(learnedWeights[0]/learnedWeights[2]) << " title \"learned function\""<< std::endl;
+    
 }
 
 

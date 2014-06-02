@@ -23,6 +23,7 @@ class randomPointsClassification
         const std::vector<point> & getTrainingData();
         const std::vector<float> & getWeights();
         const std::vector<float> & getInitialWeights();
+		const std::vector<float> & getTargetWeights();
         void setWeights(const std::vector<float> &weights);
         unsigned int validate();
         unsigned int verify();
@@ -30,6 +31,7 @@ class randomPointsClassification
         unsigned int getErrorRate(const std::vector<point> &samples, const std::vector<float> &weights);
         void generateSet(std::vector<point> &set, unsigned int N);
         void makeRandomFunction();
+        void makeFixedFunction( float x1, float y1, float x2, float y2 );
         void initWeights();
         int classifyPoint(const point& sample, const std::vector<float> &weights);
 };

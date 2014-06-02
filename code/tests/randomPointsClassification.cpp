@@ -14,7 +14,8 @@ randomPointsClassification::randomPointsClassification( unsigned int N )
     m_minY = -1.0f;
     m_maxY = 1.0f;
 
-    makeRandomFunction();
+    //makeRandomFunction();
+    makeFixedFunction( m_minX, 0.0f, m_maxX, 0.0f );
 
     // Generate learning data
     generateSet( m_trainingSet, N );
@@ -30,6 +31,10 @@ const std::vector< float > & randomPointsClassification::getInitialWeights()
     return m_iweights;
 }
 
+const std::vector<float> & randomPointsClassification::getTargetWeights()
+{
+    return m_fweights;
+}
 
 const std::vector< float > & randomPointsClassification::getWeights()
 {
@@ -124,6 +129,24 @@ void randomPointsClassification::generateSet( std::vector< point > &set, unsigne
     }
 
 }
+
+
+/*! Calculate line coefficients (weights) for given two points
+ *  eg. get line coefficients so that this line go through given two points
+ *  This is mainly for diagnostic
+ */
+void randomPointsClassification::makeFixedFunction( float x1, float y1, float x2, float y2 )
+{
+    // calculate A,B,C coefficients, where Ax + By + C = 0
+    // y = (y_2 - y_1)/(x_2 - x_1)*(x - x_1) <=>
+    // <=>  (x_2 - x_1)*y + (y_1 -y_2)*x + y_2*x_1 - y_1*x_1 = 0
+    m_fweights.push_back( y2 * x1 - y1 * x1 );    //C
+    m_fweights.push_back( y1 - y2 );              //A
+    m_fweights.push_back( x2 - x1 );              //B
+
+    SKYNET_DEBUG( "Fixed (target) w0=%f w1=%f w2=%f\n", m_fweights[0], m_fweights[1], m_fweights[2] );
+}
+
 
 /*! Idea is to take random two points on <min_x,rand_y> and <max_x,rand_y>
  */

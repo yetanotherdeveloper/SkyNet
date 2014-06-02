@@ -44,10 +44,6 @@ public:
 
 class ISkyNetClassificationProtocol
 {
-private:
-    std::vector<std::vector<float> > m_historyOfWeights;    /// Weights assuming that in chronological
-                                                            /// order First one is the oldest(earliest) iteration
-    std::string m_dumpDirName;                              /// Directory where gathered/generated data will be stored
 public:
     virtual ~ISkyNetClassificationProtocol() {
     };
