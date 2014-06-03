@@ -205,8 +205,10 @@ void SkyNet::RunTests()
         //it->module->RunCL();
         rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),rpc.getInitialWeights(),diagnostic));
         SKYNET_INFO("In-sample error: %u Out-of-sample error: %u\n",rpc.validate(),rpc.verify()); 
+
         diagnostic.dumpWeights(it->module->About()); 
         diagnostic.makeTrainingAnalysis(it->module->About(),rpc.getTrainingData(), rpc.getTargetWeights() ,rpc.getWeights());
+        diagnostic.makeGeneralizationAnalysis(it->module->About(),rpc.getTestingData(), rpc.getTargetWeights() ,rpc.getWeights());
     }
 }
 

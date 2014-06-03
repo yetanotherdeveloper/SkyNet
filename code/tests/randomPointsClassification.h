@@ -21,6 +21,7 @@ class randomPointsClassification
     public:
         randomPointsClassification(unsigned int N);
         const std::vector<point> & getTrainingData();
+        const std::vector<point> & getTestingData();
         const std::vector<float> & getWeights();
         const std::vector<float> & getInitialWeights();
 		const std::vector<float> & getTargetWeights();

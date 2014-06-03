@@ -25,8 +25,14 @@ public:
     ~SkyNetDiagnostic();
     void storeWeights(const std::vector<float> &weights);
     void dumpWeights(const std::string& dirName);
-    void makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & trainingSet,
-                              const std::vector<float> &targetWeights,const std::vector<float> &learnedweights);
+    void makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & set,
+                              const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights);
+    void makeGeneralizationAnalysis(const std::string& dirName,const std::vector<point> & set,
+                              const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights);
+private:
+    void makeAnalysis(const std::string& dirName,const std::string& dataFilename, const std::string& scriptFilename,
+                                            const std::vector<point> & set, const std::vector<float> &targetWeights,
+                                            const std::vector<float> &learnedWeights);
 };
 
 typedef void (SkyNetDiagnostic::*fp_storeWeights)(const std::vector<float> &weights);

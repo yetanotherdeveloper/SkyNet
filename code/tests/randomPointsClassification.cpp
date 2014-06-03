@@ -99,6 +99,12 @@ const std::vector< point > & randomPointsClassification::getTrainingData()
 }
 
 
+const std::vector<point> & randomPointsClassification::getTestingData()
+{
+    return m_testingSet;
+}
+
+
 /// sign(A*x + B*y +C) where x,y are above chosen by random points
 int randomPointsClassification::classifyPoint( const point& sample, const std::vector< float > &weights )
 {
