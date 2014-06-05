@@ -1,5 +1,5 @@
-#ifndef __GD__
-#define __GD__
+#ifndef __SGD
+#define __SGD__
 #include <string>
 #include "protocol.h"
 
@@ -11,7 +11,7 @@ class CommandQueue;
 class Kernel;
 }
 
-class GradientDescent : public ISkyNetClassificationProtocol
+class StochasticGradientDescent : public ISkyNetClassificationProtocol
 {
 private:
     std::string                         m_about;
@@ -22,8 +22,8 @@ private:
     const cl::Device *const             m_pdevice;
     std::vector< float >                m_weights;
 public:
-    GradientDescent( const cl::Device * const pdevice );
-    ~GradientDescent();
+    StochasticGradientDescent( const cl::Device * const pdevice );
+    ~StochasticGradientDescent();
     void RunCL();
     const std::vector< float > & RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,SkyNetDiagnostic &diagnostic);              
     const std::string About() const;
@@ -31,7 +31,7 @@ public:
 private:
     float  classifyPoint( const point &rpoint );
     float getPartialErrorDerivative( const point &rpoint );
-    bool updateWeights(const std::vector<point> & trainingData);
+    bool updateWeights(const point &randomSample);
 };
-#endif //__GD__
+#endif //__SGD__
 

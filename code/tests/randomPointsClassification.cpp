@@ -14,8 +14,8 @@ randomPointsClassification::randomPointsClassification( unsigned int N )
     m_minY = -1.0f;
     m_maxY = 1.0f;
 
-    //makeRandomFunction();
-    makeFixedFunction( m_minX, 0.0f, m_maxX, 0.0f );
+    makeRandomFunction();
+    //makeFixedFunction( m_minX, 0.0f, m_maxX, 0.0f );
 
     // Generate learning data
     generateSet( m_trainingSet, N );

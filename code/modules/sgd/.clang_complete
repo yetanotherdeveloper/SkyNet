@@ -1,0 +1,10 @@
+-I/mnt/android/NN/opencl/code/.
+-I/mnt/android/NN/opencl/code/./..
+-I/mnt/android/NN/opencl/code/./os/linux
+-I/mnt/android/NN/opencl/code/modules/sgd/../../os/linux
+-I/mnt/android/NN/opencl/code/modules/sgd/.
+-I/mnt/android/NN/opencl/code/modules/sgd/../..
+-DDEBUG
+-Dsgd_EXPORTS
+-std=c++11
+-Wl,-soname,libsgd.so
