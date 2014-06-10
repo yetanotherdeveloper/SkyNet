@@ -16,6 +16,7 @@ class GradientDescent : public ISkyNetClassificationProtocol
 private:
     std::string                         m_about;
     float                               m_theta; /// learning grade
+    float                               m_flatness; /// Value below which sum of weights updates, we declare as flat
     std::unique_ptr< cl::Context >      m_pContext;
     std::unique_ptr< cl::CommandQueue > m_pCommandQueue;
     std::unique_ptr< cl::Kernel >       m_plaKernel;

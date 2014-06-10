@@ -14,7 +14,8 @@ extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const p
 /*! Build kernels , initialize data
  *
  */
-GradientDescent::GradientDescent(const cl::Device* const pdevice) : m_about(GradientDescent::composeAboutString(pdevice) ), m_pdevice(pdevice), m_theta(0.1) 
+GradientDescent::GradientDescent(const cl::Device* const pdevice) : m_about(GradientDescent::composeAboutString(pdevice) ), m_pdevice(pdevice), m_theta(0.1) , m_flatness(0.0000001f)
+
 {
     cl_int err;
 
@@ -55,18 +56,37 @@ std::string GradientDescent::composeAboutString(const cl::Device* const pdevice)
  *
  *          where:
  *            x*w(t) is learned_value
- *            E_in(w(t)) is square error eg. sum of square errors over all training set
+ *            E_in(w(t)) is square error eg. sum of square errors over all training set 
+ *            divided by number of samples 
  *
  */ 
-bool GradientDescent::updateWeights(const std::vector<point> & trainingData)
+bool GradientDescent::updateWeights( const std::vector< point > & trainingData )
 {
-    std::vector<point>::const_iterator it;
-    for(it = trainingData.begin(); it != trainingData.end(); ++it)
+    float                                dw0, dw1, dw2, tmpVal;
+    std::vector< point >::const_iterator it;
+
+    dw0 = 0.0f;
+    dw1 = 0.0f;
+    dw2 = 0.0f;
+    for( it = trainingData.begin(); it != trainingData.end(); ++it )
     {
-        m_weights[0] += -m_theta*2.0*(it->x * m_weights[1] + m_weights[2] * it->y + m_weights[0] - it->classification);       // gradient per w0
-        m_weights[1] += -m_theta*2.0*(it->x * m_weights[1] + m_weights[2] * it->y + m_weights[0] - it->classification)*it->x; // gradient per w1
-        m_weights[2] += -m_theta*2.0*(it->x * m_weights[1] + m_weights[2] * it->y + m_weights[0] - it->classification)*it->y; // gradient per w2
+        tmpVal = -m_theta * 2.0 * ( it->x * m_weights[1] + m_weights[2] * it->y + m_weights[0] - it->classification );
+        dw0   += tmpVal;         // gradient per w0
+        dw1   += tmpVal * it->x; // gradient per w1
+        dw2   += tmpVal * it->y; // gradient per w2
     }
+
+    m_weights[0] += dw0/trainingData.size();
+    m_weights[1] += dw1/trainingData.size();
+    m_weights[2] += dw2/trainingData.size();
+
+    // sum of updates to weights is less then our flatness value then
+    // we decalre that no progress is made
+    if( dw0 * dw0 + dw1 * dw1 + dw2 * dw2 <= m_flatness )
+    {
+        return true;
+    }
+
     return false;
 }
 
