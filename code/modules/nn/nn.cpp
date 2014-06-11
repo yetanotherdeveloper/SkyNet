@@ -1,6 +1,7 @@
 #include "nn.h"
 #include <CL/cl.hpp>
 #include <random>
+#include <cmath>
 #include <limits>
 
 static std::string kernelSource = "__kernel void dodaj(float veciu) \
@@ -38,7 +39,19 @@ NeuralNetwork::NeuralNetwork(const cl::Device* const pdevice, unsigned int nrInp
 
 
     // Create Neural Network infrastructure
-    
+    /* Here we create topology of Neural Network. This will be adjusted in the future
+     *  regarding the probem we use Neural Network to solve 
+     *
+     *  So this is just example NN topology, looking like this:
+     *     N      <-- output layer
+     *    / \
+     *   N   N    <-- first layer
+     *
+     */
+    for( unsigned int i = 0; i < nrLayers; ++i )
+    {
+        m_layers.push_back(NeuralLayer(nrInputs,(unsigned int)powf(2.0f,(float)(nrLayers - i -1)),NeuronFlags::INIT_ONE));
+    }
 
 }
 
@@ -143,14 +156,16 @@ NeuralNetwork::~NeuralNetwork()
 // ----> NeuralLayer struct implementation
 /*! Create layer of neurons
  */
-std::uniform_real_distribution< float > NeuralNetwork::NeuralLayer::Neuron::s_randFloat = std::uniform_real_distribution<float>(std::numeric_limits< float >::min(), std::numeric_limits< float >::max());
+const float NeuralNetwork::NeuralLayer::Neuron::minRandValue = -1000000.0f;
+const float NeuralNetwork::NeuralLayer::Neuron::maxRandValue = 1000000.0f;
+std::uniform_real_distribution< float > NeuralNetwork::NeuralLayer::Neuron::s_randFloat = std::uniform_real_distribution<float>( Neuron::minRandValue, Neuron::maxRandValue);
 std::random_device NeuralNetwork::NeuralLayer::Neuron::s_rd; 
 
-NeuralNetwork::NeuralLayer::NeuralLayer( unsigned int nrInputs, unsigned int nrNeurons )
+NeuralNetwork::NeuralLayer::NeuralLayer( unsigned int nrInputs, unsigned int nrNeurons, NeuronFlags flags )
 {
     for( unsigned int i = 0; i < nrNeurons; ++i )
     {
-        m_neurons.push_back( Neuron( nrInputs ) );
+        m_neurons.push_back( Neuron( nrInputs, flags ) );
     }
 }
 
@@ -161,16 +176,27 @@ NeuralNetwork::NeuralLayer::~NeuralLayer()
 
 
 // ----> Neuron struct implementation
-/*! Create a neuron with number of weights 
+/*! Create a neuron with number of weights
  *  equal to number of inputs + 1 (threshold)
-*/ 
-NeuralNetwork::NeuralLayer::Neuron::Neuron( unsigned int numInputs )
+ */
+NeuralNetwork::NeuralLayer::Neuron::Neuron( unsigned int numInputs, NeuronFlags flags )
 {
 
     // Number of weights is equal to number of inputs + bias (threshold)
-    for( unsigned int i = 0; i < numInputs +1; ++i )
+    for( unsigned int i = 0; i < numInputs + 1; ++i )
     {
-        m_weights.push_back( s_randFloat( s_rd ) );
+        switch( flags )
+        {
+        case NeuronFlags::INIT_RANDOM:
+            m_weights.push_back( s_randFloat( s_rd ) );
+            break;
+        case NeuronFlags::INIT_ZERO:
+            m_weights.push_back( 0.0f );
+            break;
+        case NeuronFlags::INIT_ONE:
+            m_weights.push_back( 1.0f );
+            break;
+        }
     }
 }
 
