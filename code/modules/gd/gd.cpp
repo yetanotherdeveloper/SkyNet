@@ -91,6 +91,12 @@ bool GradientDescent::updateWeights( const std::vector< point > & trainingData )
 }
 
 
+float GradientDescent::getError(const std::vector<point> & data)
+{
+    return 1.0f;
+}
+
+
 // TODO: move this constant to some other area or make it derived based on number of training  points
 const std::vector<float> & GradientDescent::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,SkyNetDiagnostic &diagnostic)              
 {

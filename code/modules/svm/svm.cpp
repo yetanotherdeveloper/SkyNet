@@ -20,6 +20,12 @@ SupportVectorMachine::~SupportVectorMachine()
 }
 
 
+float SupportVectorMachine::getError(const std::vector<point> & data)
+{
+    return 1.0f;
+}
+
+
 const std::vector<float> & SupportVectorMachine::RunCL(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,
                                                        SkyNetDiagnostic &diagnostic)
 {

@@ -48,6 +48,13 @@ std::string StochasticGradientDescent::composeAboutString(const cl::Device* cons
 }
 
 
+float StochasticGradientDescent::getError(const std::vector<point> & data)
+{
+    return 1.0f;
+}
+
+
+
 /*! Function updating weights based on current stochastic gradient descent
  *  Desc: 
  *          Update rule: w_k+1 <-- w_k - theta*grad(E_in(w(k))          

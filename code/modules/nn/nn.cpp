@@ -104,6 +104,7 @@ float NeuralNetwork::getError(const std::vector<point> & data)
         // Here output should be just a single float number
         assert(output.size() == 1);
         total_error += getSampleClassificationError(data[k],output[0]);
+        output.clear();
     }
     return total_error/(float)data.size();
 

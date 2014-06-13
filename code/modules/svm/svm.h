@@ -25,6 +25,7 @@ class SupportVectorMachine : public ISkyNetClassificationProtocol
                                                                SkyNetDiagnostic &diagnostic);
         const std::vector<float> & RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,
                                          SkyNetDiagnostic &diagnostic);              
+        float getError(const std::vector<point> & data);
         void About();
         const std::string About() const;
 };

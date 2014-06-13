@@ -30,6 +30,7 @@ public:
                                       SkyNetDiagnostic &diagnostic);
     const std::string About() const;
     static std::string composeAboutString(const cl::Device* const pdevice);
+    float getError(const std::vector<point> & data);
 private:
     int  classifyPoint(const point &rpoint);
     void updateWeights(const point& rpoint);

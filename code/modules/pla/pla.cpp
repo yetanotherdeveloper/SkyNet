@@ -67,6 +67,12 @@ bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point>
 }
 
 
+float PerceptronLearningAlgorithm::getError(const std::vector<point> & data)
+{
+    return 1.0f;
+}
+
+
 // Update weights according the rule: w_k+1 <-- w_k + y_t*x_t
 void PerceptronLearningAlgorithm::updateWeights(const point& rpoint)
 {

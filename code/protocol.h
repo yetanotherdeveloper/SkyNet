@@ -55,6 +55,7 @@ public:
     };
     virtual const std::vector<float> & RunCL(const std::vector<point> &, const std::vector<float> &, SkyNetDiagnostic &)   = 0;
     virtual const std::vector<float> & RunRef(const std::vector<point> &, const std::vector<float> &, SkyNetDiagnostic & ) = 0;
+    virtual float getError(const std::vector<point> & data)                                                                = 0;
     virtual const std::string About() const                                                                                = 0;
     std::string Identify()
     {

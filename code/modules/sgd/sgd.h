@@ -29,6 +29,7 @@ public:
     const std::vector< float > & RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,SkyNetDiagnostic &diagnostic);              
     const std::string About() const;
     static std::string composeAboutString( const cl::Device *const pdevice );
+    float getError(const std::vector<point> & data);
 private:
     float  classifyPoint( const point &rpoint );
     float getPartialErrorDerivative( const point &rpoint );
