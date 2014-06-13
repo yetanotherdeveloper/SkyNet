@@ -91,7 +91,7 @@ void SkyNetDiagnostic::storeWeights(const std::vector<float> &weights)
 
 
 // TODO: portable way of creating directories
-void SkyNetDiagnostic::dumpWeights(const std::string& dirName)
+void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
 {
     if(m_historyOfWeights.empty() )
     {
@@ -114,6 +114,7 @@ void SkyNetDiagnostic::dumpWeights(const std::string& dirName)
     {
         dumpfile << " w" + std::to_string(i);
     }
+    // After weights there is an in sample error
     dumpfile << std::endl;
 
     // This module holds the history of weights (how weights evolved over time
@@ -166,10 +167,12 @@ void SkyNetDiagnostic::makeAnalysis(const std::string& dirName,const std::string
     script << "set title \"In-sample error (" << desc.c_str() << ")\"" << std::endl;
     script << "plot \"" << dataFilename.c_str() << "\" using 1:($3 == 1 ?  $2:1/0) title \"" << desc.c_str()<< " set (class +1)\" , \
              \"" << dataFilename.c_str() << "\" using 1:($3 == -1? $2:1/0) title \"" << desc.c_str()<<" set (class -1)\"";
+
+    //TODO: Somehow print info about not recognized points
     
     // Make transformation (assuming w2 <> 0) w0 + w1*x w2*y = 0 <=> y = -w1/w2 *x -w0/w2
-    script << "," << -(targetWeights[1]/targetWeights[2]) << "*x +" << -(targetWeights[0]/targetWeights[2]) << " title \"target function\"";
-    script << "," << -(learnedWeights[1]/learnedWeights[2]) << "*x +" << -(learnedWeights[0]/learnedWeights[2]) << " title \"learned function\""<< std::endl;
+    //script << "," << -(targetWeights[1]/targetWeights[2]) << "*x +" << -(targetWeights[0]/targetWeights[2]) << " title \"target function\"";
+    //script << "," << -(learnedWeights[1]/learnedWeights[2]) << "*x +" << -(learnedWeights[0]/learnedWeights[2]) << " title \"learned function\""<< std::endl;
     
 }
 

@@ -3,6 +3,7 @@
 #include <random>
 #include <cmath>
 #include <limits>
+#include <cassert>
 
 static std::string kernelSource = "__kernel void dodaj(float veciu) \
                                    {  \
@@ -65,8 +66,48 @@ std::string NeuralNetwork::composeAboutString(const cl::Device* const pdevice)
     return aboutString;
 }
 
-// Get Error based on current state of neural network
+/*! Given sample classification error 
+ *  Square error is used as error measure eg
+ *  (NN_classification_value - sample_classification )^2
+*/
+float NeuralNetwork::getSampleClassificationError(const point& sample,float output)
+{
+    return powf((output - (float)sample.classification),2.0f);
+}
 
+
+// Get Error based on current state of neural network
+float NeuralNetwork::getError(const std::vector<point> & data)
+{
+    // TODO: adjust capacity 
+    std::vector<float> input;
+    std::vector<float> output;
+    float total_error = 0.0f;
+
+    // Send each point through NN and get classification error for it
+    // later on all errors are summed up and divided by number of samples
+    for(unsigned int k=0; k<data.size();++k) {
+        // First Layer takes data as input     
+        for(unsigned int j=0; j< m_layers[0].m_neurons.size(); ++j) {
+            input.push_back(m_layers[0].m_neurons[j].getOutput(data[k]));
+        }
+
+        // hidden layers
+        for(unsigned int i=1; i< m_layers.size();++i)
+        {
+            for(unsigned int j=0; j< m_layers[i].m_neurons.size(); ++j)
+            {
+                output.push_back(m_layers[i].m_neurons[j].getOutput(input));
+            }
+            input = output;
+        }
+        // Here output should be just a single float number
+        assert(output.size() == 1);
+        total_error += getSampleClassificationError(data[k],output[0]);
+    }
+    return total_error/(float)data.size();
+
+}
 
 
 /*! Function updating weights based on current stochastic gradient descent
@@ -135,7 +176,7 @@ const std::vector<float> & NeuralNetwork::RunRef(const std::vector<point> & trai
 }
 
 
-void NeuralNetwork::RunCL()
+const std::vector<float> & NeuralNetwork::RunCL(const std::vector<point> &trainingData, const std::vector<float> &initial_weights, SkyNetDiagnostic &diagnostic)
 {
     float testValue = 0.0f;
     m_plaKernel->setArg(0,&testValue);
@@ -206,3 +247,25 @@ NeuralNetwork::NeuralLayer::Neuron::~Neuron()
 }
 
 
+/*! Function to calculate output of single Neuron
+ *  Output = tanh(wx)
+ *  tanh -- hiperbolic tangent (nonlinear diffrentiable activate function that each neuron needs)
+ *  */
+float NeuralNetwork::NeuralLayer::Neuron::getOutput( const std::vector< float > & input )
+{
+    float output = m_weights[0];
+
+    // Input's length has to be equal to weights's length -1 (m_weights[0] is bias) 
+    for(unsigned int i=0; i< input.size(); ++i) {
+        output += m_weights[i+1]*input[i];
+    }
+    return (float)tanh(output);
+}
+
+
+// This is only for tests operating on point data (input = 2 )
+float NeuralNetwork::NeuralLayer::Neuron::getOutput( const point & input )
+{
+    return ( float )tanh( ( float )( m_weights[0] + m_weights[1] * input.x + m_weights[2] * input.y ) );
+
+}

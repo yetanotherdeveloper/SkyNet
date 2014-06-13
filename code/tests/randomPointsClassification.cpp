@@ -6,7 +6,7 @@
 /*!
  * \param  Generate
    !*/
-randomPointsClassification::randomPointsClassification( unsigned int N )
+randomPointsClassification::randomPointsClassification(unsigned int N, unsigned int nrLines)
 {
     // Area from which random points are to be sampled
     m_minX = -1.0f;
@@ -14,8 +14,7 @@ randomPointsClassification::randomPointsClassification( unsigned int N )
     m_minY = -1.0f;
     m_maxY = 1.0f;
 
-    makeRandomFunction();
-    //makeFixedFunction( m_minX, 0.0f, m_maxX, 0.0f );
+    makeRandomFunctions(nrLines);
 
     // Generate learning data
     generateSet( m_trainingSet, N );
@@ -66,8 +65,8 @@ unsigned int randomPointsClassification::verify()
  * by iterating through traiing set and comparing its learned classification with
  * the one used for learning. if they are diffrent then increase error rate
  */
-unsigned int randomPointsClassification::getErrorRate( const std::vector< point > &samples,
-                                                       const std::vector< float > &weights )
+// TODO: Function is aplicable for simple linear models, but is no use for Non-linear models like NN 
+unsigned int randomPointsClassification::getErrorRate(const std::vector<point> &samples, const std::vector<float> &weights)
 {
     unsigned int                         error_rate = 0;
     std::vector< point >::const_iterator it;
@@ -111,7 +110,21 @@ int randomPointsClassification::classifyPoint( const point& sample, const std::v
     return ( weights[1] * sample.x + weights[2] * sample.y + weights[0] >= 0.0f ) ? 1 : -1;
 }
 
+/*! there is a number of separating lines. We classify given point
+ *  as +1 class if multiplication  of all (An*x + Bn*y +Cn)
+ *  where x,y are above chosen by random points, for n <1..nrLines>
+ *  is negative. This should give as intresting set
+ */
+int randomPointsClassification::classifyPoint(const point& sample)
+{
+    float result = 1.0f;
 
+    for(unsigned int i = 0; i < m_fweights.size(); i += 3)
+    {
+        result *= (m_fweights[i+1] * sample.x + m_fweights[i+2] * sample.y + m_fweights[i]);
+    }
+    return result < 0.0f ? 1 : -1;
+}
 
 void randomPointsClassification::generateSet( std::vector< point > &set, unsigned int N )
 {
@@ -129,9 +142,9 @@ void randomPointsClassification::generateSet( std::vector< point > &set, unsigne
         randPoint.x = randx( rd );
         randPoint.y = randy( rd );
         // get its classification value eg.
-        randPoint.classification = classifyPoint( randPoint, m_fweights );
-        SKYNET_DEBUG( "point[%d]: x=%f y=%f class=%d\n", i, randPoint.x, randPoint.y, randPoint.classification );
-        set.push_back( randPoint );
+        randPoint.classification = classifyPoint(randPoint);
+        SKYNET_DEBUG("point[%d]: x=%f y=%f class=%d\n",i,randPoint.x,randPoint.y,randPoint.classification);
+        set.push_back(randPoint);
     }
 
 }
@@ -153,32 +166,34 @@ void randomPointsClassification::makeFixedFunction( float x1, float y1, float x2
     SKYNET_DEBUG( "Fixed (target) w0=%f w1=%f w2=%f\n", m_fweights[0], m_fweights[1], m_fweights[2] );
 }
 
-
-/*! Idea is to take random two points on <min_x,rand_y> and <max_x,rand_y>
+/*! We generate given number of separation lines acording to following idea: 
+ * taking  random two points on <min_x,rand_y> and <max_x,rand_y>
+ *  
  */
-void randomPointsClassification::makeRandomFunction()
+void randomPointsClassification::makeRandomFunctions(unsigned int nrLines)
 {
-    std::uniform_real_distribution< float > ud( 0.0f, 1.0f );
+    std::uniform_real_distribution<float> ud(0.0f,1.0f);
     std::random_device rd;
 
-    // First random point generation <min_x,rand_y>
-    float randval = ud( rd );
-    float r1x     = m_minX;
-    float r1y     = m_minY + ( m_maxY - m_minY ) * randval;
+    for(unsigned int i = 0; i < nrLines; ++i)
+    {
+        // First random point generation <min_x,rand_y>
+        float randval = ud(rd);
+        float r1x     = m_minX;
+        float r1y     = m_minY + (m_maxY - m_minY) * randval;
 
-    // second random point generation <max_x,rand_y>
-    randval = ud( rd );
-    float r2x = m_maxX;
-    float r2y = m_minY + ( m_maxY - m_minY ) * randval;
+        // second random point generation <max_x,rand_y>
+        randval = ud(rd);
+        float r2x = m_maxX;
+        float r2y = m_minY + (m_maxY - m_minY) * randval;
 
-    // calculate A,B,C coefficients, where Ax + By + C = 0
-    // y = (y_2 - y_1)/(x_2 - x_1)*(x - x_1) <=>
-    // <=>  (x_2 - x_1)*y + (y_1 -y_2)*x + y_2*x_1 - y_1*x_1 = 0
-    m_fweights.push_back( r2y * r1x - r1y * r1x );    //C
-    m_fweights.push_back( r1y - r2y );                //A
-    m_fweights.push_back( r2x - r1x );                //B
-
-    SKYNET_DEBUG( "Generated (target) w0=%f w1=%f w2=%f\n", m_fweights[0], m_fweights[1], m_fweights[2] );
+        // calculate A,B,C coefficients, where Ax + By + C = 0
+        // y = (y_2 - y_1)/(x_2 - x_1)*(x - x_1) <=>
+        // <=>  (x_2 - x_1)*y + (y_1 -y_2)*x + y_2*x_1 - y_1*x_1 = 0
+        m_fweights.push_back(r2y * r1x - r1y * r1x); //C
+        m_fweights.push_back(r1y - r2y);            //A
+        m_fweights.push_back(r2x - r1x);            //B
+    }
 }
 
 /*! Init weights

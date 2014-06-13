@@ -14,7 +14,12 @@ class Kernel;
 
 class NeuralNetwork : public ISkyNetClassificationProtocol
 {
-
+/*! This enum represents the way we initialize weights of neuron
+ *  Note: Only INIT_RANDOM is to be ultimately used
+ *  INIT_ONE and INIT_ZERO are added just for diagnostic purposes
+ *  Having weights iniitialized to any fixed value (0,1 or any other)
+ *  increase a danager of falling into local minimum
+ */
 enum class NeuronFlags {INIT_RANDOM , INIT_ZERO, INIT_ONE};
 
 
@@ -33,6 +38,9 @@ struct Neuron
     public:
         Neuron( unsigned int numInputs, NeuronFlags flags = NeuronFlags::INIT_RANDOM );   /// weights initialization
         ~Neuron();
+        // There are to functions calculating out as on first layer we have a points as input , on next layers it is floats given as input
+        float getOutput(const point & input);
+        float getOutput(const std::vector<float> & input);
 };
 public:
     std::vector<Neuron> m_neurons;
@@ -54,13 +62,13 @@ private:
 public:
     NeuralNetwork( const cl::Device * const pdevice , unsigned int nrInputs, unsigned int nrLayers);
     ~NeuralNetwork();
-    void RunCL();
+    const std::vector<float> & RunCL(const std::vector<point> &trainingData, const std::vector<float> &initial_weights, SkyNetDiagnostic &diagnostic);
     const std::vector< float > & RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,SkyNetDiagnostic &diagnostic);              
     const std::string About() const;
     static std::string composeAboutString( const cl::Device *const pdevice );
+    float getError(const std::vector<point> & data);
 private:
-    float  classifyPoint( const point &rpoint );
-    float getPartialErrorDerivative( const point &rpoint );
+    float getSampleClassificationError(const point& sample,float output);
     bool updateWeights(const point &randomSample);
 };
 #endif //__NN__

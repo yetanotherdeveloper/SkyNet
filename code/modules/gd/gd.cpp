@@ -112,8 +112,7 @@ const std::vector<float> & GradientDescent::RunRef(const std::vector<point> & tr
     return m_weights;
 }
 
-
-void GradientDescent::RunCL()
+const std::vector<float> & GradientDescent::RunCL(const std::vector<point> &trainingData, const std::vector<float> &initial_weights, SkyNetDiagnostic &diagnostic)
 {
     float testValue = 0.0f;
     m_plaKernel->setArg(0,&testValue);

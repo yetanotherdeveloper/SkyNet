@@ -24,7 +24,7 @@ public:
     SkyNetDiagnostic();
     ~SkyNetDiagnostic();
     void storeWeights(const std::vector<float> &weights);
-    void dumpWeights(const std::string& dirName);
+    void makeWeightsAnalysis(const std::string& dirName);
     void makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & set,
                               const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights);
     void makeGeneralizationAnalysis(const std::string& dirName,const std::vector<point> & set,
@@ -53,7 +53,7 @@ class ISkyNetClassificationProtocol
 public:
     virtual ~ISkyNetClassificationProtocol() {
     };
-    virtual void RunCL(void)                                                                                               = 0;
+    virtual const std::vector<float> & RunCL(const std::vector<point> &, const std::vector<float> &, SkyNetDiagnostic &)   = 0;
     virtual const std::vector<float> & RunRef(const std::vector<point> &, const std::vector<float> &, SkyNetDiagnostic & ) = 0;
     virtual const std::string About() const                                                                                = 0;
     std::string Identify()

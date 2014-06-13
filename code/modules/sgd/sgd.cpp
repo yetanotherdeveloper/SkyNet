@@ -114,7 +114,7 @@ const std::vector<float> & StochasticGradientDescent::RunRef(const std::vector<p
 }
 
 
-void StochasticGradientDescent::RunCL()
+const std::vector<float> & StochasticGradientDescent::RunCL(const std::vector<point> &trainingData, const std::vector<float> &initial_weights, SkyNetDiagnostic &diagnostic)
 {
     float testValue = 0.0f;
     m_plaKernel->setArg(0,&testValue);

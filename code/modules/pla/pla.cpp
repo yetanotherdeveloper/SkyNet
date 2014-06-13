@@ -100,7 +100,8 @@ const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector
 }
 
 
-void PerceptronLearningAlgorithm::RunCL()
+const std::vector<float> & PerceptronLearningAlgorithm::RunCL(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,
+                                                               SkyNetDiagnostic &diagnostic)
 {
     float testValue = 0.0f;
     m_plaKernel->setArg(0,&testValue);

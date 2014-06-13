@@ -20,7 +20,8 @@ SupportVectorMachine::~SupportVectorMachine()
 }
 
 
-void SupportVectorMachine::RunCL()
+const std::vector<float> & SupportVectorMachine::RunCL(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,
+                                                       SkyNetDiagnostic &diagnostic)
 {
 }
 
