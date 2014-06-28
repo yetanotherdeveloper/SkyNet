@@ -30,17 +30,27 @@ struct NeuralLayer
 struct Neuron
 {
     private:
+        static float s_theta; /// learning grade
+        static float s_flatness; /// Value below which sum of weights updates, we declare as flat (no update)
         static const float minRandValue;  /// value used to set minimal limit for randomization (TODO: we may derive this from problem description) 
         static const float maxRandValue;   /// value used to set maximal limit for randomization 
         static std::uniform_real_distribution< float > s_randFloat;
         static std::random_device s_rd;
         std::vector< float > m_weights;
+        float m_output;     /// Recently calculated output
+        float m_delta;      /// Recently calculated delta(gradE/gradSignal) for neuron
     public:
         Neuron( unsigned int numInputs, NeuronFlags flags = NeuronFlags::INIT_RANDOM );   /// weights initialization
         ~Neuron();
-        // There are to functions calculating out as on first layer we have a points as input , on next layers it is floats given as input
+        // There are to functions calculating or getting  output as on first layer we have a points as input , on next layers it is floats given as input
+        float getOutput();
         float getOutput(const point & input);
         float getOutput(const std::vector<float> & input);
+        void setDelta(float deltaValue);
+        float getDelta();
+        float getWeight(unsigned int index);
+        bool updateWeights( const point & input ); // Update weights of Neuron
+        bool updateWeights( const std::vector<float> & input ); // Update weights of Neuron
 };
 public:
     std::vector<Neuron> m_neurons;
@@ -52,8 +62,6 @@ public:
 private:
     std::vector<NeuralLayer>            m_layers;  /// Layers of Neural Network
     std::string                         m_about;
-    float                               m_theta; /// learning grade
-    float                               m_flatness; /// Value below which sum of weights updates, we declare as flat
     std::unique_ptr< cl::Context >      m_pContext;
     std::unique_ptr< cl::CommandQueue > m_pCommandQueue;
     std::unique_ptr< cl::Kernel >       m_plaKernel;
