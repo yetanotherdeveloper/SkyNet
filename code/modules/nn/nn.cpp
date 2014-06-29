@@ -167,7 +167,7 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
 
     // Backpropagate delta backwards (lower NN layers)
     // starting from previous to highest layer
-    for( unsigned int l = m_layers.size() - 2; l >= 0; --l )
+    for( int l = m_layers.size() - 2; l >= 0; --l )
     {
         // neurons we are to get deltas for
         for( unsigned int n = 0; n < m_layers[l].m_neurons.size(); ++n )
