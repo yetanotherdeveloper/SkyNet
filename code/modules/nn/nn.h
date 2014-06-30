@@ -66,7 +66,6 @@ private:
     std::unique_ptr< cl::CommandQueue > m_pCommandQueue;
     std::unique_ptr< cl::Kernel >       m_plaKernel;
     const cl::Device *const             m_pdevice;
-    std::vector< float >                m_weights;
 public:
     NeuralNetwork( const cl::Device * const pdevice , unsigned int nrInputs, unsigned int nrLayers);
     ~NeuralNetwork();

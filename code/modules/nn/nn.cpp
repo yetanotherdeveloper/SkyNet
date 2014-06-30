@@ -57,7 +57,7 @@ NeuralNetwork::NeuralNetwork( const cl::Device *const pdevice, unsigned int nrIn
         m_layers.push_back( NeuralLayer( nrInputs,
                                          ( unsigned int )powf( 2.0f,
                                                                ( float )( nrLayers - i - 1 ) ),
-                                         NeuronFlags::INIT_ONE ) );
+                                         NeuronFlags::INIT_RANDOM ) );
     }
 
 }
@@ -146,8 +146,8 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
     for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
     {
         input.push_back( m_layers[0].m_neurons[j].getOutput( randomSample ) );
-        neurons_outputs[0] = input;
     }
+    neurons_outputs[0] = input;
 
     // hidden layers
     for( unsigned int i = 1; i < m_layers.size(); ++i )
@@ -213,15 +213,12 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() - 1 );
     std::random_device rd;
 
-    m_weights = initial_weights;
     const int max_iterations = 1000 * trainingData.size();
     int       i              = 0;
     bool      finish         = false;
-    diagnostic.storeWeights( m_weights );
     while( ( i < max_iterations ) && ( finish == false ) )
     {
         finish = updateWeights( trainingData[sample_index( rd )] );
-        diagnostic.storeWeights( m_weights );
         if( finish == false )
         {
             ++i;
@@ -238,7 +235,8 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
         printf(
             "Warning: Neural Network Learning alogorithm exhusted all iterations. TODO: Make proper termination criteria\n" );
     }
-    return m_weights;
+    // TODO: temporayr hack till I can get something decent
+    return *(new std::vector<float>(3,0.0f));   
 }
 
 
