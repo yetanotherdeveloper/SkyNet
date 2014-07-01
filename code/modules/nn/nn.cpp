@@ -57,7 +57,7 @@ NeuralNetwork::NeuralNetwork( const cl::Device *const pdevice, unsigned int nrIn
         m_layers.push_back( NeuralLayer( nrInputs,
                                          ( unsigned int )powf( 2.0f,
                                                                ( float )( nrLayers - i - 1 ) ),
-                                         NeuronFlags::INIT_RANDOM ) );
+                                         NeuronFlags::INIT_ONE ) );
     }
 
 }
@@ -189,7 +189,7 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
     // update first layer
     for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
     {
-        finish = finish && m_layers[0].m_neurons[j].updateWeights( randomSample );
+        finish = m_layers[0].m_neurons[j].updateWeights( randomSample ) && finish; 
     }
 
     // update hidden layers
@@ -198,7 +198,7 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
         for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
         {
             // pass as input to neurons of given layer an output of previous layer 
-            finish = finish && m_layers[i].m_neurons[j].updateWeights( neurons_outputs[i-1] );
+            finish = m_layers[i].m_neurons[j].updateWeights( neurons_outputs[i-1] ) && finish;
         }
     }
     return finish;
@@ -263,7 +263,7 @@ NeuralNetwork::~NeuralNetwork()
 /*! Create layer of neurons
  */
 float                                   NeuralNetwork::NeuralLayer::Neuron::s_theta        = 0.1f; /// learning grade
-float                                   NeuralNetwork::NeuralLayer::Neuron::s_flatness   = 0.0000001f;
+float                                   NeuralNetwork::NeuralLayer::Neuron::s_flatness   = 0.000000000000000001f;
 const float                             NeuralNetwork::NeuralLayer::Neuron::minRandValue = -1.0f;
 const float                             NeuralNetwork::NeuralLayer::Neuron::maxRandValue = 1.0f;
 std::uniform_real_distribution< float > NeuralNetwork::NeuralLayer::Neuron::s_randFloat =
