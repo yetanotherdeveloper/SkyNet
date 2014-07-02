@@ -20,6 +20,7 @@ private:
     std::unique_ptr<cl::Kernel>       m_plaKernel;
     const cl::Device *const           m_pdevice;
     std::vector<float>                m_weights;
+    std::vector<int>                  m_classification;   /// Last results of classification query (getClassification)
 public:
     PerceptronLearningAlgorithm(const cl::Device * const pdevice);
     ~PerceptronLearningAlgorithm();
@@ -31,6 +32,7 @@ public:
     const std::string About() const;
     static std::string composeAboutString(const cl::Device* const pdevice);
     float getError(const std::vector<point> & data);
+    std::vector<int> & getClassification(const std::vector<point> & data);
 private:
     int  classifyPoint(const point &rpoint);
     void updateWeights(const point& rpoint);

@@ -61,6 +61,7 @@ public:
 
 private:
     std::vector<NeuralLayer>            m_layers;  /// Layers of Neural Network
+    std::vector<int>                    m_classification;   /// Last results of classification query (getClassification)
     std::string                         m_about;
     std::unique_ptr< cl::Context >      m_pContext;
     std::unique_ptr< cl::CommandQueue > m_pCommandQueue;
@@ -74,6 +75,7 @@ public:
     const std::string About() const;
     static std::string composeAboutString( const cl::Device *const pdevice );
     float getError(const std::vector<point> & data);
+    std::vector<int> & getClassification(const std::vector<point> & data);
 private:
     float getSampleClassificationError(const point& sample,float output);
     bool updateWeights(const point &randomSample);

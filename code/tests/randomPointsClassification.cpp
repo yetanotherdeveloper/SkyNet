@@ -1,4 +1,5 @@
 #include <random>
+#include <cassert>
 #include "randomPointsClassification.h"
 #include "os_inc.h"
 
@@ -14,7 +15,8 @@ randomPointsClassification::randomPointsClassification(unsigned int N, unsigned 
     m_minY = -1.0f;
     m_maxY = 1.0f;
 
-    makeRandomFunctions(nrLines);
+    makeRandomFunctions(nrLines); 
+    //makeFixedFunction( -1.0f, 0.0f, 1.0f, -2.0f ); // temporar diagnostic solution
 
     // Generate learning data
     generateSet( m_trainingSet, N );
@@ -46,49 +48,48 @@ void randomPointsClassification::setWeights( const std::vector< float > &weights
     m_weights = weights;
 }
 
-/// Validate input weights through training sets
-unsigned int randomPointsClassification::validate()
+/// Validate input classification data through training sets
+float randomPointsClassification::validate(const std::vector<int> & classification)
 {
-    return getErrorRate( m_trainingSet, m_weights );
+    return getErrorRate( m_trainingSet, classification );
 }
 
 
 /*! Verification: calculate out of sample error eg. calculate error using
  * samples set not used for training
  */
-unsigned int randomPointsClassification::verify()
+float randomPointsClassification::verify( const std::vector<int> & classification)
 {
-    return getErrorRate( m_testingSet, m_weights );
+    return getErrorRate( m_testingSet, classification );
 }
 
 /*!  Caluculate error of learning
  * by iterating through traiing set and comparing its learned classification with
  * the one used for learning. if they are diffrent then increase error rate
  */
-// TODO: Function is aplicable for simple linear models, but is no use for Non-linear models like NN 
-unsigned int randomPointsClassification::getErrorRate(const std::vector<point> &samples, const std::vector<float> &weights)
+float randomPointsClassification::getErrorRate(const std::vector<point> &samples,  const std::vector<int> & classification)
 {
     unsigned int                         error_rate = 0;
     std::vector< point >::const_iterator it;
 
-    if( weights.empty() != true )
+    // If number of samples does not corresspond to number of classification data then
+    // something is very wrong and we return max error rate: 1.0
+    if( classification.size() != samples.size())
     {
+        assert(classification.size() == samples.size());
+        SKYNET_INFO("Error: classification data size and samples data size do differ!\n");
+        return 1.0f; 
+    }
 
-        for( it = samples.begin(); it != samples.end(); ++it )
+    for(unsigned int i =0; i< samples.size(); ++i) 
+    {
+        if(  classification[i]  != samples[i].classification)
         {
-            if( classifyPoint( *it, weights ) != it->classification )
-            {
-                ++error_rate;
-            }
+            ++error_rate;
         }
     }
-    else
-    {
-        SKYNET_DEBUG( "Error: No weights were send from classification module -> setting maximal error\n" );
-        error_rate = samples.size();
-    }
-
-    return error_rate;
+    
+    return error_rate/(float)samples.size();
 }
 
 
@@ -123,7 +124,7 @@ int randomPointsClassification::classifyPoint(const point& sample)
     {
         result *= (m_fweights[i+1] * sample.x + m_fweights[i+2] * sample.y + m_fweights[i]);
     }
-    return result < 0.0f ? 1 : -1;
+    return result < 0.0f ? -1 : 1;  //temporary hack
 }
 
 void randomPointsClassification::generateSet( std::vector< point > &set, unsigned int N )

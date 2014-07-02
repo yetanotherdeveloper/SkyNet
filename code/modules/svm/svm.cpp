@@ -20,6 +20,22 @@ SupportVectorMachine::~SupportVectorMachine()
 }
 
 
+std::vector<int> & SupportVectorMachine::getClassification(const std::vector<point> & data)
+{
+    m_classification.clear();
+    // each data point has corressponding classification info
+    // so we can reserve space upfront
+    m_classification.reserve(data.size());
+
+    for( unsigned int k = 0; k < data.size(); ++k )
+    {
+        float result = 1.0f;
+            // TODO: implement SVM classification 
+        m_classification.push_back(result);
+    }
+    return m_classification;
+}
+
 float SupportVectorMachine::getError(const std::vector<point> & data)
 {
     return 1.0f;

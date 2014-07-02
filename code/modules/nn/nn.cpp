@@ -57,7 +57,7 @@ NeuralNetwork::NeuralNetwork( const cl::Device *const pdevice, unsigned int nrIn
         m_layers.push_back( NeuralLayer( nrInputs,
                                          ( unsigned int )powf( 2.0f,
                                                                ( float )( nrLayers - i - 1 ) ),
-                                         NeuronFlags::INIT_ONE ) );
+                                         NeuronFlags::INIT_RANDOM ) );
     }
 
 }
@@ -71,6 +71,46 @@ std::string NeuralNetwork::composeAboutString( const cl::Device *const pdevice )
     aboutString.append( ")" );
     return aboutString;
 }
+
+
+std::vector<int> & NeuralNetwork::getClassification(const std::vector<point> & data)
+{
+    // TODO: adjust capacity
+    std::vector< float > input;
+    std::vector< float > output;
+
+    m_classification.clear();
+    // each data point has corressponding classification info
+    // so we can reserve space upfront
+    m_classification.reserve(data.size());
+
+    // Send each point through NN and get classification error for it
+    // later on all errors are summed up and divided by number of samples
+    for( unsigned int k = 0; k < data.size(); ++k )
+    {
+        // First Layer takes data as input
+        for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
+        {
+            input.push_back( m_layers[0].m_neurons[j].getOutput( data[k] ) );
+        }
+
+        // hidden layers
+        for( unsigned int i = 1; i < m_layers.size(); ++i )
+        {
+            for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
+            {
+                output.push_back( m_layers[i].m_neurons[j].getOutput( input ) );
+            }
+            input = output;
+        }
+        // Here output should be just a single float number
+        assert( output.size() == 1 );
+        m_classification.push_back(output[0] > 0.0f ? 1:-1);
+        output.clear();
+    }
+    return m_classification;
+}
+
 
 /*! Given sample classification error
  *  Square error is used as error measure eg

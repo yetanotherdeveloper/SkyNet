@@ -204,7 +204,7 @@ void SkyNet::RunTests()
         // Pass Input data , and initial weights to RunCL , RunRef functions 
         //it->module->RunCL();
         rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),rpc.getInitialWeights(),diagnostic));
-        SKYNET_INFO("In-sample error: %u Out-of-sample error: %u\n",rpc.validate(),rpc.verify()); 
+        SKYNET_INFO("In-sample error: %f Out-of-sample error: %f\n",  rpc.validate(it->module->getClassification(rpc.getTrainingData())),rpc.verify(it->module->getClassification(rpc.getTestingData()))); 
         SKYNET_INFO("GetError: %f\n",it->module->getError(rpc.getTrainingData()));
         diagnostic.makeWeightsAnalysis(it->module->About()); 
         diagnostic.makeTrainingAnalysis(it->module->About(),rpc.getTrainingData(), rpc.getTargetWeights() ,rpc.getWeights());

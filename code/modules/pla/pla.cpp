@@ -45,6 +45,21 @@ std::string PerceptronLearningAlgorithm::composeAboutString(const cl::Device* co
 }
 
 
+std::vector<int> & PerceptronLearningAlgorithm::getClassification(const std::vector<point> & data)
+{
+    m_classification.clear();
+    // each data point has corressponding classification info
+    // so we can reserve space upfront
+    m_classification.reserve(data.size());
+
+    for( unsigned int k = 0; k < data.size(); ++k )
+    {
+        m_classification.push_back(classifyPoint(data[k]));
+    }
+    return m_classification;
+}
+
+
 int PerceptronLearningAlgorithm::classifyPoint(const point &rpoint)
 {
     return rpoint.x * m_weights[1] + m_weights[2] * rpoint.y + m_weights[0] >= 0.0f ? 1 : -1;

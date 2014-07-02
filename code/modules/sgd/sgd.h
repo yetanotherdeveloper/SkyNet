@@ -22,6 +22,7 @@ private:
     std::unique_ptr< cl::Kernel >       m_plaKernel;
     const cl::Device *const             m_pdevice;
     std::vector< float >                m_weights;
+    std::vector<int>                    m_classification;   /// Last results of classification query (getClassification)
 public:
     StochasticGradientDescent( const cl::Device * const pdevice );
     ~StochasticGradientDescent();
@@ -30,6 +31,7 @@ public:
     const std::string About() const;
     static std::string composeAboutString( const cl::Device *const pdevice );
     float getError(const std::vector<point> & data);
+    std::vector<int> & getClassification(const std::vector<point> & data);
 private:
     float  classifyPoint( const point &rpoint );
     float getPartialErrorDerivative( const point &rpoint );

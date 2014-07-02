@@ -47,6 +47,27 @@ std::string GradientDescent::composeAboutString(const cl::Device* const pdevice)
 }
 
 
+std::vector<int> & GradientDescent::getClassification(const std::vector<point> & data)
+{
+    m_classification.clear();
+    // each data point has corressponding classification info
+    // so we can reserve space upfront
+    m_classification.reserve(data.size());
+
+    for( unsigned int k = 0; k < data.size(); ++k )
+    {
+        float result = 1.0f;
+
+        for(unsigned int i = 0; i < m_weights.size(); i += 3)
+        {
+            result *= (m_weights[i+1] * data[k].x + m_weights[i+2] * data[k].y + m_weights[i]);
+        }
+        m_classification.push_back(result > 0.0f ? 1 : -1);
+    }
+    return m_classification;
+}
+
+
 // TODO: make it working for any dimentions not just two
 /*! Function updating weights based on current gradient descent
  *  Desc: 
