@@ -129,13 +129,13 @@ void SkyNet::InitDevices()
     for(std::vector<cl::Platform>::iterator plat_it = platforms.begin(); plat_it != platforms.end(); ++plat_it ) {
 
         if( plat_it->getDevices(CL_DEVICE_TYPE_GPU, &m_devices ) == CL_SUCCESS ) {
-            (devices.begin())->getInfo(CL_DEVICE_NAME, &device_param_string_value);
+            (m_devices.begin())->getInfo(CL_DEVICE_NAME, &device_param_string_value);
             SKYNET_INFO(" HARDCODED GPU DEVICE to be used (temporary)  Device: %s\n",device_param_string_value.c_str());
             return;
         }
 
         if( plat_it->getDevices(CL_DEVICE_TYPE_ALL, &m_devices ) == CL_SUCCESS ) {
-            (devices.begin())->getInfo(CL_DEVICE_NAME, &device_param_string_value);
+            (m_devices.begin())->getInfo(CL_DEVICE_NAME, &device_param_string_value);
             SKYNET_INFO(" Chosen DEVICE to be used (temporary)  Device: %s\n",device_param_string_value.c_str());
             return;
         }
