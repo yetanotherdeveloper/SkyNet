@@ -6,3 +6,4 @@ include_directories(./ ../../)
 add_definitions(-std=c++11)
 
 add_library(svm SHARED ${SOURCE})
+install(TARGETS svm DESTINATION SkyNet/lib)

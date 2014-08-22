@@ -13,3 +13,4 @@ include_directories(./ ../../)
 add_definitions(-std=c++11)
 
 add_library(nn SHARED ${SOURCE})
+install(TARGETS nn DESTINATION SkyNet/lib)
