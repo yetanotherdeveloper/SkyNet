@@ -125,10 +125,12 @@ const std::vector<float> & GradientDescent::RunRef(const std::vector<point> & tr
     const int max_iterations = 1000*trainingData.size();
     int i=0;
     bool finish = false;
-    diagnostic.storeWeights(m_weights);
+    //TODO: Store proper error
+    diagnostic.storeWeightsAndError(m_weights,0.0f);
     while((i<max_iterations)&&(finish == false))  {
         finish = updateWeights(trainingData);
-        diagnostic.storeWeights(m_weights);
+        //TODO: Store proper error
+        diagnostic.storeWeightsAndError(m_weights,0.0f);
         if(finish == false) {
             ++i;
         }

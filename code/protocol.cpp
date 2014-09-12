@@ -84,16 +84,16 @@ SkyNetDiagnostic::~SkyNetDiagnostic()
 }
 
 
-void SkyNetDiagnostic::storeWeights(const std::vector<float> &weights)
+void SkyNetDiagnostic::storeWeightsAndError(const std::vector<float> &weights, float error)
 {
-    m_historyOfWeights.push_back(weights);
+    m_history.push_back(historicalNote(weights,error) );
 }
 
 
 // TODO: portable way of creating directories
 void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
 {
-    if(m_historyOfWeights.empty() )
+    if(m_history.empty() )
     {
         printf("Error: There is no weights to be dumped\n");
         return;
@@ -105,42 +105,43 @@ void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
     SkyNetOS::CreateDirectory(m_dumpDirName + "/" + dirName);
 
     // dump weights with proper comments ofcourse as a first line
-    std::ofstream dumpfile(m_dumpDirName + "/" + dirName + "/weights.txt", std::ios::trunc);
+    std::ofstream dumpfile(m_dumpDirName + "/" + dirName + "/weights_and_errors.txt", std::ios::trunc);
     dumpfile << "#";
     // Knowing that weights history contains some entries
     // we check the first entry to see how many weights was there
-    unsigned int nr_weights = m_historyOfWeights[0].size();
+    unsigned int nr_weights = m_history[0].m_weights.size();
     for(unsigned int i = 0; i < nr_weights; ++i)
     {
         dumpfile << " w" + std::to_string(i);
     }
     // After weights there is an in sample error
-    dumpfile << std::endl;
+    dumpfile << " E" << std::endl;
 
     // This module holds the history of weights (how weights evolved over time
     // number of weights is constant across history
-    for(unsigned int i = 0; i < m_historyOfWeights.size(); ++i)
+    for(unsigned int i = 0; i < m_history.size(); ++i)
     {
         for(unsigned int j = 0; j < nr_weights; ++j)
         {
-            dumpfile << " " + std::to_string( (m_historyOfWeights[i])[j]);
+            dumpfile << " " + std::to_string( (m_history[i].m_weights)[j]);
         }
-        dumpfile << std::endl;
+        dumpfile << " " << std::to_string( m_history[i].m_error) << std::endl;
     }
 }
 
 
 void SkyNetDiagnostic::makeAnalysis(const std::string& dirName,const std::string& dataFilename, const std::string& scriptFilename,
-                                            const std::vector<point> & set, const std::vector<float> &targetWeights,
-                                            const std::vector<float> &learnedWeights)
+                                    const std::vector<point> & set, const std::vector<float> &targetWeights,
+                                    const std::vector<float> &learnedWeights)
 {
-    if(learnedWeights.empty()) {
-        SKYNET_DEBUG("Warning: No learned weights send to makeTrainingAnalysis function\n");         
+    if(learnedWeights.empty() )
+    {
+        SKYNET_DEBUG("Warning: No learned weights send to makeTrainingAnalysis function\n");
         return;
     }
 
     // Dump training data into file
-    
+
     // create PID directory, do some check if this is allowed
     SkyNetOS::CreateDirectory(m_dumpDirName);
 
@@ -151,41 +152,41 @@ void SkyNetDiagnostic::makeAnalysis(const std::string& dirName,const std::string
     std::ofstream dumpfile(m_dumpDirName + "/" + dirName + "/" + dataFilename, std::ios::trunc);
     dumpfile << "#x y class" << std::endl;
 
-    for(unsigned int i=0; i < set.size(); ++i)
+    for(unsigned int i = 0; i < set.size(); ++i)
     {
         dumpfile << set[i].x << " " << set[i].y << " " << set[i].classification << std::endl;
     }
     // Generate gnuplot script drawing a validation chart
     // presenting points as well as target function and learned(trained) function
 
-    std::string desc = scriptFilename.substr(0,scriptFilename.rfind("."));    
+    std::string desc = scriptFilename.substr(0,scriptFilename.rfind(".") );
 
     // Make something like: plot "trainingData.txt" using 1:($3 == 1 ?  $2:1/0), "trainingData.txt" using 1:($3 == -1? $2:1/0)
     std::ofstream script(m_dumpDirName + "/" + dirName + "/" + scriptFilename, std::ios::trunc);
-    script << "set terminal png size 1280,960"<< std::endl;
-    script << "set output \""<< desc.c_str()<<".png\""<< std::endl;
+    script << "set terminal png size 1280,960" << std::endl;
+    script << "set output \"" << desc.c_str() << ".png\"" << std::endl;
     script << "set title \"In-sample error (" << desc.c_str() << ")\"" << std::endl;
-    script << "plot \"" << dataFilename.c_str() << "\" using 1:($3 == 1 ?  $2:1/0) title \"" << desc.c_str()<< " set (class +1)\" , \
-             \"" << dataFilename.c_str() << "\" using 1:($3 == -1? $2:1/0) title \"" << desc.c_str()<<" set (class -1)\"";
+    script << "plot \"" << dataFilename.c_str() << "\" using 1:($3 == 1 ?  $2:1/0) title \"" << desc.c_str() << " set (class +1)\" , \
+             \"" << dataFilename.c_str() << "\" using 1:($3 == -1? $2:1/0) title \"" << desc.c_str() << " set (class -1)\"";
 
     //TODO: Somehow print info about not recognized points
-    
+
     // Make transformation (assuming w2 <> 0) w0 + w1*x w2*y = 0 <=> y = -w1/w2 *x -w0/w2
     //script << "," << -(targetWeights[1]/targetWeights[2]) << "*x +" << -(targetWeights[0]/targetWeights[2]) << " title \"target function\"";
     //script << "," << -(learnedWeights[1]/learnedWeights[2]) << "*x +" << -(learnedWeights[0]/learnedWeights[2]) << " title \"learned function\""<< std::endl;
-    
+
 }
 
 
 void SkyNetDiagnostic::makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & set,
                                             const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights)
 {
-        makeAnalysis(dirName,"trainingData.txt","validation.plot",set,targetWeights,learnedWeights);
+    makeAnalysis(dirName,"trainingData.txt","validation.plot",set,targetWeights,learnedWeights);
 }
 
 
 void SkyNetDiagnostic::makeGeneralizationAnalysis(const std::string& dirName,const std::vector<point> & set,
-                                            const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights)
+                                                  const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights)
 {
-        makeAnalysis(dirName,"testingData.txt","verification.plot",set,targetWeights,learnedWeights);
+    makeAnalysis(dirName,"testingData.txt","verification.plot",set,targetWeights,learnedWeights);
 }

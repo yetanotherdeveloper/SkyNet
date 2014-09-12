@@ -16,23 +16,32 @@ struct point {
 
 class SkyNetDiagnostic
 {
+    struct historicalNote
+    {
+        std::vector<float> m_weights;
+        float m_error;
+        historicalNote(const std::vector<float> &weights, float error) : m_weights(weights), m_error(error)
+        {
+        }
+
+    };
 private:
-    std::vector<std::vector<float> > m_historyOfWeights;    /// Weights assuming that in chronological
-                                                            /// order First one is the oldest(earliest) iteration
-    std::string m_dumpDirName;                              /// Directory where gathered/generated data will be stored
+    std::vector<historicalNote> m_history;                /// Weights assuming that in chronological
+                                                          /// order First one is the oldest(earliest) iteration
+    std::string m_dumpDirName;                             /// Directory where gathered/generated data will be stored
 public:
     SkyNetDiagnostic();
     ~SkyNetDiagnostic();
-    void storeWeights(const std::vector<float> &weights);
+    void storeWeightsAndError(const std::vector<float> &weights, float error);
     void makeWeightsAnalysis(const std::string& dirName);
     void makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & set,
                               const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights);
     void makeGeneralizationAnalysis(const std::string& dirName,const std::vector<point> & set,
-                              const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights);
+                                    const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights);
 private:
     void makeAnalysis(const std::string& dirName,const std::string& dataFilename, const std::string& scriptFilename,
-                                            const std::vector<point> & set, const std::vector<float> &targetWeights,
-                                            const std::vector<float> &learnedWeights);
+                      const std::vector<point> & set, const std::vector<float> &targetWeights,
+                      const std::vector<float> &learnedWeights);
 };
 
 typedef void (SkyNetDiagnostic::*fp_storeWeights)(const std::vector<float> &weights);

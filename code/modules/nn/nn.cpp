@@ -9,7 +9,7 @@ static std::string kernelSource =
     "__kernel void dodaj(float veciu) \
                                    {  \
                                             veciu = 1.0f; \
-                                   }"                                                                                                                                            ;
+                                   }";
 
 extern "C" ISkyNetClassificationProtocol *CreateModule( const cl::Device *const pdevice )
 {
@@ -22,7 +22,7 @@ extern "C" ISkyNetClassificationProtocol *CreateModule( const cl::Device *const 
  */
 NeuralNetwork::NeuralNetwork( const cl::Device *const pdevice, unsigned int nrInputs, unsigned int nrLayers ) : m_about( NeuralNetwork::composeAboutString(
                                                                                                                              pdevice ) ),
-    m_pdevice( pdevice ) 
+    m_pdevice( pdevice )
 {
     cl_int err;
 
@@ -56,7 +56,7 @@ NeuralNetwork::NeuralNetwork( const cl::Device *const pdevice, unsigned int nrIn
     {
         m_layers.push_back( NeuralLayer( nrInputs,
                                          ( unsigned int )powf( 2.0f,
-                                                               ( float )( nrLayers - i - 1 ) ),
+                                                               ( float )(nrLayers - i - 1) ),
                                          NeuronFlags::INIT_RANDOM ) );
     }
 
@@ -78,13 +78,13 @@ std::vector<int> & NeuralNetwork::getClassification(const std::vector<point> & d
     m_classification.clear();
     // each data point has corressponding classification info
     // so we can reserve space upfront
-    m_classification.reserve(data.size());
+    m_classification.reserve(data.size() );
 
     // Send each point through NN and get classification error for it
     // later on all errors are summed up and divided by number of samples
     for( unsigned int k = 0; k < data.size(); ++k )
     {
-        m_classification.push_back(getNetworkOutput(data[k]) > 0.0f ? 1:-1);
+        m_classification.push_back(getNetworkOutput(data[k]) > 0.0f ? 1 : -1);
     }
     return m_classification;
 }
@@ -96,7 +96,25 @@ std::vector<int> & NeuralNetwork::getClassification(const std::vector<point> & d
  */
 float NeuralNetwork::getSampleClassificationError( const point& sample, float output )
 {
-    return powf( ( output - ( float )sample.classification ), 2.0f );
+    return powf( (output - ( float )sample.classification), 2.0f );
+}
+
+
+/*! Get all weights from all neurons of all layers and
+ *  put it in given container
+ */
+void NeuralNetwork::getAllWeights(std::vector< float > &all_weights)
+{
+    all_weights.clear();
+    for( unsigned int i = 0; i < m_layers.size(); ++i )
+    {
+        for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
+        {
+            for(unsigned int w = 0; w < m_layers[i].m_neurons[j].getWeightsQuantity(); ++w) {
+                all_weights.push_back(m_layers[i].m_neurons[j].getWeight(w));
+            }
+        }
+    }
 }
 
 
@@ -104,13 +122,13 @@ float NeuralNetwork::getSampleClassificationError( const point& sample, float ou
 float NeuralNetwork::getError( const std::vector< point > & data )
 {
     // TODO: adjust capacity
-    float                total_error = 0.0f;
+    float total_error = 0.0f;
 
     // Send each point through NN and get classification error for it
     // later on all errors are summed up and divided by number of samples
     for( unsigned int k = 0; k < data.size(); ++k )
     {
-        total_error += getSampleClassificationError( data[k], getNetworkOutput(data[k]));
+        total_error += getSampleClassificationError( data[k], getNetworkOutput(data[k]) );
     }
     return total_error / ( float )data.size();
 
@@ -158,11 +176,11 @@ float NeuralNetwork::getNetworkOutput(const point &randomSample)
 bool NeuralNetwork::updateWeights( const point &randomSample )
 {
     // Get final delta: de/ds^l
-    std::vector< float > input;
-    std::vector< float > output;
-    std::vector<std::vector<float>> neurons_outputs;    // All outputs are here 0 - first layer, 1 - first hidden..
+    std::vector< float >             input;
+    std::vector< float >             output;
+    std::vector<std::vector<float> > neurons_outputs;    // All outputs are here 0 - first layer, 1 - first hidden..
     // init vector of layers with vector of outputs for each layer
-    for(unsigned int m = 0; m<m_layers.size(); ++m) {
+    for(unsigned int m = 0; m < m_layers.size(); ++m) {
         neurons_outputs.push_back(input);
     }
 
@@ -182,7 +200,7 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
         {
             output.push_back( m_layers[i].m_neurons[j].getOutput( input ) );
         }
-        input = output;
+        input              = output;
         neurons_outputs[i] = input;
     }
     // Here output should be just a single float number
@@ -205,7 +223,7 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
                 // Weight index is an index of considered neuron + 1 as weights 0 is threshold
                 delta += m_layers[l + 1].m_neurons[i].getDelta() * m_layers[l + 1].m_neurons[i].getWeight( n + 1 );
             }
-            delta *= ( 1.0f - m_layers[l].m_neurons[n].getOutput() * m_layers[l].m_neurons[n].getOutput() );
+            delta *= (1.0f - m_layers[l].m_neurons[n].getOutput() * m_layers[l].m_neurons[n].getOutput() );
             m_layers[l].m_neurons[n].setDelta( delta );
         }
     }
@@ -215,7 +233,7 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
     // update first layer
     for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
     {
-        finish = m_layers[0].m_neurons[j].updateWeights( randomSample ) && finish; 
+        finish = m_layers[0].m_neurons[j].updateWeights( randomSample ) && finish;
     }
 
     // update hidden layers
@@ -223,8 +241,8 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
     {
         for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
         {
-            // pass as input to neurons of given layer an output of previous layer 
-            finish = m_layers[i].m_neurons[j].updateWeights( neurons_outputs[i-1] ) && finish;
+            // pass as input to neurons of given layer an output of previous layer
+            finish = m_layers[i].m_neurons[j].updateWeights( neurons_outputs[i - 1] ) && finish;
         }
     }
     return finish;
@@ -239,10 +257,15 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() - 1 );
     std::random_device rd;
 
+    std::vector<float> all_weights;
+    getAllWeights(all_weights);
+
+    diagnostic.storeWeightsAndError(all_weights,getError(trainingData) );
+
     const int max_iterations = 1000 * trainingData.size();
     int       i              = 0;
     bool      finish         = false;
-    while( ( i < max_iterations ) && ( finish == false ) )
+    while( (i < max_iterations) && (finish == false) )
     {
         finish = updateWeights( trainingData[sample_index( rd )] );
         if( finish == false )
@@ -262,7 +285,7 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
             "Warning: Neural Network Learning alogorithm exhusted all iterations. TODO: Make proper termination criteria\n" );
     }
     // TODO: temporayr hack till I can get something decent
-    return *(new std::vector<float>(3,0.0f));   
+    return *(new std::vector<float>(3,0.0f) );
 }
 
 
@@ -283,12 +306,13 @@ const std::string NeuralNetwork::About() const
 }
 
 NeuralNetwork::~NeuralNetwork()
-{}
+{
+}
 
 // ----> NeuralLayer struct implementation
 /*! Create layer of neurons
  */
-float                                   NeuralNetwork::NeuralLayer::Neuron::s_theta        = 0.1f; /// learning grade
+float                                   NeuralNetwork::NeuralLayer::Neuron::s_theta = 0.1f;        /// learning grade
 float                                   NeuralNetwork::NeuralLayer::Neuron::s_flatness   = 0.000000000000000001f;
 const float                             NeuralNetwork::NeuralLayer::Neuron::minRandValue = -1.0f;
 const float                             NeuralNetwork::NeuralLayer::Neuron::maxRandValue = 1.0f;
@@ -306,7 +330,8 @@ NeuralNetwork::NeuralLayer::NeuralLayer( unsigned int nrInputs, unsigned int nrN
 
 // NeuralLayer struct implementation
 NeuralNetwork::NeuralLayer::~NeuralLayer()
-{}
+{
+}
 
 
 // ----> Neuron struct implementation
@@ -337,7 +362,8 @@ NeuralNetwork::NeuralLayer::Neuron::Neuron( unsigned int numInputs, NeuronFlags 
 
 
 NeuralNetwork::NeuralLayer::Neuron::~Neuron()
-{}
+{
+}
 
 
 /*! Function to calculate output of single Neuron
@@ -361,7 +387,7 @@ float NeuralNetwork::NeuralLayer::Neuron::getOutput( const std::vector< float > 
 // This is only for tests operating on point data (input = 2 )
 float NeuralNetwork::NeuralLayer::Neuron::getOutput( const point & input )
 {
-    m_output = ( float )tanh( ( float )( m_weights[0] + m_weights[1] * input.x + m_weights[2] * input.y ) );
+    m_output = ( float )tanh( ( float )(m_weights[0] + m_weights[1] * input.x + m_weights[2] * input.y) );
     return m_output;
 
 }
@@ -392,6 +418,11 @@ float NeuralNetwork::NeuralLayer::Neuron::getWeight( unsigned int index )
     return m_weights[index];
 }
 
+float NeuralNetwork::NeuralLayer::Neuron::getWeightsQuantity()
+{
+    return m_weights.size();
+}
+
 
 //TODO: Make it a template not a copy of functions
 
@@ -400,9 +431,9 @@ bool NeuralNetwork::NeuralLayer::Neuron::updateWeights( const point & input )
     float dw0,dw1,dw2;
     // w <-- w - theta * x^(l-1)*Delta^l
     // iterate through all weights of this neuron and update its weights
-    dw0 = -this->m_delta*s_theta;
-    dw1 = dw0*input.x;
-    dw2 = dw0*input.y;
+    dw0 = -this->m_delta * s_theta;
+    dw1 = dw0 * input.x;
+    dw2 = dw0 * input.y;
 
     m_weights[0] += dw0;
     m_weights[1] += dw1;
@@ -424,10 +455,10 @@ bool NeuralNetwork::NeuralLayer::Neuron::updateWeights( const std::vector<float>
     float dw0,dw1,dw2;
     // w <-- w - theta * x^(l-1)*Delta^l
     // iterate through all weights of this neuron and update its weights
-    float tmpVal = -this->m_delta*s_theta;
-    dw0 = tmpVal*input[0]; 
-    dw1 = tmpVal*input[1];
-    dw2 = tmpVal*input[2];
+    float tmpVal = -this->m_delta * s_theta;
+    dw0 = tmpVal * input[0];
+    dw1 = tmpVal * input[1];
+    dw2 = tmpVal * input[2];
 
     m_weights[0] += dw0;
     m_weights[1] += dw1;

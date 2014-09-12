@@ -122,10 +122,12 @@ const std::vector<float> & StochasticGradientDescent::RunRef(const std::vector<p
     const int max_iterations = 1000*trainingData.size();
     int i=0;
     bool finish = false;
-    diagnostic.storeWeights(m_weights);
+    //TODO: Store proper error
+    diagnostic.storeWeightsAndError(m_weights,0.0f);
     while((i<max_iterations)&&(finish == false))  {
         finish = updateWeights(trainingData[sample_index(rd)]);
-        diagnostic.storeWeights(m_weights);
+        //TODO: Store proper error
+        diagnostic.storeWeightsAndError(m_weights,0.0f);
         if(finish == false) {
             ++i;
         } else {

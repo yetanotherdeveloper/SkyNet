@@ -49,6 +49,7 @@ struct Neuron
         void setDelta(float deltaValue);
         float getDelta();
         float getWeight(unsigned int index);
+        float getWeightsQuantity();
         bool updateWeights( const point & input ); // Update weights of Neuron
         bool updateWeights( const std::vector<float> & input ); // Update weights of Neuron
 };
@@ -78,6 +79,7 @@ public:
     std::vector<int> & getClassification(const std::vector<point> & data);
 private:
     float getNetworkOutput(const point &randomSample);
+    void getAllWeights(std::vector< float > &all_weights);
     float getSampleClassificationError(const point& sample,float output);
     bool updateWeights(const point &randomSample);
 };

@@ -105,12 +105,14 @@ const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector
     const point* misclassified = nullptr;
     int i=0;
     bool finish = false;
-    diagnostic.storeWeights(m_weights);
+    //TODO: pass proper error
+    diagnostic.storeWeightsAndError(m_weights,0.0f);
     while((i<max_iterations)&&(finish == false))  {
         finish = !getMisclassifiedPoint(trainingData,&misclassified);
         if(finish == false) {
             updateWeights(*misclassified);
-            diagnostic.storeWeights(m_weights);
+            //TODO: pass proper error
+            diagnostic.storeWeightsAndError(m_weights,0.0f);
             ++i;
         }
     } 
