@@ -77,6 +77,7 @@ public:
     float getError(const std::vector<point> & data);
     std::vector<int> & getClassification(const std::vector<point> & data);
 private:
+    float getNetworkOutput(const point &randomSample);
     float getSampleClassificationError(const point& sample,float output);
     bool updateWeights(const point &randomSample);
 };

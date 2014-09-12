@@ -75,10 +75,6 @@ std::string NeuralNetwork::composeAboutString( const cl::Device *const pdevice )
 
 std::vector<int> & NeuralNetwork::getClassification(const std::vector<point> & data)
 {
-    // TODO: adjust capacity
-    std::vector< float > input;
-    std::vector< float > output;
-
     m_classification.clear();
     // each data point has corressponding classification info
     // so we can reserve space upfront
@@ -88,25 +84,7 @@ std::vector<int> & NeuralNetwork::getClassification(const std::vector<point> & d
     // later on all errors are summed up and divided by number of samples
     for( unsigned int k = 0; k < data.size(); ++k )
     {
-        // First Layer takes data as input
-        for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
-        {
-            input.push_back( m_layers[0].m_neurons[j].getOutput( data[k] ) );
-        }
-
-        // hidden layers
-        for( unsigned int i = 1; i < m_layers.size(); ++i )
-        {
-            for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
-            {
-                output.push_back( m_layers[i].m_neurons[j].getOutput( input ) );
-            }
-            input = output;
-        }
-        // Here output should be just a single float number
-        assert( output.size() == 1 );
-        m_classification.push_back(output[0] > 0.0f ? 1:-1);
-        output.clear();
+        m_classification.push_back(getNetworkOutput(data[k]) > 0.0f ? 1:-1);
     }
     return m_classification;
 }
@@ -126,36 +104,43 @@ float NeuralNetwork::getSampleClassificationError( const point& sample, float ou
 float NeuralNetwork::getError( const std::vector< point > & data )
 {
     // TODO: adjust capacity
-    std::vector< float > input;
-    std::vector< float > output;
     float                total_error = 0.0f;
 
     // Send each point through NN and get classification error for it
     // later on all errors are summed up and divided by number of samples
     for( unsigned int k = 0; k < data.size(); ++k )
     {
-        // First Layer takes data as input
-        for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
-        {
-            input.push_back( m_layers[0].m_neurons[j].getOutput( data[k] ) );
-        }
-
-        // hidden layers
-        for( unsigned int i = 1; i < m_layers.size(); ++i )
-        {
-            for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
-            {
-                output.push_back( m_layers[i].m_neurons[j].getOutput( input ) );
-            }
-            input = output;
-        }
-        // Here output should be just a single float number
-        assert( output.size() == 1 );
-        total_error += getSampleClassificationError( data[k], output[0] );
-        output.clear();
+        total_error += getSampleClassificationError( data[k], getNetworkOutput(data[k]));
     }
     return total_error / ( float )data.size();
 
+}
+
+
+float NeuralNetwork::getNetworkOutput(const point &randomSample)
+{
+    std::vector< float > input;
+    std::vector< float > output;
+
+    // First Layer takes data as input
+    for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
+    {
+        input.push_back( m_layers[0].m_neurons[j].getOutput( randomSample ) );
+    }
+
+    // hidden layers
+    for( unsigned int i = 1; i < m_layers.size(); ++i )
+    {
+        for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
+        {
+            output.push_back( m_layers[i].m_neurons[j].getOutput( input ) );
+        }
+        input = output;
+    }
+    // Here output should be just a single float number
+    assert( output.size() == 1 );
+
+    return output[0];
 }
 
 
@@ -172,7 +157,6 @@ float NeuralNetwork::getError( const std::vector< point > & data )
  */
 bool NeuralNetwork::updateWeights( const point &randomSample )
 {
-
     // Get final delta: de/ds^l
     std::vector< float > input;
     std::vector< float > output;
@@ -181,6 +165,8 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
     for(unsigned int m = 0; m<m_layers.size(); ++m) {
         neurons_outputs.push_back(input);
     }
+
+    // FORWARD PROPAGATE
 
     // First Layer takes data as input
     for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
@@ -205,7 +191,7 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
     // d(tanh(s))/ds = 1 - tanh**2(s)
     m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 1.0f - output[0] * output[0] );
 
-    // Backpropagate delta backwards (lower NN layers)
+    // BACKPROPAGATE delta backwards (lower NN layers)
     // starting from previous to highest layer
     for( int l = m_layers.size() - 2; l >= 0; --l )
     {
