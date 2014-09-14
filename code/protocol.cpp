@@ -84,6 +84,12 @@ SkyNetDiagnostic::~SkyNetDiagnostic()
 }
 
 
+void SkyNetDiagnostic::reset()
+{
+    m_history.clear();
+}
+
+
 void SkyNetDiagnostic::storeWeightsAndError(const std::vector<float> &weights, float error)
 {
     m_history.push_back(historicalNote(weights,error) );

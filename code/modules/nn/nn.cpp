@@ -259,7 +259,6 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
 
     std::vector<float> all_weights;
     getAllWeights(all_weights);
-
     diagnostic.storeWeightsAndError(all_weights,getError(trainingData) );
 
     const int max_iterations = 1000 * trainingData.size();
@@ -268,6 +267,9 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
     while( (i < max_iterations) && (finish == false) )
     {
         finish = updateWeights( trainingData[sample_index( rd )] );
+
+        getAllWeights(all_weights);
+        diagnostic.storeWeightsAndError(all_weights,getError(trainingData) );
         if( finish == false )
         {
             ++i;

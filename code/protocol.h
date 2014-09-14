@@ -32,6 +32,7 @@ private:
 public:
     SkyNetDiagnostic();
     ~SkyNetDiagnostic();
+    void reset();
     void storeWeightsAndError(const std::vector<float> &weights, float error);
     void makeWeightsAnalysis(const std::string& dirName);
     void makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & set,

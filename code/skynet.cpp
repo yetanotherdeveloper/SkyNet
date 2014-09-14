@@ -202,6 +202,7 @@ void SkyNet::RunTests()
     randomPointsClassification rpc(100,1);
     std::vector<classificationModule>::iterator it; 
     for(it = m_classifiers.begin(); it != m_classifiers.end(); ++it) {
+        diagnostic.reset();
         SKYNET_INFO("Running OCL test against: %s\n",it->module->About().c_str());
         // Pass Input data , and initial weights to RunCL , RunRef functions 
         //it->module->RunCL();
