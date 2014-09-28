@@ -57,7 +57,7 @@ NeuralNetwork::NeuralNetwork( const cl::Device *const pdevice, unsigned int nrIn
         m_layers.push_back( NeuralLayer( nrInputs,
                                          ( unsigned int )powf( 2.0f,
                                                                ( float )(nrLayers - i - 1) ),
-                                         NeuronFlags::INIT_RANDOM ) );
+                                         NeuronFlags::INIT_ONE ) );
     }
 
 }
@@ -205,9 +205,9 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
     }
     // Here output should be just a single float number
     assert( output.size() == 1 );
-    // Set Final(top level neuron) delta
+    // Set Final(top level neuron) delta: 2*(tanh(s) - y)*(1 - tanh**2(s))
     // d(tanh(s))/ds = 1 - tanh**2(s)
-    m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 1.0f - output[0] * output[0] );
+    m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 2.0f*( output[0] - randomSample.y )*(1.0f - output[0] * output[0]) );
 
     // BACKPROPAGATE delta backwards (lower NN layers)
     // starting from previous to highest layer
