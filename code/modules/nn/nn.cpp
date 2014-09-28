@@ -266,7 +266,10 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
     bool      finish         = false;
     while( (i < max_iterations) && (finish == false) )
     {
+        //float err_before = getError(trainingData);
         finish = updateWeights( trainingData[sample_index( rd )] );
+
+        //float err_after = getError(trainingData);
 
         getAllWeights(all_weights);
         diagnostic.storeWeightsAndError(all_weights,getError(trainingData) );
@@ -457,10 +460,9 @@ bool NeuralNetwork::NeuralLayer::Neuron::updateWeights( const std::vector<float>
     float dw0,dw1,dw2;
     // w <-- w - theta * x^(l-1)*Delta^l
     // iterate through all weights of this neuron and update its weights
-    float tmpVal = -this->m_delta * s_theta;
-    dw0 = tmpVal * input[0];
-    dw1 = tmpVal * input[1];
-    dw2 = tmpVal * input[2];
+    dw0 = -this->m_delta * s_theta;
+    dw1 = dw0 * input[0];
+    dw2 = dw0 * input[1];
 
     m_weights[0] += dw0;
     m_weights[1] += dw1;
