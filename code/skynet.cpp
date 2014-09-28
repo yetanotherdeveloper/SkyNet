@@ -199,7 +199,7 @@ void SkyNet::RunTests()
     // diagnostic results are stored in directory named after process ID
     SkyNetDiagnostic diagnostic;
     // Just run all tests
-    randomPointsClassification rpc(100,1);
+    randomPointsClassification rpc(100,2);
     std::vector<classificationModule>::iterator it; 
     for(it = m_classifiers.begin(); it != m_classifiers.end(); ++it) {
         diagnostic.reset();

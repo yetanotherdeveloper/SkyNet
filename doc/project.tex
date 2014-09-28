@@ -92,12 +92,16 @@ For example randomPointsClassification module. Its purpose is to:
 Where to deliver reference CPU implementation? I think good place for CPU reference implementation is module itself.
 So Protocol will be extended with method RunReferencePLA
 
-Classification test instance will give a reference to const training object 
 Classification modules when requested will return reference to classification data of last processed set. Eg.
+- Analyze missing convergence
+Observation:
+Convergence for two lines random points classification case is not happenning .
 Next Step:
+implement batching (also for debugging (each time convergence should maintained)
 consider unique pointer instead normal one
-Implement charts generation 
-Analyze missing convergence
+Implement charts generation (Error how does it change) 
+Implement error/stats gathering for non NN modules
+
 
 
 \section{Usage Interface}
@@ -133,7 +137,6 @@ make copy_clang_complete
 \item make common module handling init of opencl and kernel/program building
 \item Make a git branches: master and milestone(release)
 \item make/lear proper c++ exceptions usage to handle errors of OpenCL initialization
-\item add support for initializing weights to zero or random
 \item Write a report that clang complete works badly with C++ openCL
 \item each module should provide also CPU plain implementation of algorithm
 \item Modules are algorithms and Devices( hardware layer) are to be initialized in SkyNet core

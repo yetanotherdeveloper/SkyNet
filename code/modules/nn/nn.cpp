@@ -57,7 +57,7 @@ NeuralNetwork::NeuralNetwork( const cl::Device *const pdevice, unsigned int nrIn
         m_layers.push_back( NeuralLayer( nrInputs,
                                          ( unsigned int )powf( 2.0f,
                                                                ( float )(nrLayers - i - 1) ),
-                                         NeuronFlags::INIT_ONE ) );
+                                         NeuronFlags::INIT_RANDOM ) );
     }
 
 }
