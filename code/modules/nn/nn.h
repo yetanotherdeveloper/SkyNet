@@ -12,6 +12,12 @@ class CommandQueue;
 class Kernel;
 }
 
+/*! The way gradient is computed :
+ * STOCHASTIC -- one sample at time
+ * BATCH -- all available samples 
+ */
+enum class GradientDescentType {STOCHASTIC, BATCH};
+
 class NeuralNetwork : public ISkyNetClassificationProtocol
 {
 /*! This enum represents the way we initialize weights of neuron
@@ -21,7 +27,6 @@ class NeuralNetwork : public ISkyNetClassificationProtocol
  *  increase a danager of falling into local minimum
  */
 enum class NeuronFlags {INIT_RANDOM , INIT_ZERO, INIT_ONE};
-
 
 /// Struct representing single layer of Neural Network
 struct NeuralLayer
@@ -68,8 +73,9 @@ private:
     std::unique_ptr< cl::CommandQueue > m_pCommandQueue;
     std::unique_ptr< cl::Kernel >       m_plaKernel;
     const cl::Device *const             m_pdevice;
+    GradientDescentType                 m_gradType; 
 public:
-    NeuralNetwork( const cl::Device * const pdevice , unsigned int nrInputs, unsigned int nrLayers);
+    NeuralNetwork( const cl::Device * const pdevice , unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype = GradientDescentType::STOCHASTIC);
     ~NeuralNetwork();
     const std::vector<float> & RunCL(const std::vector<point> &trainingData, const std::vector<float> &initial_weights, SkyNetDiagnostic &diagnostic);
     const std::vector< float > & RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,SkyNetDiagnostic &diagnostic);              
@@ -82,6 +88,7 @@ private:
     void getAllWeights(std::vector< float > &all_weights);
     float getSampleClassificationError(const point& sample,float output);
     bool updateWeights(const point &randomSample);
+    bool updateWeights(const std::vector< point > & trainingData);
 };
 #endif //__NN__
 

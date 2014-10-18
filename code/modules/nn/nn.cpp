@@ -13,16 +13,15 @@ static std::string kernelSource =
 
 extern "C" ISkyNetClassificationProtocol *CreateModule( const cl::Device *const pdevice )
 {
-    return new NeuralNetwork( pdevice, 2, 2 );  // Just for testing, architecture depends heavily on problem we are to
+    return new NeuralNetwork( pdevice, 2, 2, GradientDescentType::BATCH );  // Just for testing, architecture depends heavily on problem we are to
                                                 // solve
 }
 
 /*! Build kernels , initialize data
  *
  */
-NeuralNetwork::NeuralNetwork( const cl::Device *const pdevice, unsigned int nrInputs, unsigned int nrLayers ) : m_about( NeuralNetwork::composeAboutString(
-                                                                                                                             pdevice ) ),
-    m_pdevice( pdevice )
+NeuralNetwork::NeuralNetwork( const cl::Device *const pdevice, unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype) : 
+                              m_about( NeuralNetwork::composeAboutString( pdevice ) ), m_pdevice( pdevice ), m_gradType(gdtype)
 {
     cl_int err;
 
@@ -160,8 +159,7 @@ float NeuralNetwork::getNetworkOutput(const point &randomSample)
 
     return output[0];
 }
-
-
+//////////////////////////////////////////////////////////////////////////////////
 /*! Function updating weights based on current stochastic gradient descent
  *  Desc:
  *          Update rule: w_k+1 <-- w_k - theta*grad(E_in(w(k))
@@ -248,8 +246,110 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
     return finish;
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+/*! Function updating weights based on current batch gradient descent
+ *  Desc:
+ *          Update rule: w_k+1 <-- w_k - theta*grad(E_in(w(k))
+ *          E_in(w(t)) = (x*w(t) - target_value )**2
+ *          dE_in/dw(t) = 2*(x*w(t) - target_value)
+ *
+ *          where:
+ *            x*w(t) is learned_value
+ *            E_in(w(t)) is square error eg. square error on random sample() from training set
+ *
+ */
+bool NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
+{
+    // Get final delta: de/ds^l
+    std::vector< float >             input;
+    std::vector< float >             output;
+    std::vector<std::vector<float> > neurons_outputs;    // All outputs are here 0 - first layer, 1 - first hidden..
 
-// TODO: move this constant to some other area or make it derived based on number of training  points
+    bool finish = true;
+    // init vector of layers with vector of outputs for each layer
+    for(unsigned int m = 0; m < m_layers.size(); ++m) {
+        neurons_outputs.push_back(input);
+    }
+
+    // get gradients for every sample and add them together to update weights
+    for(unsigned int s = 0; s < trainingData.size(); ++s) {    
+
+        // for every new sample we need to clear outputs of layers
+        for(unsigned int m = 0; m< m_layers.size(); ++m) {
+            neurons_outputs[m].clear();
+        }
+
+        // FORWARD PROPAGATE
+
+        // First Layer takes data as input
+        input.clear();
+        output.clear();
+        for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
+        {
+            input.push_back( m_layers[0].m_neurons[j].getOutput( trainingData[s] ) );
+        }
+        neurons_outputs[0] = input;
+
+        // hidden layers
+        for( unsigned int i = 1; i < m_layers.size(); ++i )
+        {
+            for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
+            {
+                output.push_back( m_layers[i].m_neurons[j].getOutput( input ) );
+            }
+            input              = output;
+            neurons_outputs[i] = input;
+        }
+        // Here output should be just a single float number
+        assert( output.size() == 1 );
+        // Set Final(top level neuron) delta: 2*(tanh(s) - y)*(1 - tanh**2(s))
+        // d(tanh(s))/ds = 1 - tanh**2(s)
+        m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 2.0f*( output[0] - trainingData[s].y )*(1.0f - output[0] * output[0]) );
+
+        // BACKPROPAGATE delta backwards (lower NN layers)
+        // starting from previous to highest layer
+        for( int l = m_layers.size() - 2; l >= 0; --l )
+        {
+            // neurons we are to get deltas for
+            for( unsigned int n = 0; n < m_layers[l].m_neurons.size(); ++n )
+            {
+                // For all neurons (of higher layer) attached to analyzed neuron
+                float delta = 0.0f;
+                for( unsigned int i = 0; i < m_layers[l + 1].m_neurons.size(); ++i )
+                {
+                    // Weight index is an index of considered neuron + 1 as weights 0 is threshold
+                    delta += m_layers[l + 1].m_neurons[i].getDelta() * m_layers[l + 1].m_neurons[i].getWeight( n + 1 );
+                }
+                delta *= (1.0f - m_layers[l].m_neurons[n].getOutput() * m_layers[l].m_neurons[n].getOutput() );
+                m_layers[l].m_neurons[n].setDelta( delta );
+            }
+        }
+
+        // Finish rule is that we end when no single neuron was updated above theta value
+        // update first layer
+        for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
+        {
+            finish = m_layers[0].m_neurons[j].updateWeights( trainingData[s] ) && finish;
+        }
+
+        // update hidden layers
+        for( unsigned int i = 1; i < m_layers.size(); ++i )
+        {
+            for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
+            {
+                // pass as input to neurons of given layer an output of previous layer
+                finish = m_layers[i].m_neurons[j].updateWeights( neurons_outputs[i - 1] ) && finish;
+            }
+        }
+
+
+    }   //s
+
+    return finish;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
 const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > & trainingData,
                                                     const std::vector< float > & initial_weights,
                                                     SkyNetDiagnostic           &diagnostic )
@@ -261,13 +361,23 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
     getAllWeights(all_weights);
     diagnostic.storeWeightsAndError(all_weights,getError(trainingData) );
 
-    const int max_iterations = 1000 * trainingData.size();
+    unsigned int max_iterations = 1000;
+    if(m_gradType == GradientDescentType::STOCHASTIC)
+    {
+        max_iterations *= trainingData.size();
+    }
+
     int       i              = 0;
     bool      finish         = false;
     while( (i < max_iterations) && (finish == false) )
     {
         //float err_before = getError(trainingData);
-        finish = updateWeights( trainingData[sample_index( rd )] );
+        if(m_gradType == GradientDescentType::STOCHASTIC)
+        {
+            finish = updateWeights( trainingData[sample_index( rd )] );
+        } else {
+            finish = updateWeights( trainingData );
+        }
 
         //float err_after = getError(trainingData);
 
