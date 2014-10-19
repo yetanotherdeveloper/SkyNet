@@ -45,7 +45,8 @@ include(./cmake/copy_clang_complete.cmake )
 add_executable(SkyNet ${SOURCE})
 target_link_libraries(SkyNet dl ${OPENCL_LIB})
 
-#installation and packaging
-install(TARGETS SkyNet DESTINATION SkyNet)
+install(TARGETS SkyNet DESTINATION bin)
 
-
+set(CPACK_STRIP_FILES TRUE)
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Jacek Czaja")
+include(CPack)

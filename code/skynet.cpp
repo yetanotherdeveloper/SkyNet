@@ -17,7 +17,7 @@ SkyNet::SkyNet(void)
 
 
     SKYNET_INFO("Loading Modules:\n");
-    LoadModules(std::string("./modules") );
+    LoadModules(std::string("../share/SkyNet/modules") );
 }
 
 SkyNet::~SkyNet()

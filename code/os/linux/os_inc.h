@@ -28,6 +28,7 @@ class SkyNetOS
         static void ReleaseModule(ISkyNetClassificationProtocol** pModule,void** pLibHandle);
         static unsigned int getPID();
         static bool CreateDirectory(const std::string& dirname);
+        static std::string GetHomeDirectory(void);
 };
 
 

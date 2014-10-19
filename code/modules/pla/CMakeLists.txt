@@ -13,4 +13,5 @@ include_directories(./ ../../)
 add_definitions(-std=c++11)
 
 add_library(pla SHARED ${SOURCE})
-install(TARGETS pla DESTINATION SkyNet/lib)
+
+install(TARGETS pla DESTINATION share/SkyNet/modules)

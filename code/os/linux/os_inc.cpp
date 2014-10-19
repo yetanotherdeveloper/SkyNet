@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <pwd.h>
 
 
 typedef ISkyNetClassificationProtocol* (*pCreateModule)(const cl::Device* const pdevice);
@@ -72,5 +73,12 @@ bool SkyNetOS::CreateDirectory(const std::string& dirname)
     }
     perror("Error creating directory: ");
     return false;
+}
+
+
+std::string SkyNetOS::GetHomeDirectory(void)
+{
+    struct passwd *pw = getpwuid(getuid());
+    return std::string(pw->pw_dir);
 }
 

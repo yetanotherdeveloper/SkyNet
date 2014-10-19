@@ -75,7 +75,7 @@ std::unique_ptr<cl::Kernel> SkyNetOpenCLHelper::makeKernels(const cl::Context &c
 //---> SkyNetDiagnostic definitions
 SkyNetDiagnostic::SkyNetDiagnostic()
 {
-    m_dumpDirName = std::to_string(SkyNetOS::getPID() );
+    m_dumpDirName =  SkyNetOS::GetHomeDirectory() + "/" + std::to_string(SkyNetOS::getPID() );
 }
 
 
