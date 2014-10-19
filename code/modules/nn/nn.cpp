@@ -13,7 +13,7 @@ static std::string kernelSource =
 
 extern "C" ISkyNetClassificationProtocol *CreateModule( const cl::Device *const pdevice )
 {
-    return new NeuralNetwork( pdevice, 2, 2, GradientDescentType::BATCH );  // Just for testing, architecture depends heavily on problem we are to
+    return new NeuralNetwork( pdevice, 2, 2, GradientDescentType::STOCHASTIC );  // Just for testing, architecture depends heavily on problem we are to
                                                 // solve
 }
 
@@ -205,7 +205,7 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
     assert( output.size() == 1 );
     // Set Final(top level neuron) delta: 2*(tanh(s) - y)*(1 - tanh**2(s))
     // d(tanh(s))/ds = 1 - tanh**2(s)
-    m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 2.0f*( output[0] - randomSample.y )*(1.0f - output[0] * output[0]) );
+    m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 2.0f*( output[0] - (float)randomSample.classification )*(1.0f - output[0] * output[0]) );
 
     // BACKPROPAGATE delta backwards (lower NN layers)
     // starting from previous to highest layer
@@ -304,7 +304,7 @@ bool NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
         assert( output.size() == 1 );
         // Set Final(top level neuron) delta: 2*(tanh(s) - y)*(1 - tanh**2(s))
         // d(tanh(s))/ds = 1 - tanh**2(s)
-        m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 2.0f*( output[0] - trainingData[s].y )*(1.0f - output[0] * output[0]) );
+        m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 2.0f*( output[0] - (float)trainingData[s].classification )*(1.0f - output[0] * output[0]) );
 
         // BACKPROPAGATE delta backwards (lower NN layers)
         // starting from previous to highest layer
@@ -324,6 +324,9 @@ bool NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
                 m_layers[l].m_neurons[n].setDelta( delta );
             }
         }
+
+
+        //TODO: This is broken as we should move along average vector not sum of gradients
 
         // Finish rule is that we end when no single neuron was updated above theta value
         // update first layer
@@ -361,7 +364,7 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
     getAllWeights(all_weights);
     diagnostic.storeWeightsAndError(all_weights,getError(trainingData) );
 
-    unsigned int max_iterations = 1000;
+    unsigned int max_iterations = 10000;
     if(m_gradType == GradientDescentType::STOCHASTIC)
     {
         max_iterations *= trainingData.size();
