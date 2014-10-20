@@ -48,5 +48,6 @@ target_link_libraries(SkyNet dl ${OPENCL_LIB})
 install(TARGETS SkyNet DESTINATION bin)
 
 set(CPACK_STRIP_FILES TRUE)
+set(CPACK_GENERATOR "RPM")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Jacek Czaja")
 include(CPack)
