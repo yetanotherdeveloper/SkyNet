@@ -75,7 +75,10 @@ std::unique_ptr<cl::Kernel> SkyNetOpenCLHelper::makeKernels(const cl::Context &c
 //---> SkyNetDiagnostic definitions
 SkyNetDiagnostic::SkyNetDiagnostic()
 {
-    m_dumpDirName =  SkyNetOS::GetHomeDirectory() + "/Skynet_Logs/" + std::to_string(SkyNetOS::getPID() );
+    m_dumpDirName =  SkyNetOS::GetHomeDirectory() + "/skynet_logs/";
+    SkyNetOS::CreateDirectory(m_dumpDirName);
+    m_dumpDirName += std::to_string(SkyNetOS::getPID() );
+    SkyNetOS::CreateDirectory(m_dumpDirName);
 }
 
 
@@ -104,8 +107,6 @@ void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
         printf("Error: There is no weights to be dumped\n");
         return;
     }
-    // create PID directory, do some check if this is allowed
-    SkyNetOS::CreateDirectory(m_dumpDirName);
 
     // create PID directory, do some check if this is allowed
     SkyNetOS::CreateDirectory(m_dumpDirName + "/" + dirName);
@@ -147,10 +148,6 @@ void SkyNetDiagnostic::makeAnalysis(const std::string& dirName,const std::string
     }
 
     // Dump training data into file
-
-    // create PID directory, do some check if this is allowed
-    SkyNetOS::CreateDirectory(m_dumpDirName);
-
     // create PID directory, do some check if this is allowed
     SkyNetOS::CreateDirectory(m_dumpDirName + "/" + dirName);
 
