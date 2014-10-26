@@ -13,4 +13,4 @@ include_directories(./ ../../)
 add_definitions(-std=c++11)
 
 add_library(sgd SHARED ${SOURCE})
-install(TARGETS sgd DESTINATION share/SkyNet/modules)
+install(TARGETS sgd DESTINATION share/skynet/modules)

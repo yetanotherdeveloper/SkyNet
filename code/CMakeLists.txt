@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(SkyNet)
+project(skynet)
 macro(getsubdirlist result curdir)
     file(GLOB items RELATIVE ${curdir} ${curdir}/modules/*)
     set(dirlist "")
@@ -42,10 +42,10 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 include(./cmake/copy_clang_complete.cmake )
 
-add_executable(SkyNet ${SOURCE})
-target_link_libraries(SkyNet dl ${OPENCL_LIB})
+add_executable(skynet ${SOURCE})
+target_link_libraries(skynet dl ${OPENCL_LIB})
 
-install(TARGETS SkyNet DESTINATION bin)
+install(TARGETS skynet DESTINATION bin)
 
 set(CPACK_STRIP_FILES TRUE)
 set(CPACK_GENERATOR "RPM")

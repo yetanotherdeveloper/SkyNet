@@ -14,4 +14,4 @@ add_definitions(-std=c++11)
 
 add_library(nn SHARED ${SOURCE})
 
-install(TARGETS nn DESTINATION share/SkyNet/modules)
+install(TARGETS nn DESTINATION share/skynet/modules)

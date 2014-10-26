@@ -60,6 +60,11 @@ unsigned int SkyNetOS::getPID()
 
 bool SkyNetOS::CreateDirectory(const std::string& dirname)
 {
+    //TODO: Make recursive directory creating
+    std::size_t found = dirname.find_first_of("/",1);   //Find second slash
+
+    //std::string::npos
+
     if(mkdir(dirname.c_str(),0777) == 0)
     {
         SKYNET_DEBUG("Directory: %s created\n",dirname.c_str() );
