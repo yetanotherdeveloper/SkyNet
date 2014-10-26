@@ -1,5 +1,6 @@
 #include "pla.h"
 #include <CL/cl.hpp>
+#include <cmath>
 
 static std::string kernelSource = "__kernel void dodaj(float veciu) \
                                    {  \
@@ -81,10 +82,27 @@ bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point>
     return false;
 }
 
+/*! Given sample classification error
+ *  Square error is used as error measure eg
+ *  (perceptron_value - sample_classification )^2
+ */
+float PerceptronLearningAlgorithm::getSampleClassificationError( const point& sample, float output )
+{
+    return powf( (output - ( float )sample.classification), 2.0f );
+}
 
 float PerceptronLearningAlgorithm::getError(const std::vector<point> & data)
 {
-    return 1.0f;
+    // TODO: adjust capacity
+    float total_error = 0.0f;
+
+    // Send each point through NN and get classification error for it
+    // later on all errors are summed up and divided by number of samples
+    for( unsigned int k = 0; k < data.size(); ++k )
+    {
+        total_error += getSampleClassificationError( data[k], classifyPoint(data[k]) );
+    }
+    return total_error / ( float )data.size();
 }
 
 
@@ -105,14 +123,12 @@ const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector
     const point* misclassified = nullptr;
     int i=0;
     bool finish = false;
-    //TODO: pass proper error
-    diagnostic.storeWeightsAndError(m_weights,0.0f);
+    diagnostic.storeWeightsAndError(m_weights,getError(trainingData));
     while((i<max_iterations)&&(finish == false))  {
         finish = !getMisclassifiedPoint(trainingData,&misclassified);
         if(finish == false) {
             updateWeights(*misclassified);
-            //TODO: pass proper error
-            diagnostic.storeWeightsAndError(m_weights,0.0f);
+            diagnostic.storeWeightsAndError(m_weights,getError(trainingData));
             ++i;
         }
     } 

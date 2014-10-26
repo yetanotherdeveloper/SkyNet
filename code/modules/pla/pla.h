@@ -26,7 +26,7 @@ public:
     ~PerceptronLearningAlgorithm();
     void RunCL();
     const std::vector<float> & RunCL(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,
-                                                               SkyNetDiagnostic &diagnostic);
+                                     SkyNetDiagnostic &diagnostic);
     const std::vector<float> & RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,
                                       SkyNetDiagnostic &diagnostic);
     const std::string About() const;
@@ -35,6 +35,7 @@ public:
     std::vector<int> & getClassification(const std::vector<point> & data);
 private:
     int  classifyPoint(const point &rpoint);
+    float getSampleClassificationError( const point& sample, float output );
     void updateWeights(const point& rpoint);
     bool getMisclassifiedPoint(const std::vector<point> & trainingData, const point** output);
 };

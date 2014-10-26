@@ -144,7 +144,7 @@ void randomPointsClassification::generateSet( std::vector< point > &set, unsigne
         randPoint.y = randy( rd );
         // get its classification value eg.
         randPoint.classification = classifyPoint(randPoint);
-        SKYNET_DEBUG("point[%d]: x=%f y=%f class=%d\n",i,randPoint.x,randPoint.y,randPoint.classification);
+        //SKYNET_DEBUG("point[%d]: x=%f y=%f class=%d\n",i,randPoint.x,randPoint.y,randPoint.classification);
         set.push_back(randPoint);
     }
 
@@ -164,7 +164,7 @@ void randomPointsClassification::makeFixedFunction( float x1, float y1, float x2
     m_fweights.push_back( y1 - y2 );              //A
     m_fweights.push_back( x2 - x1 );              //B
 
-    SKYNET_DEBUG( "Fixed (target) w0=%f w1=%f w2=%f\n", m_fweights[0], m_fweights[1], m_fweights[2] );
+    //SKYNET_DEBUG( "Fixed (target) w0=%f w1=%f w2=%f\n", m_fweights[0], m_fweights[1], m_fweights[2] );
 }
 
 /*! We generate given number of separation lines acording to following idea: 

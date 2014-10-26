@@ -94,13 +94,10 @@ So Protocol will be extended with method RunReferencePLA
 
 Classification modules when requested will return reference to classification data of last processed set. Eg.
 
-
 consider unique pointer instead normal one
 Implement charts generation (Error how does it change) 
-Implement error/stats gathering for non NN modules
 
--- Make recursive directory creation
-
+- Implement user interface 
 \section{Usage Interface}
 SkyNet can be operated from command line. Options:
 \begin{itemize}
@@ -143,7 +140,8 @@ make copy_clang_complete
 \item As for drawing animation out generated weights. We could make a global output buffer
 containing weights as they are being updated
 \item Create a module creating gnuplot charts/ generting scripts making a movie out of generated charts
-\item Make packaging
+\item User Interface (command line)
+\item serialization / loading initial weights from file 
 \item make gnuplot script generation of charts of learning steps , and make video out of it
 \item coding standard fixes:
 \begin{enumerate}
