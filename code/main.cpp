@@ -4,10 +4,10 @@
 #include "os_inc.h"
 
 
-int main()
+int main(int argc, char **argv)
 {
     // Parse CommandLine
-    SkyNet m_skynet;
+    SkyNet m_skynet(argc, argv);
   
     // Run tests, all or selected ones
     m_skynet.RunTests(); 

@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <getopt.h>
 #include <errno.h>
 #include <stack>
 #include <CL/cl.hpp>
@@ -7,10 +8,12 @@
 #include "os_inc.h"
 #include "tests/randomPointsClassification.h"
 
-SkyNet::SkyNet(void)
+SkyNet::SkyNet(int argc, char *const *argv)
 {
     SKYNET_INFO("Skynet Initializing...\n\n");
 
+    SKYNET_INFO("Processing command line\n");
+    ProcessCommandLine(argc,argv);
 
     SKYNET_INFO("Initializing computing devices:\n");
     InitDevices();
@@ -31,6 +34,26 @@ SkyNet::~SkyNet()
     }
     
 }
+
+//////////////////////////////////////////////////////////////////// 
+// Process commandline
+void SkyNet::ProcessCommandLine(int argc, char *const *argv)
+{
+    int c;
+
+    // Wez tutaj okresla tablice opcji:
+    // 1. Help (--help)
+    // 2. Test (--test , bez argumentow wyswietla wszystkie testy z nazwy, poza tym all i z listy dostepnych modulow)
+
+
+    do {
+
+    }while(c != -1);
+
+    return;
+}
+//////////////////////////////////////////////////////////////////// 
+
 
 // Scan available computing devices
 //
