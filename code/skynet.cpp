@@ -8,20 +8,27 @@
 #include "os_inc.h"
 #include "tests/randomPointsClassification.h"
 
-SkyNet::SkyNet(int argc, char *const *argv)
+SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodules(false), m_enableModule("")
 {
     SKYNET_INFO("Skynet Initializing...\n\n");
 
     SKYNET_INFO("Processing command line\n");
-    ProcessCommandLine(argc,argv);
+    try {
+        ProcessCommandLine(argc,argv);
 
-    SKYNET_INFO("Initializing computing devices:\n");
-    InitDevices();
+        SKYNET_INFO("Initializing computing devices:\n");
+        InitDevices();
 
-
-    SKYNET_INFO("Loading Modules:\n");
-    LoadModules(std::string("./modules") );
-    LoadModules(std::string("/usr/share/skynet/modules") );
+        SKYNET_INFO("Loading Modules:\n");
+        LoadModules(std::string("./modules") );
+        LoadModules(std::string("/usr/share/skynet/modules") );
+        PrintModules();
+    }
+    catch(std::string err)
+    {
+        SKYNET_INFO(err.c_str() );
+        m_terminated = true;
+    }
 }
 
 SkyNet::~SkyNet()
@@ -34,7 +41,23 @@ SkyNet::~SkyNet()
     }
     
 }
-
+//////////////////////////////////////////////////////////////////// 
+void SkyNet::PrintModules()
+{
+    if(m_printmodules == true)
+    {
+        SKYNET_INFO("\n List of found Machine learning modules:\n\n");
+        for(auto it = m_classifiers.begin(); it < m_classifiers.end(); ++it) {
+            SKYNET_INFO("   %s\n",it->module->About().c_str() );
+        }
+    }
+}
+//////////////////////////////////////////////////////////////////// 
+void SkyNet::PrintHelp()
+{
+    printf("SkyNet [--help] [--list_modules]\n");
+    return;
+}
 //////////////////////////////////////////////////////////////////// 
 // Process commandline
 void SkyNet::ProcessCommandLine(int argc, char *const *argv)
@@ -44,11 +67,31 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
     // Wez tutaj okresla tablice opcji:
     // 1. Help (--help)
     // 2. Test (--test , bez argumentow wyswietla wszystkie testy z nazwy, poza tym all i z listy dostepnych modulow)
+    // 3. Dodaj Unit testy na linie polecen
 
-
-    do {
-
-    }while(c != -1);
+    struct option longopts[] = { {"help", no_argument, nullptr, 1 },
+                                 {"module", required_argument, nullptr, 2 },
+                                 {"list_modules", no_argument, nullptr, 4 },
+                                 {0,0,0,0}};
+    do
+    {
+        c = getopt_long(argc,argv, "", longopts, nullptr);
+        // Unrecognized option?
+        if(c == '?')
+        {
+            throw std::string("Skynet Error: Unrecognized option");
+        }
+        else if(c == 1)
+        {
+            PrintHelp();
+            throw std::string("");
+        }
+        else if (c==4) {
+            m_printmodules = true;
+            m_terminated = true;
+        }
+    }
+    while(c != -1);
 
     return;
 }
@@ -71,7 +114,7 @@ void SkyNet::InitDevices()
     cl_bool device_param_bool_value;
 
     if( cl::Platform::get(&platforms) != CL_SUCCESS) {
-        SKYNET_INFO("ERROR: No computing platforms found!\n");
+        SKYNET_DEBUG("ERROR: No computing platforms found!\n");
         return;
     }
 
@@ -80,19 +123,19 @@ void SkyNet::InitDevices()
     for(std::vector<cl::Platform>::iterator plat_it = platforms.begin(); plat_it != platforms.end(); ++plat_it ) {
 
         plat_it->getInfo(CL_PLATFORM_NAME, &platform_param_value);
-        SKYNET_INFO("\nPlatform: %s\n",platform_param_value.c_str());
+        SKYNET_DEBUG("\nPlatform: %s\n",platform_param_value.c_str());
 
         plat_it->getInfo(CL_PLATFORM_VENDOR, &platform_param_value);
-        SKYNET_INFO("   vendor: %s\n",platform_param_value.c_str());
+        SKYNET_DEBUG("   vendor: %s\n",platform_param_value.c_str());
 
         plat_it->getInfo(CL_PLATFORM_VERSION, &platform_param_value);
-        SKYNET_INFO("   version: %s\n",platform_param_value.c_str());
+        SKYNET_DEBUG("   version: %s\n",platform_param_value.c_str());
 
         plat_it->getInfo(CL_PLATFORM_PROFILE, &platform_param_value);
-        SKYNET_INFO("   profile: %s\n",platform_param_value.c_str());
+        SKYNET_DEBUG("   profile: %s\n",platform_param_value.c_str());
 
         plat_it->getInfo(CL_PLATFORM_EXTENSIONS, &platform_param_value);
-        SKYNET_INFO("   extensions: %s\n",platform_param_value.c_str());
+        SKYNET_DEBUG("   extensions: %s\n",platform_param_value.c_str());
 
         // Now for given platform get list of devices and their capabilities
 
@@ -100,43 +143,43 @@ void SkyNet::InitDevices()
         
             for(std::vector<cl::Device>::iterator device_it = devices.begin(); device_it != devices.end(); ++device_it) {
                 device_it->getInfo(CL_DEVICE_NAME, &device_param_string_value);
-                SKYNET_INFO("   Device: %s\n",device_param_string_value.c_str());
+                SKYNET_DEBUG("   Device: %s\n",device_param_string_value.c_str());
 
                 device_it->getInfo(CL_DEVICE_VENDOR, &device_param_string_value);
-                SKYNET_INFO("       vendor: %s\n",device_param_string_value.c_str());
+                SKYNET_DEBUG("       vendor: %s\n",device_param_string_value.c_str());
 
                 device_it->getInfo(CL_DEVICE_EXTENSIONS, &device_param_string_value);
-                SKYNET_INFO("       extensions: %s\n",device_param_string_value.c_str());
+                SKYNET_DEBUG("       extensions: %s\n",device_param_string_value.c_str());
 
                 device_it->getInfo(CL_DEVICE_VERSION, &device_param_string_value);
-                SKYNET_INFO("       device version: %s\n",device_param_string_value.c_str());
+                SKYNET_DEBUG("       device version: %s\n",device_param_string_value.c_str());
 
                 device_it->getInfo(CL_DRIVER_VERSION, &device_param_string_value);
-                SKYNET_INFO("       driver version: %s\n",device_param_string_value.c_str());
+                SKYNET_DEBUG("       driver version: %s\n",device_param_string_value.c_str());
 
                 device_it->getInfo(CL_DEVICE_OPENCL_C_VERSION, &device_param_string_value);
-                SKYNET_INFO("       OpenCL C Version: %s\n",device_param_string_value.c_str());
+                SKYNET_DEBUG("       OpenCL C Version: %s\n",device_param_string_value.c_str());
 
                 device_it->getInfo(CL_DEVICE_PROFILE, &device_param_string_value);
-                SKYNET_INFO("       profile: %s\n",device_param_string_value.c_str());
+                SKYNET_DEBUG("       profile: %s\n",device_param_string_value.c_str());
 
                 device_it->getInfo(CL_DEVICE_GLOBAL_MEM_SIZE, &global_mem_size);
-                SKYNET_INFO("       global memory size: %lu\n",global_mem_size);
+                SKYNET_DEBUG("       global memory size: %lu\n",global_mem_size);
 
                 device_it->getInfo(CL_DEVICE_ADDRESS_BITS, &addr_size);
-                SKYNET_INFO("       address space size: %d\n",addr_size);
+                SKYNET_DEBUG("       address space size: %d\n",addr_size);
 
                 device_it->getInfo(CL_DEVICE_MAX_WORK_ITEM_SIZES, &device_param_numeric_value);
-                SKYNET_INFO("       max_work_item_sizes: %d x %d x %d\n",device_param_numeric_value[0],device_param_numeric_value[1],device_param_numeric_value[2]);
+                SKYNET_DEBUG("       max_work_item_sizes: %d x %d x %d\n",device_param_numeric_value[0],device_param_numeric_value[1],device_param_numeric_value[2]);
 
                 device_it->getInfo(CL_DEVICE_AVAILABLE, &device_param_bool_value);
-                SKYNET_INFO("       availability: %d\n",device_param_bool_value);
+                SKYNET_DEBUG("       availability: %d\n",device_param_bool_value);
 
                 device_it->getInfo(CL_DEVICE_COMPILER_AVAILABLE, &device_param_bool_value);
-                SKYNET_INFO("       compiler availability: %d\n",device_param_bool_value);
+                SKYNET_DEBUG("       compiler availability: %d\n",device_param_bool_value);
 
                 device_it->getInfo(CL_DEVICE_ADDRESS_BITS, &addr_size);
-                SKYNET_INFO("       address space size: %d\n",addr_size);
+                SKYNET_DEBUG("       address space size: %d\n",addr_size);
             }
    
 
@@ -154,7 +197,7 @@ void SkyNet::InitDevices()
 
         if( plat_it->getDevices(CL_DEVICE_TYPE_GPU, &m_devices ) == CL_SUCCESS ) {
             (m_devices.begin())->getInfo(CL_DEVICE_NAME, &device_param_string_value);
-            SKYNET_INFO(" HARDCODED GPU DEVICE to be used (temporary)  Device: %s\n",device_param_string_value.c_str());
+            SKYNET_DEBUG(" HARDCODED GPU DEVICE to be used (temporary)  Device: %s\n",device_param_string_value.c_str());
             return;
         }
     }
@@ -162,7 +205,7 @@ void SkyNet::InitDevices()
     for(std::vector<cl::Platform>::iterator plat_it = platforms.begin(); plat_it != platforms.end(); ++plat_it ) {
         if( plat_it->getDevices(CL_DEVICE_TYPE_ALL, &m_devices ) == CL_SUCCESS ) {
             (m_devices.begin())->getInfo(CL_DEVICE_NAME, &device_param_string_value);
-            SKYNET_INFO(" Chosen DEVICE to be used (temporary)  Device: %s\n",device_param_string_value.c_str());
+            SKYNET_DEBUG(" Chosen DEVICE to be used (temporary)  Device: %s\n",device_param_string_value.c_str());
             return;
         }
     }
@@ -220,6 +263,10 @@ void SkyNet::LoadModules(std::string modulesDirectoryName)
 
 void SkyNet::RunTests()
 {
+    // if termination flag is on then do not even start work
+    if (m_terminated == true) {
+        return;
+    }
     // diagnostic results are stored in directory named after process ID
     SkyNetDiagnostic diagnostic;
     // Just run all tests

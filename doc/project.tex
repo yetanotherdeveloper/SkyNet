@@ -108,6 +108,7 @@ SkyNet can be operated from command line. Options:
 
 Starting without parameters will run all possible tests of available modules.
 
+Currently to implement enabling selected module , by default all modules are enabled
 
 \section{Installation}
 \subsection{Building with GCC for generation of clang\_complete\_config}
@@ -134,13 +135,11 @@ make copy_clang_complete
 \item Write a report that clang complete works badly with C++ openCL
 \item each module should provide also CPU plain implementation of algorithm
 \item Modules are algorithms and Devices( hardware layer) are to be initialized in SkyNet core
-\item Command Line parser (use gnuopt)
 \item Create Contexts assigned to given devices/platforms
 \item Mapping of errors(ints) to strings
 \item As for drawing animation out generated weights. We could make a global output buffer
 containing weights as they are being updated
 \item Create a module creating gnuplot charts/ generting scripts making a movie out of generated charts
-\item User Interface (command line)
 \item serialization / loading initial weights from file 
 \item make gnuplot script generation of charts of learning steps , and make video out of it
 \item coding standard fixes:
