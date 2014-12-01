@@ -62,7 +62,7 @@ void SkyNet::PrintModules()
 //////////////////////////////////////////////////////////////////// 
 void SkyNet::PrintHelp()
 {
-    printf("SkyNet [--help] [--list_modules]\n");
+    printf("SkyNet [--help] [--list_modules] [--module <number of module to be loaded>]\n");
     return;
 }
 //////////////////////////////////////////////////////////////////// 
@@ -86,7 +86,7 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
         // Unrecognized option?
         if(c == '?')
         {
-            throw std::string("Skynet Error: Unrecognized option");
+            throw std::string("Skynet Error: Unrecognized option\n");
         }
         else if(c == 1)
         {

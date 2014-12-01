@@ -101,15 +101,11 @@ Implement charts generation (Error how does it change)
 \section{Usage Interface}
 SkyNet can be operated from command line. Options:
 \begin{itemize}
-\item list (lists available modules)
+\item list\_modules (lists available modules)
 \item help (print info about usage of SkyNet)
-\item test (Run Tests from specific module)
+\item module <number of module to be loaded> (run tests against indicated module. Numbers to be taken from list\_module option)
 \item loading weights from file
 \end{itemize}
-
-Starting without parameters will run all possible tests of available modules.
-
-Currently to implement enabling selected module , by default all modules are enabled
 
 \section{Installation}
 \subsection{Building with GCC for generation of clang\_complete\_config}
@@ -129,7 +125,7 @@ make copy_clang_complete
 \section{TODO}
 \begin{itemize}
 \item Make chart (iterations/ Ein)
-\item make selected module loading
+\item serialization / loading initial weights from file 
 \item Make exceptions,errors handling for SKyNetOpenCLHelper module
 \item Compilation flags for kernels should come from SkyNet module alond with device send or generate flags itself in helper
 \item make common module handling init of opencl and kernel/program building
@@ -143,7 +139,6 @@ make copy_clang_complete
 \item As for drawing animation out generated weights. We could make a global output buffer
 containing weights as they are being updated
 \item Create a module creating gnuplot charts/ generting scripts making a movie out of generated charts
-\item serialization / loading initial weights from file 
 \item make gnuplot script generation of charts of learning steps , and make video out of it
 \item coding standard fixes:
 \begin{enumerate}
