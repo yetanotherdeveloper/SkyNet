@@ -115,10 +115,9 @@ void PerceptronLearningAlgorithm::updateWeights(const point& rpoint)
 }
 
 // TODO: move this constant to some other area or make it derived based on number of training  points
-const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,
-                                                               SkyNetDiagnostic &diagnostic)              
+const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic)              
 {
-    m_weights = initial_weights;
+    m_weights = std::vector<float>(3,0.0f);
     const int max_iterations = 1000*trainingData.size();
     const point* misclassified = nullptr;
     int i=0;
@@ -139,8 +138,7 @@ const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector
 }
 
 
-const std::vector<float> & PerceptronLearningAlgorithm::RunCL(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,
-                                                               SkyNetDiagnostic &diagnostic)
+const std::vector<float> & PerceptronLearningAlgorithm::RunCL(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic)
 {
     float testValue = 0.0f;
     m_plaKernel->setArg(0,&testValue);

@@ -354,7 +354,6 @@ bool NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
 
 /////////////////////////////////////////////////////////////////////////////////////
 const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > & trainingData,
-                                                    const std::vector< float > & initial_weights,
                                                     SkyNetDiagnostic           &diagnostic )
 {
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() - 1 );
@@ -408,7 +407,6 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
 
 
 const std::vector< float > & NeuralNetwork::RunCL( const std::vector< point > &trainingData,
-                                                   const std::vector< float > &initial_weights,
                                                    SkyNetDiagnostic           &diagnostic )
 {
     float testValue = 0.0f;

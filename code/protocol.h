@@ -63,8 +63,8 @@ class ISkyNetClassificationProtocol
 public:
     virtual ~ISkyNetClassificationProtocol() {
     };
-    virtual const std::vector<float> & RunCL(const std::vector<point> &, const std::vector<float> &, SkyNetDiagnostic &)   = 0;
-    virtual const std::vector<float> & RunRef(const std::vector<point> &, const std::vector<float> &, SkyNetDiagnostic & ) = 0;
+    virtual const std::vector<float> & RunCL(const std::vector<point> &, SkyNetDiagnostic &)   = 0;
+    virtual const std::vector<float> & RunRef(const std::vector<point> &, SkyNetDiagnostic & ) = 0;
     virtual float getError(const std::vector<point> & data)                                                                = 0;
     virtual std::vector<int> & getClassification(const std::vector<point> & data)                                          = 0;
     virtual const std::string About() const                                                                                = 0;

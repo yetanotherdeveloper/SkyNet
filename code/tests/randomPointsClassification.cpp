@@ -22,14 +22,6 @@ randomPointsClassification::randomPointsClassification(unsigned int N, unsigned 
     generateSet( m_trainingSet, N );
     // Generate data for testing generalization
     generateSet( m_testingSet, N );
-
-    initWeights();
-}
-
-
-const std::vector< float > & randomPointsClassification::getInitialWeights()
-{
-    return m_iweights;
 }
 
 const std::vector<float> & randomPointsClassification::getTargetWeights()
@@ -196,14 +188,3 @@ void randomPointsClassification::makeRandomFunctions(unsigned int nrLines)
         m_fweights.push_back(r2x - r1x);            //B
     }
 }
-
-/*! Init weights
- */
-void randomPointsClassification::initWeights()
-{
-    m_iweights.push_back( 0.0f );  //w0
-    m_iweights.push_back( 0.0f );  //w1
-    m_iweights.push_back( 0.0f );  //w2
-    SKYNET_DEBUG( "Initial weights: w0=%f w1=%f w2=%f\n", m_iweights[0], m_iweights[1], m_iweights[2] );
-}
-

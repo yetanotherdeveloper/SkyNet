@@ -113,12 +113,12 @@ bool StochasticGradientDescent::updateWeights(const point &randomSample)
 
 
 // TODO: move this constant to some other area or make it derived based on number of training  points
-const std::vector<float> & StochasticGradientDescent::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,SkyNetDiagnostic &diagnostic)              
+const std::vector<float> & StochasticGradientDescent::RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic)              
 {
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() -1 );
     std::random_device rd;
 
-    m_weights = initial_weights;
+    m_weights = std::vector<float>(3,0.0f);
     const int max_iterations = 1000*trainingData.size();
     int i=0;
     bool finish = false;
@@ -143,7 +143,7 @@ const std::vector<float> & StochasticGradientDescent::RunRef(const std::vector<p
 }
 
 
-const std::vector<float> & StochasticGradientDescent::RunCL(const std::vector<point> &trainingData, const std::vector<float> &initial_weights, SkyNetDiagnostic &diagnostic)
+const std::vector<float> & StochasticGradientDescent::RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic)
 {
     float testValue = 0.0f;
     m_plaKernel->setArg(0,&testValue);

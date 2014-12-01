@@ -34,6 +34,6 @@ private:
     std::vector<cl::Device> m_devices;
     bool m_terminated;  //< No further work to be done. Just finish gracefully
     bool m_printmodules;//< Whether to print found
-    std::string m_enableModule;
+    unsigned short m_enableModule; 
 };
 #endif //__SKYNET__

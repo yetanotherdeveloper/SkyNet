@@ -8,7 +8,7 @@
 #include "os_inc.h"
 #include "tests/randomPointsClassification.h"
 
-SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodules(false), m_enableModule("")
+SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodules(false), m_enableModule(0) 
 {
     SKYNET_INFO("Skynet Initializing...\n\n");
 
@@ -29,6 +29,12 @@ SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodul
         SKYNET_INFO(err.c_str() );
         m_terminated = true;
     }
+    // CLI argument conversion to numeric value , failed
+    catch(std::invalid_argument err)
+    {
+        SKYNET_INFO("SkyNet Error: Invalid Argument value: %s\n", err.what());
+        m_terminated = true;
+    }
 }
 
 SkyNet::~SkyNet()
@@ -47,8 +53,9 @@ void SkyNet::PrintModules()
     if(m_printmodules == true)
     {
         SKYNET_INFO("\n List of found Machine learning modules:\n\n");
+        int lpr = 1;
         for(auto it = m_classifiers.begin(); it < m_classifiers.end(); ++it) {
-            SKYNET_INFO("   %s\n",it->module->About().c_str() );
+            SKYNET_INFO("    %d. %s\n",lpr++,it->module->About().c_str() );
         }
     }
 }
@@ -85,8 +92,10 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
         {
             PrintHelp();
             throw std::string("");
-        }
-        else if (c==4) {
+        } else if(c == 2) 
+        {
+            m_enableModule = std::stoi(optarg);         
+        } else if (c==4) {
             m_printmodules = true;
             m_terminated = true;
         }
@@ -264,25 +273,32 @@ void SkyNet::LoadModules(std::string modulesDirectoryName)
 void SkyNet::RunTests()
 {
     // if termination flag is on then do not even start work
-    if (m_terminated == true) {
+    if (m_terminated == true)
+    {
         return;
     }
     // diagnostic results are stored in directory named after process ID
     SkyNetDiagnostic diagnostic;
     // Just run all tests
     randomPointsClassification rpc(100,2);
-    std::vector<classificationModule>::iterator it; 
+    std::vector<classificationModule>::iterator it;
+    unsigned short                              module_lpr = 1;
     for(it = m_classifiers.begin(); it != m_classifiers.end(); ++it) {
-        diagnostic.reset();
-        SKYNET_INFO("Running OCL test against: %s\n",it->module->About().c_str());
-        // Pass Input data , and initial weights to RunCL , RunRef functions 
-        //it->module->RunCL();
-        rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),rpc.getInitialWeights(),diagnostic));
-        SKYNET_INFO("In-sample error: %f Out-of-sample error: %f\n",  rpc.validate(it->module->getClassification(rpc.getTrainingData())),rpc.verify(it->module->getClassification(rpc.getTestingData()))); 
-        SKYNET_INFO("GetError: %f\n",it->module->getError(rpc.getTrainingData()));
-        diagnostic.makeWeightsAnalysis(it->module->About()); 
-        diagnostic.makeTrainingAnalysis(it->module->About(),rpc.getTrainingData(), rpc.getTargetWeights() ,rpc.getWeights());
-        diagnostic.makeGeneralizationAnalysis(it->module->About(),rpc.getTestingData(), rpc.getTargetWeights() ,rpc.getWeights());
+        // Run all modules or only then one indicated by cli option: --module
+        if( (m_enableModule == 0) || (module_lpr == m_enableModule) )
+        {
+            diagnostic.reset();
+            SKYNET_INFO("Running OCL test against: %s\n",it->module->About().c_str() );
+            // Pass Input data , and initial weights to RunCL , RunRef functions
+            //it->module->RunCL();
+            rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),diagnostic) );
+            SKYNET_INFO("In-sample error: %f Out-of-sample error: %f\n",  rpc.validate(it->module->getClassification(rpc.getTrainingData() ) ),rpc.verify(it->module->getClassification(rpc.getTestingData() ) ) );
+            SKYNET_INFO("GetError: %f\n",it->module->getError(rpc.getTrainingData() ) );
+            diagnostic.makeWeightsAnalysis(it->module->About() );
+            diagnostic.makeTrainingAnalysis(it->module->About(),rpc.getTrainingData(), rpc.getTargetWeights(),rpc.getWeights() );
+            diagnostic.makeGeneralizationAnalysis(it->module->About(),rpc.getTestingData(), rpc.getTargetWeights(),rpc.getWeights() );
+        }
+        ++module_lpr;
     }
 }
 

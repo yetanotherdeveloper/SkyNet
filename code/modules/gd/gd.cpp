@@ -119,9 +119,9 @@ float GradientDescent::getError(const std::vector<point> & data)
 
 
 // TODO: move this constant to some other area or make it derived based on number of training  points
-const std::vector<float> & GradientDescent::RunRef(const std::vector<point> & trainingData, const std::vector<float> & initial_weights,SkyNetDiagnostic &diagnostic)              
+const std::vector<float> & GradientDescent::RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic)              
 {
-    m_weights = initial_weights;
+    m_weights = std::vector<float>(3,0.0f);
     const int max_iterations = 1000*trainingData.size();
     int i=0;
     bool finish = false;
@@ -141,7 +141,7 @@ const std::vector<float> & GradientDescent::RunRef(const std::vector<point> & tr
     return m_weights;
 }
 
-const std::vector<float> & GradientDescent::RunCL(const std::vector<point> &trainingData, const std::vector<float> &initial_weights, SkyNetDiagnostic &diagnostic)
+const std::vector<float> & GradientDescent::RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic)
 {
     float testValue = 0.0f;
     m_plaKernel->setArg(0,&testValue);

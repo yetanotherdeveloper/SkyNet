@@ -104,6 +104,7 @@ SkyNet can be operated from command line. Options:
 \item list (lists available modules)
 \item help (print info about usage of SkyNet)
 \item test (Run Tests from specific module)
+\item loading weights from file
 \end{itemize}
 
 Starting without parameters will run all possible tests of available modules.
@@ -127,6 +128,8 @@ make copy_clang_complete
 
 \section{TODO}
 \begin{itemize}
+\item Make chart (iterations/ Ein)
+\item make selected module loading
 \item Make exceptions,errors handling for SKyNetOpenCLHelper module
 \item Compilation flags for kernels should come from SkyNet module alond with device send or generate flags itself in helper
 \item make common module handling init of opencl and kernel/program building
