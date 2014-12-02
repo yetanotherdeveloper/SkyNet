@@ -137,11 +137,13 @@ void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
 
     std::ofstream script(m_dumpDirName + "/" + dirName + "/" + "/weights_and_errors.plot", std::ios::trunc);
     script << "set terminal png size 1280,960" << std::endl;
+    script << "set xlabel \"Iteration\"" << std::endl;
+    script << "set ylabel \"In-sample Error\"" << std::endl;
     script << "set output \"" << "weights_and_errors.png\"" << std::endl;
     script << "set title \"In-sample error E_in(iteration)"  << std::endl;
     script << "plot \"" << "weights_and_errors.txt" << "\" using 10 title \"In sample Error\""<< std::endl;
     script << "set terminal wxt" << std::endl;
-    script << "set output STDOUT" << std::endl;
+    script << "set output " << std::endl;
     script << "replot" << std::endl;
 }
 
