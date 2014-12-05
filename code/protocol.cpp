@@ -141,7 +141,7 @@ void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
     script << "set ylabel \"In-sample Error\"" << std::endl;
     script << "set output \"" << "weights_and_errors.png\"" << std::endl;
     script << "set title \"In-sample error E_in(iteration)"  << std::endl;
-    script << "plot \"" << "weights_and_errors.txt" << "\" using 10 title \"In sample Error\""<< std::endl;
+    script << "plot \"" << "weights_and_errors.txt" << "\" using "<<  std::to_string(m_history[0].m_weights.size() + 1) << " title \"In sample Error\""<< std::endl;
     script << "set terminal wxt" << std::endl;
     script << "set output " << std::endl;
     script << "replot" << std::endl;
