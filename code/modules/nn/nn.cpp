@@ -350,7 +350,44 @@ bool NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
 
     return finish;
 }
+/////////////////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+#include <termios.h>    // Termios 
+#include <fcntl.h>      // file control
+struct termios original,modified;
+int stdio_flags;
+
+void initTermios(void)
+{
+
+    tcgetattr(0,&original);
+    modified = original;    
+    modified.c_lflag &= ~ICANON;
+    modified.c_lflag &= ~ECHO;
+    tcsetattr(0, TCSANOW,&modified);
+    stdio_flags = fcntl(0,F_GETFL,0);
+    fcntl(0,F_SETFL, stdio_flags | O_NONBLOCK);
+}
+
+void resetTermios(void)
+{
+    tcsetattr(0, TCSANOW, &original);
+    fcntl(0,F_SETFL, stdio_flags );
+}
+
+void mygetch()
+{
+    char a = 0;
+    while(a != 'q') {
+        //std::cout << "Type something: " << std::endl;
+        initTermios();
+        //std::cin >> a;
+        a= getchar();
+        resetTermios();
+        printf("a: %c\n",a);    
+}
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > & trainingData,
