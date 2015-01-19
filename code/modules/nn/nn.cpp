@@ -350,48 +350,10 @@ bool NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
 
     return finish;
 }
-/////////////////////////////////////////////////////////////////////////////////////
-
-#include <iostream>
-#include <termios.h>    // Termios 
-#include <fcntl.h>      // file control
-struct termios original,modified;
-int stdio_flags;
-
-void initTermios(void)
-{
-
-    tcgetattr(0,&original);
-    modified = original;    
-    modified.c_lflag &= ~ICANON;
-    modified.c_lflag &= ~ECHO;
-    tcsetattr(0, TCSANOW,&modified);
-    stdio_flags = fcntl(0,F_GETFL,0);
-    fcntl(0,F_SETFL, stdio_flags | O_NONBLOCK);
-}
-
-void resetTermios(void)
-{
-    tcsetattr(0, TCSANOW, &original);
-    fcntl(0,F_SETFL, stdio_flags );
-}
-
-void mygetch()
-{
-    char a = 0;
-    while(a != 'q') {
-        //std::cout << "Type something: " << std::endl;
-        initTermios();
-        //std::cin >> a;
-        a= getchar();
-        resetTermios();
-        printf("a: %c\n",a);    
-}
-}
 
 /////////////////////////////////////////////////////////////////////////////////////
 const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > & trainingData,
-                                                    SkyNetDiagnostic           &diagnostic )
+                                                    SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter)
 {
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() - 1 );
     std::random_device rd;
@@ -422,6 +384,9 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
 
         getAllWeights(all_weights);
         diagnostic.storeWeightsAndError(all_weights,getError(trainingData) );
+
+        // Check if user want to cease learning
+        finish = finish || exitter();
         if( finish == false )
         {
             ++i;
@@ -444,7 +409,8 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
 
 
 const std::vector< float > & NeuralNetwork::RunCL( const std::vector< point > &trainingData,
-                                                   SkyNetDiagnostic           &diagnostic )
+                                                   SkyNetDiagnostic           &diagnostic,
+                                                   SkynetTerminalInterface& exitter)
 {
     float testValue = 0.0f;
     m_plaKernel->setArg( 0, &testValue );

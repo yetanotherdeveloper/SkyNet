@@ -42,12 +42,12 @@ float SupportVectorMachine::getError(const std::vector<point> & data)
 }
 
 
-const std::vector<float> & SupportVectorMachine::RunCL(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic)
+const std::vector<float> & SupportVectorMachine::RunCL(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
 {
 }
 
 
-const std::vector<float> & SupportVectorMachine::RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic)
+const std::vector<float> & SupportVectorMachine::RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
 {
     return m_weights;
 }

@@ -110,10 +110,10 @@ SkyNet can be operated from command line. Options:
 \section{Serialization}
 It is all about storing learned weights so they can be loadedl ateron and learning can be resumed.
 Loosy. So RunRef RunCL methods will be updated with callback routine to be calledi n between interations
- Some verification if data suits for selected algorithm should be added
-
-
-
+Some verification if data suits for selected algorithm should be added. 
+There is a protocol class for checking if specific key was pressed and returns true if that is the case
+At the same time weights storring takes place . If no key was pressed then weights that were learned are also stored at very end.
+From Commandline interface it is possible to resume learning starting from loaded (previously stored weights).
 
 \section{Installation}
 \subsection{Building with GCC for generation of clang\_complete\_config}

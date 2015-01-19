@@ -283,6 +283,7 @@ void SkyNet::RunTests()
     randomPointsClassification rpc(100,2);
     std::vector<classificationModule>::iterator it;
     unsigned short                              module_lpr = 1;
+    SkynetTerminalInterface                     exitter('q');
     for(it = m_classifiers.begin(); it != m_classifiers.end(); ++it) {
         // Run all modules or only then one indicated by cli option: --module
         if( (m_enableModule == 0) || (module_lpr == m_enableModule) )
@@ -291,7 +292,7 @@ void SkyNet::RunTests()
             SKYNET_INFO("Running OCL test against: %s\n",it->module->About().c_str() );
             // Pass Input data , and initial weights to RunCL , RunRef functions
             //it->module->RunCL();
-            rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),diagnostic) );
+            rpc.setWeights(it->module->RunRef(rpc.getTrainingData(),diagnostic, exitter ) );
             SKYNET_INFO("In-sample error: %f Out-of-sample error: %f\n",  rpc.validate(it->module->getClassification(rpc.getTrainingData() ) ),rpc.verify(it->module->getClassification(rpc.getTestingData() ) ) );
             SKYNET_INFO("GetError: %f\n",it->module->getError(rpc.getTrainingData() ) );
             diagnostic.makeWeightsAnalysis(it->module->About() );

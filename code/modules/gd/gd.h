@@ -26,8 +26,8 @@ private:
 public:
     GradientDescent( const cl::Device * const pdevice );
     ~GradientDescent();
-    const std::vector<float> & RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic);
-    const std::vector< float > & RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic);              
+    const std::vector<float> & RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+    const std::vector< float > & RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
     const std::string About() const;
     static std::string composeAboutString( const cl::Device *const pdevice );
     float getError(const std::vector<point> & data);

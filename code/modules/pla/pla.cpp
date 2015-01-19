@@ -115,7 +115,7 @@ void PerceptronLearningAlgorithm::updateWeights(const point& rpoint)
 }
 
 // TODO: move this constant to some other area or make it derived based on number of training  points
-const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic)              
+const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)              
 {
     m_weights = std::vector<float>(3,0.0f);
     const int max_iterations = 1000*trainingData.size();
@@ -125,6 +125,8 @@ const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector
     diagnostic.storeWeightsAndError(m_weights,getError(trainingData));
     while((i<max_iterations)&&(finish == false))  {
         finish = !getMisclassifiedPoint(trainingData,&misclassified);
+        // Check if user want to cease learning
+        finish = finish || exitter();
         if(finish == false) {
             updateWeights(*misclassified);
             diagnostic.storeWeightsAndError(m_weights,getError(trainingData));
@@ -138,7 +140,7 @@ const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector
 }
 
 
-const std::vector<float> & PerceptronLearningAlgorithm::RunCL(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic)
+const std::vector<float> & PerceptronLearningAlgorithm::RunCL(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
 {
     float testValue = 0.0f;
     m_plaKernel->setArg(0,&testValue);
