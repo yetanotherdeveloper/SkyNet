@@ -38,6 +38,7 @@ public:
     void reset();
     void storeWeightsAndError(const std::vector<float> &weights, float error);
     void makeWeightsAnalysis(const std::string& dirName);
+    void saveWeightsToFile(const std::string& dirName);
     void makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & set,
                               const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights);
     void makeGeneralizationAnalysis(const std::string& dirName,const std::vector<point> & set,

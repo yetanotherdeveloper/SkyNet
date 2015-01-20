@@ -97,8 +97,31 @@ void SkyNetDiagnostic::storeWeightsAndError(const std::vector<float> &weights, f
 {
     m_history.push_back(historicalNote(weights,error) );
 }
+///////////////////////////////////////////////////////////////////////////////////////
+/// Function to save learned wieghts into file: final_weights.txt
+void SkyNetDiagnostic::saveWeightsToFile(const std::string& dirName)
+{
+    if(m_history.empty() )
+    {
+        printf("Error: There is no weights to be dumped\n");
+        return;
+    }
 
+    // create PID directory, do some check if this is allowed
+    SkyNetOS::CreateDirectory(m_dumpDirName + "/" + dirName);
 
+    // dump weights with proper comments ofcourse as a first line
+    std::ofstream dumpfile(m_dumpDirName + "/" + dirName + "/final_weights.txt", std::ios::trunc);
+    dumpfile << "#" << dirName << std::endl;
+
+    unsigned int nr_weights = m_history[m_history.size() - 1].m_weights.size(); 
+
+    for(unsigned int j = 0; j < nr_weights; ++j)
+    {
+        dumpfile << " " + std::to_string( (m_history[m_history.size() - 1].m_weights)[j]);
+    }
+}
+///////////////////////////////////////////////////////////////////////////////////////
 // TODO: portable way of creating directories
 void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
 {
