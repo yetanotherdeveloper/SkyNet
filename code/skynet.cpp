@@ -2,17 +2,19 @@
 #include <getopt.h>
 #include <errno.h>
 #include <stack>
+#include <iostream>
+#include <fstream>
 #include <CL/cl.hpp>
 
 #include "skynet.h"
 #include "os_inc.h"
 #include "tests/randomPointsClassification.h"
 
-SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodules(false), m_enableModule(0) 
+SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodules(false), m_enableModule(0), m_moduleToLoad("") 
 {
     SKYNET_INFO("Skynet Initializing...\n\n");
 
-    SKYNET_INFO("Processing command line\n");
+    SKYNET_DEBUG("Processing command line\n");
     try {
         ProcessCommandLine(argc,argv);
 
@@ -62,7 +64,7 @@ void SkyNet::PrintModules()
 //////////////////////////////////////////////////////////////////// 
 void SkyNet::PrintHelp()
 {
-    printf("SkyNet [--help] [--list_modules] [--module <number of module to be loaded>]\n");
+    printf("SkyNet [--help] [--list_modules] [--resume=<Path to file with stored weights eg. final_weights.txt>]  [--module <number of module to be loaded>]\n");
     return;
 }
 //////////////////////////////////////////////////////////////////// 
@@ -79,6 +81,7 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
     struct option longopts[] = { {"help", no_argument, nullptr, 1 },
                                  {"module", required_argument, nullptr, 2 },
                                  {"list_modules", no_argument, nullptr, 4 },
+                                 {"resume", required_argument, nullptr, 8 },
                                  {0,0,0,0}};
     do
     {
@@ -98,6 +101,9 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
         } else if (c==4) {
             m_printmodules = true;
             m_terminated = true;
+        } else if (c==8) {
+            m_moduleToLoad = getModuleToLoad(optarg);
+            SKYNET_INFO("Resuming Training for: %s\n",m_moduleToLoad.c_str());
         }
     }
     while(c != -1);
@@ -105,8 +111,24 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
     return;
 }
 //////////////////////////////////////////////////////////////////// 
+std::string SkyNet::getModuleToLoad(char *fileToLoad)
+{
+    std::ifstream file(fileToLoad);
+    std::string line;
+    if (file.is_open())
+    {
+        std::getline(file,line);
+        std::cout << "Odczyt: " << line << std::endl;
 
-
+    } else {
+        SKYNET_INFO(" %s",fileToLoad); 
+        std::string err_string("Error: Unable to open a file: ");
+        err_string += fileToLoad;
+        throw std::invalid_argument(err_string);
+    }
+    return line.substr(1); 
+}
+//////////////////////////////////////////////////////////////////// 
 // Scan available computing devices
 //
 //
@@ -246,9 +268,14 @@ void SkyNet::LoadModules(std::string modulesDirectoryName)
                     // based on identity assign to proper module holders
                     id = module->Identify();
                     if(id.compare("ISkyNetClassificationProtocol") == 0) {
-                        this->m_classifiers.push_back({module,libHandle});
-                        info = "    " + module->About() + " [OK]\n";
-                        SKYNET_INFO(info.c_str() );
+                        // If either no module to Load is specifically selected (All found modules are to be load)
+                        // or module to Load was selected and candiadte module's about string matches
+                        // then load candidate module
+                        if((m_moduleToLoad.size() == 0) || ( m_moduleToLoad.compare(module->About()) == 0 ))  {
+                            this->m_classifiers.push_back({module,libHandle});
+                            info = "    " + module->About() + " [OK]\n";
+                            SKYNET_INFO(info.c_str() );
+                        }
                     }
                 }
                 break;

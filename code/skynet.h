@@ -27,6 +27,7 @@ private:
     void LoadModules(std::string modulesDirectoryName);
     void InitDevices();
     void ProcessCommandLine(int argc, char *const *argv);
+    std::string getModuleToLoad(char *fileToLoad);
     void PrintHelp();
     void PrintModules();
 private:
@@ -35,5 +36,7 @@ private:
     bool m_terminated;  //< No further work to be done. Just finish gracefully
     bool m_printmodules;//< Whether to print found
     unsigned short m_enableModule; 
+    std::string m_moduleToLoad;
+
 };
 #endif //__SKYNET__

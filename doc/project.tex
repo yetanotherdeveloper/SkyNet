@@ -114,6 +114,8 @@ Some verification if data suits for selected algorithm should be added.
 There is a protocol class for checking if specific key was pressed and returns true if that is the case
 At the same time weights storring takes place . If no key was pressed then weights that were learned are also stored at very end.
 From Commandline interface it is possible to resume learning starting from loaded (previously stored weights).
+So in file with weights we have a name of algorithm (first line starting with #) and weights itself (second line). So
+based on this info we can resume training of specific algorithm using given weights from file as starting weights.
 
 \section{Installation}
 \subsection{Building with GCC for generation of clang\_complete\_config}
@@ -132,7 +134,7 @@ make copy_clang_complete
 
 \section{TODO}
 \begin{itemize}
-\item serialization / loading initial weights from file  
+\item serialization / loading initial weights from file (load from file.. loading from file selects algorithm to be used) 
 \item make proper stopping criteria
 \item Make exceptions,errors handling for SKyNetOpenCLHelper module
 \item Compilation flags for kernels should come from SkyNet module alond with device send or generate flags itself in helper
