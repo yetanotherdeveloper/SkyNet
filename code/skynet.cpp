@@ -114,19 +114,28 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
 std::string SkyNet::getModuleToLoad(char *fileToLoad)
 {
     std::ifstream file(fileToLoad);
-    std::string line;
+    std::string module_name;
     if (file.is_open())
     {
-        std::getline(file,line);
-        std::cout << "Odczyt: " << line << std::endl;
-
+        // Read name of module for which weights are stored
+        std::getline(file,module_name);
+        // read weights
+        std::string weight;
+        while(!file.eof()) {
+            std::getline(file,weight,' ');
+            // At very beginning there is a space so we may get empty read
+            if(weight.size() != 0) {
+                m_moduleWeights.push_back(std::stof(weight)); 
+            }
+        }
     } else {
         SKYNET_INFO(" %s",fileToLoad); 
         std::string err_string("Error: Unable to open a file: ");
         err_string += fileToLoad;
         throw std::invalid_argument(err_string);
     }
-    return line.substr(1); 
+    // Return first line read starting from second character (to omit '#' that starts the line in a file)
+    return module_name.substr(1); 
 }
 //////////////////////////////////////////////////////////////////// 
 // Scan available computing devices

@@ -529,6 +529,12 @@ float NeuralNetwork::NeuralLayer::Neuron::getDelta()
     return m_delta;
 }
 
+void NeuralNetwork::NeuralLayer::Neuron::setWeight( unsigned int index, float value )
+{
+    // given index needs to be within range [0..size of mweights-1]
+    assert( index < m_weights.size() );
+    m_weights[index] = value;
+}
 
 float NeuralNetwork::NeuralLayer::Neuron::getWeight( unsigned int index )
 {

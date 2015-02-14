@@ -37,6 +37,7 @@ private:
     bool m_printmodules;//< Whether to print found
     unsigned short m_enableModule; 
     std::string m_moduleToLoad;
+    std::vector< float > m_moduleWeights;   //< serialized Weights for given module (to be used for initialization of learning for this module)
 
 };
 #endif //__SKYNET__

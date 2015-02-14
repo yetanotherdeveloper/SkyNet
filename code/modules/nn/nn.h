@@ -53,6 +53,7 @@ public:
             float getOutput(const std::vector<float> & input);
             void setDelta(float deltaValue);
             float getDelta();
+            void setWeight( unsigned int index, float value );
             float getWeight(unsigned int index);
             float getWeightsQuantity();
             bool updateWeights( const point & input ); // Update weights of Neuron
