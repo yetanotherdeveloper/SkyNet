@@ -282,7 +282,12 @@ void SkyNet::LoadModules(std::string modulesDirectoryName)
                         // then load candidate module
                         if((m_moduleToLoad.size() == 0) || ( m_moduleToLoad.compare(module->About()) == 0 ))  {
                             this->m_classifiers.push_back({module,libHandle});
+                            // Initialize weights to those read from given file eg. resume ceased learning
+                            if( m_moduleToLoad.compare(module->About()) == 0 ) {
+                                module->setWeights(m_moduleWeights);
+                            }
                             info = "    " + module->About() + " [OK]\n";
+                            
                             SKYNET_INFO(info.c_str() );
                         }
                     }

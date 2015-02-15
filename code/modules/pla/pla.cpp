@@ -34,6 +34,7 @@ PerceptronLearningAlgorithm::PerceptronLearningAlgorithm(const cl::Device* const
 
     //TODO: error handling section
 
+    m_weights = std::vector<float>(3,0.0f);
 }
 
 std::string PerceptronLearningAlgorithm::composeAboutString(const cl::Device* const pdevice)
@@ -124,7 +125,6 @@ void PerceptronLearningAlgorithm::updateWeights(const point& rpoint)
 // TODO: move this constant to some other area or make it derived based on number of training  points
 const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)              
 {
-    m_weights = std::vector<float>(3,0.0f);
     const int max_iterations = 1000*trainingData.size();
     const point* misclassified = nullptr;
     int i=0;

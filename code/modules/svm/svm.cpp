@@ -10,6 +10,7 @@ extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const p
 SupportVectorMachine::SupportVectorMachine(const cl::Device* const pdevice) : m_about("Support Vector Machine"), m_pdevice(pdevice)
 {
 
+    m_weights = std::vector<float>(3,0.0f);
 }
 SupportVectorMachine::~SupportVectorMachine()
 {

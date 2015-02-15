@@ -34,6 +34,7 @@ StochasticGradientDescent::StochasticGradientDescent(const cl::Device* const pde
     m_plaKernel = SkyNetOpenCLHelper::makeKernels(*m_pContext, *pdevice, kernelSource, "dodaj" );
 
     //TODO: error handling section
+    m_weights = std::vector<float>(3,0.0f);
 
 }
 
@@ -125,7 +126,6 @@ const std::vector<float> & StochasticGradientDescent::RunRef(const std::vector<p
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() -1 );
     std::random_device rd;
 
-    m_weights = std::vector<float>(3,0.0f);
     const int max_iterations = 1000*trainingData.size();
     int i=0;
     bool finish = false;
