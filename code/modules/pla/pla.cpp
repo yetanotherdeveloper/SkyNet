@@ -66,6 +66,13 @@ int PerceptronLearningAlgorithm::classifyPoint(const point &rpoint)
     return rpoint.x * m_weights[1] + m_weights[2] * rpoint.y + m_weights[0] >= 0.0f ? 1 : -1;
 }
 
+void PerceptronLearningAlgorithm::setWeights(std::vector< float > &initial_weights)
+{
+    for(unsigned int i =0; i< m_weights.size(); ++i) 
+    {
+        m_weights[i] = initial_weights[i];
+    }
+}
 
 // routine to calculate classification and pick missclassiffied point
 bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point> & trainingData, const point** output)

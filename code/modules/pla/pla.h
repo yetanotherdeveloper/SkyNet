@@ -25,6 +25,7 @@ public:
     PerceptronLearningAlgorithm(const cl::Device * const pdevice);
     ~PerceptronLearningAlgorithm();
     void RunCL();
+    void setWeights(std::vector< float > &initial_weights);
     const std::vector<float> & RunCL(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
     const std::vector<float> & RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
     const std::string About() const;

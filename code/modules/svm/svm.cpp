@@ -19,6 +19,13 @@ SupportVectorMachine::~SupportVectorMachine()
     //m_queue = NULL;
 }
 
+void SupportVectorMachine::setWeights(std::vector< float > &initial_weights)
+{
+    for(unsigned int i =0; i< m_weights.size(); ++i) 
+    {
+        m_weights[i] = initial_weights[i];
+    }
+}
 
 std::vector<int> & SupportVectorMachine::getClassification(const std::vector<point> & data)
 {

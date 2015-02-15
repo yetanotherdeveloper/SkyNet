@@ -416,8 +416,23 @@ const std::vector< float > & NeuralNetwork::RunCL( const std::vector< point > &t
     m_plaKernel->setArg( 0, &testValue );
     m_pCommandQueue->enqueueTask( *m_plaKernel );
 }
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////
+void NeuralNetwork::setWeights(std::vector< float > &initial_weights)
+{
+    // We assume here that given vector of weights correspond in size to
+    // architecture of this neural network
+    unsigned int k = 0;
+    for( unsigned int i = 0; i < m_layers.size(); ++i )
+    {
+        for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
+        {
+            for(unsigned int w = 0; w < m_layers[i].m_neurons[j].getWeightsQuantity(); ++w) {
+                m_layers[i].m_neurons[j].setWeight(w,initial_weights[k++]);
+            }
+        }
+    }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////
 const std::string NeuralNetwork::About() const
 {
     // TODO: Return Also Device we are running for

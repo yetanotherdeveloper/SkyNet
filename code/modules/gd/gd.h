@@ -29,6 +29,7 @@ public:
     const std::vector<float> & RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
     const std::vector< float > & RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
     const std::string About() const;
+    void setWeights(std::vector< float > &initial_weights);
     static std::string composeAboutString( const cl::Device *const pdevice );
     float getError(const std::vector<point> & data);
     std::vector<int> & getClassification(const std::vector<point> & data);

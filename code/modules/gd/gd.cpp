@@ -110,8 +110,15 @@ bool GradientDescent::updateWeights( const std::vector< point > & trainingData )
 
     return false;
 }
-
-
+////////////////////////////////////////////////////////////////////////////
+void GradientDescent::setWeights(std::vector< float > &initial_weights)
+{
+    for(unsigned int i =0; i< m_weights.size(); ++i) 
+    {
+        m_weights[i] = initial_weights[i];
+    }
+}
+////////////////////////////////////////////////////////////////////////////
 float GradientDescent::getError(const std::vector<point> & data)
 {
     return 1.0f;
