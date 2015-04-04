@@ -27,7 +27,7 @@ public:
     StochasticGradientDescent( const cl::Device * const pdevice );
     ~StochasticGradientDescent();
     const std::vector<float> & RunCL(const std::vector<point> &, SkyNetDiagnostic &, SkynetTerminalInterface& exitter);
-    const std::vector< float > & RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+    const std::vector< float > & RunRef(const std::vector<point> & trainingData,const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
     const std::string About() const;
     void setWeights(std::vector< float > &initial_weights);
     static std::string composeAboutString( const cl::Device *const pdevice );

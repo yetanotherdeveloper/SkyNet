@@ -79,7 +79,9 @@ public:
     NeuralNetwork( const cl::Device * const pdevice, unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype = GradientDescentType::STOCHASTIC);
     ~NeuralNetwork();
     const std::vector<float> & RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
-    const std::vector< float > & RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+    const std::vector< float > & RunRef(const std::vector<point> & trainingData, 
+                                        const std::vector<point> &validationData,
+                                        SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
     void setWeights(std::vector< float > &initial_weights);
     const std::string About() const;
     static std::string composeAboutString( const cl::Device *const pdevice );

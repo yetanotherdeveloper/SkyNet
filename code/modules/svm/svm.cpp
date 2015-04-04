@@ -55,7 +55,7 @@ const std::vector<float> & SupportVectorMachine::RunCL(const std::vector<point> 
 }
 
 
-const std::vector<float> & SupportVectorMachine::RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
+const std::vector<float> & SupportVectorMachine::RunRef(const std::vector<point> & trainingData,const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
 {
     return m_weights;
 }

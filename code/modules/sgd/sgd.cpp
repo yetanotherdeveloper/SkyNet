@@ -121,7 +121,7 @@ bool StochasticGradientDescent::updateWeights(const point &randomSample)
 
 
 // TODO: move this constant to some other area or make it derived based on number of training  points
-const std::vector<float> & StochasticGradientDescent::RunRef(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)              
+const std::vector<float> & StochasticGradientDescent::RunRef(const std::vector<point> & trainingData, const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)              
 {
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() -1 );
     std::random_device rd;
