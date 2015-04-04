@@ -20,6 +20,8 @@ randomPointsClassification::randomPointsClassification(unsigned int N, unsigned 
 
     // Generate learning data
     generateSet( m_trainingSet, N );
+    // Generate validation set (used for early stopping)
+    generateSet( m_validationSet, N/2 );
     // Generate data for testing generalization
     generateSet( m_testingSet, N );
 }
@@ -83,8 +85,12 @@ float randomPointsClassification::getErrorRate(const std::vector<point> &samples
     
     return error_rate/(float)samples.size();
 }
-
-
+///////////////////////////////////////////////////////////////////////////
+const std::vector< point > & randomPointsClassification::getValidationData()
+{
+    return m_validationSet;
+}
+////////////////////////////////////////////////////////////////////////////
 const std::vector< point > & randomPointsClassification::getTrainingData()
 {
     return m_trainingSet;

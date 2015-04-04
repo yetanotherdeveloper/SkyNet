@@ -17,10 +17,12 @@ class randomPointsClassification
         std::vector<float> m_weights;       /// hypotesis weights
         std::vector<float> m_iweights;       /// initial weights (weights to start with)
         std::vector<point> m_trainingSet;
+        std::vector<point> m_validationSet;
         std::vector<point> m_testingSet;
     public:
         randomPointsClassification(unsigned int N, unsigned int nrLines);
         const std::vector<point> & getTrainingData();
+        const std::vector< point > & getValidationData();
         const std::vector<point> & getTestingData();
         const std::vector<float> & getWeights();
 		const std::vector<float> & getTargetWeights();

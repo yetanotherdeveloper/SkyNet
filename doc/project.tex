@@ -114,8 +114,18 @@ Some verification if data suits for selected algorithm should be added.
 There is a protocol class for checking if specific key was pressed and returns true if that is the case
 At the same time weights storring takes place . If no key was pressed then weights that were learned are also stored at very end.
 From Commandline interface it is possible to resume learning starting from loaded (previously stored weights).
-So in file with weights we have a name of algorithm (first line starting with #) and weights itself (second line). So
+So in file with weights we have a name of algorithm (first line starting with \#) and weights itself (second line). So
 based on this info we can resume training of specific algorithm using given weights from file as starting weights.
+
+\section{Stopping Ciriteria}
+Implement Early stop method\\
+Things to do:
+\begin{enumerate}
+\item Create validation set next to test and training sets
+\item Implement calcullating of validation error and dumping it into file with training error 
+\end{enumerate}
+
+Currently changing protocol interface to accept validation set as well
 
 
 \section{Installation}
