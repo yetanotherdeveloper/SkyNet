@@ -130,11 +130,11 @@ const std::vector<float> & StochasticGradientDescent::RunRef(const std::vector<p
     int i=0;
     bool finish = false;
     //TODO: Store proper error
-    diagnostic.storeWeightsAndError(m_weights,0.0f);
+    diagnostic.storeWeightsAndError(m_weights,0.0f,0.0f);
     while((i<max_iterations)&&(finish == false))  {
         finish = updateWeights(trainingData[sample_index(rd)]);
         //TODO: Store proper error
-        diagnostic.storeWeightsAndError(m_weights,0.0f);
+        diagnostic.storeWeightsAndError(m_weights,0.0f, 0.0f);
         // Check if user want to cease learning
         finish = finish || exitter();
         if(finish == false) {

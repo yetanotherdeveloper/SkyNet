@@ -361,7 +361,7 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
 
     std::vector<float> all_weights;
     getAllWeights(all_weights);
-    diagnostic.storeWeightsAndError(all_weights,getError(trainingData) );
+    diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
 
     unsigned int max_iterations = 10000;
     if(m_gradType == GradientDescentType::STOCHASTIC)
@@ -384,7 +384,7 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
         //float err_after = getError(trainingData);
 
         getAllWeights(all_weights);
-        diagnostic.storeWeightsAndError(all_weights,getError(trainingData) );
+        diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
 
         // Check if user want to cease learning
         finish = finish || exitter();

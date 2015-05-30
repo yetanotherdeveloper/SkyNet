@@ -129,14 +129,14 @@ const std::vector<float> & PerceptronLearningAlgorithm::RunRef(const std::vector
     const point* misclassified = nullptr;
     int i=0;
     bool finish = false;
-    diagnostic.storeWeightsAndError(m_weights,getError(trainingData));
+    diagnostic.storeWeightsAndError(m_weights,getError(trainingData), getError(validationData) );
     while((i<max_iterations)&&(finish == false))  {
         finish = !getMisclassifiedPoint(trainingData,&misclassified);
         // Check if user want to cease learning
         finish = finish || exitter();
         if(finish == false) {
             updateWeights(*misclassified);
-            diagnostic.storeWeightsAndError(m_weights,getError(trainingData));
+            diagnostic.storeWeightsAndError(m_weights,getError(trainingData), getError(validationData) );
             ++i;
         }
     } 

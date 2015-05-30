@@ -123,9 +123,10 @@ Things to do:
 \begin{enumerate}
 \item Create validation set next to test and training sets
 \item Implement calcullating of validation error and dumping it into file with training error 
+\item Draw a chart of training error and validation error to see when overfitting starts 
 \end{enumerate}
 
-Currently changing protocol interface to accept validation set as well as training set
+Next Step: Verify generated data and charts and then proceed with implementing Validation measure
 
 
 
@@ -153,9 +154,9 @@ make copy_clang_complete
 \item make common module handling init of opencl and kernel/program building
 \item Make a git branches: master and milestone(release)
 \item make/lear proper c++ exceptions usage to handle errors of OpenCL initialization
-\item Write a report that clang complete works badly with C++ openCL
 \item each module should provide also CPU plain implementation of algorithm
 \item Modules are algorithms and Devices( hardware layer) are to be initialized in SkyNet core
+\item Add routines for measuring time eg. time of day etc
 \item Create Contexts assigned to given devices/platforms
 \item Mapping of errors(ints) to strings
 \item As for drawing animation out generated weights. We could make a global output buffer

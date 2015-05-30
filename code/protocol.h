@@ -22,8 +22,10 @@ class SkyNetDiagnostic
     struct historicalNote
     {
         std::vector<float> m_weights;
-        float m_error;
-        historicalNote(const std::vector<float> &weights, float error) : m_weights(weights), m_error(error)
+        float m_in_error;
+        float m_val_error;
+        historicalNote(const std::vector<float> &weights, float in_error, float val_error) :
+                             m_weights(weights), m_in_error(in_error), m_val_error(val_error) 
         {
         }
 
@@ -36,7 +38,7 @@ public:
     SkyNetDiagnostic();
     ~SkyNetDiagnostic();
     void reset();
-    void storeWeightsAndError(const std::vector<float> &weights, float error);
+    void storeWeightsAndError(const std::vector<float> &weights, float in_error, float val_error);
     void makeWeightsAnalysis(const std::string& dirName);
     void saveWeightsToFile(const std::string& dirName);
     void makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & set,

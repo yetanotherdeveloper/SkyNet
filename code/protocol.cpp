@@ -93,9 +93,9 @@ void SkyNetDiagnostic::reset()
 }
 
 
-void SkyNetDiagnostic::storeWeightsAndError(const std::vector<float> &weights, float error)
+void SkyNetDiagnostic::storeWeightsAndError(const std::vector<float> &weights, float in_error, float val_error)
 {
-    m_history.push_back(historicalNote(weights,error) );
+    m_history.push_back(historicalNote(weights,in_error, val_error) );
 }
 ///////////////////////////////////////////////////////////////////////////////////////
 /// Function to save learned wieghts into file: final_weights.txt
@@ -145,7 +145,10 @@ void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
         dumpfile << " w" + std::to_string(i);
     }
     // After weights there is an in sample error
-    dumpfile << " E" << std::endl;
+    dumpfile << " Ein" << std::endl;
+
+    // And validation error as a next one
+    dumpfile << " Eval" << std::endl;
 
     // This module holds the history of weights (how weights evolved over time
     // number of weights is constant across history
@@ -155,16 +158,16 @@ void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
         {
             dumpfile << " " + std::to_string( (m_history[i].m_weights)[j]);
         }
-        dumpfile << " " << std::to_string( m_history[i].m_error) << std::endl;
+        dumpfile << " " << std::to_string( m_history[i].m_in_error) << " " << std::to_string(m_history[i].m_val_error) <<  std::endl;
     }
 
     std::ofstream script(m_dumpDirName + "/" + dirName + "/" + "/weights_and_errors.plot", std::ios::trunc);
     script << "set terminal png size 1280,960" << std::endl;
     script << "set xlabel \"Iteration\"" << std::endl;
-    script << "set ylabel \"In-sample Error\"" << std::endl;
+    script << "set ylabel \"Error\"" << std::endl;
     script << "set output \"" << "weights_and_errors.png\"" << std::endl;
-    script << "set title \"In-sample error E_in(iteration)"  << std::endl;
-    script << "plot \"" << "weights_and_errors.txt" << "\" using "<<  std::to_string(m_history[0].m_weights.size() + 1) << " title \"In sample Error\""<< std::endl;
+    script << "set title \"In-sample and Validation errors: E_in(iteration), E_val(iteration)"  << std::endl;
+    script << "plot \"" << "weights_and_errors.txt" << "\" using "<<  std::to_string(m_history[0].m_weights.size() + 1) << " title \"In sample Error\"," << "\"" << "weights_and_errors.txt" << "\" using "<<  std::to_string(m_history[0].m_weights.size() + 2) << " title \"Validation Error\""<< std::endl;
     script << "set terminal wxt" << std::endl;
     script << "set output " << std::endl;
     script << "replot" << std::endl;

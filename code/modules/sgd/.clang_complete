@@ -1,9 +1,9 @@
--I/mnt/android/NN/opencl/code/.
--I/mnt/android/NN/opencl/code/./..
--I/mnt/android/NN/opencl/code/./os/linux
--I/mnt/android/NN/opencl/code/modules/sgd/../../os/linux
--I/mnt/android/NN/opencl/code/modules/sgd/.
--I/mnt/android/NN/opencl/code/modules/sgd/../..
+-I/home/jczaja/projects/intel/opencl/code/.
+-I/home/jczaja/projects/intel/opencl/code/./..
+-I/home/jczaja/projects/intel/opencl/code/./os/linux
+-I/home/jczaja/projects/intel/opencl/code/modules/sgd/../../os/linux
+-I/home/jczaja/projects/intel/opencl/code/modules/sgd/.
+-I/home/jczaja/projects/intel/opencl/code/modules/sgd/../..
 -DDEBUG
 -Dsgd_EXPORTS
 -std=c++11
