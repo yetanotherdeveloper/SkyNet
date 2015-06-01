@@ -226,6 +226,9 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
         }
     }
 
+
+    //TODO : finish can be used to check if enough big update of weights was made 
+    //
     // Finish rule is that we end when no single neuron was updated above theta value
     bool finish = true;
     // update first layer
@@ -363,15 +366,17 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
     getAllWeights(all_weights);
     diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
 
-    unsigned int max_iterations = 10000;
-    if(m_gradType == GradientDescentType::STOCHASTIC)
-    {
-        max_iterations *= trainingData.size();
-    }
+    unsigned int max_iterations = 30000;
+    //if(m_gradType == GradientDescentType::STOCHASTIC)
+    //{
+        //max_iterations *= trainingData.size();
+    //}
+
+    SkyNetEarlyStop es(max_iterations, 0.4f);
 
     int       i              = 0;
     bool      finish         = false;
-    while( (i < max_iterations) && (finish == false) )
+    while( (es.earlyStop(all_weights,getError(validationData)) == false) && (exitter() == false) )
     {
         //float err_before = getError(trainingData);
         if(m_gradType == GradientDescentType::STOCHASTIC)
@@ -385,19 +390,6 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
 
         getAllWeights(all_weights);
         diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
-
-        // Check if user want to cease learning
-        finish = finish || exitter();
-        if( finish == false )
-        {
-            ++i;
-        }
-        else
-        {
-            // TODO: If flatness was reached then
-            // check if error is below certain error threshold
-        }
-
     }
     if( finish == false )
     {

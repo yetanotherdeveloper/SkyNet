@@ -63,6 +63,42 @@ public:
     static std::unique_ptr<cl::Kernel> makeKernels(const cl::Context & context,const cl::Device & target_device, const std::string & kernelSource, const std::string kernelName);
 };
 
+/// This module is implementing early stop algorithm
+class SkyNetEarlyStop
+{
+private:
+        std::vector<float> m_weights;
+        float m_opt_val_error;
+        unsigned int m_iteration;          // Current number of iterations processed
+        unsigned int m_min_num_iterations; // minimum number of iterations to be processed (we won't stop before getting
+                                           //  errors of that much iterations at least
+        float m_alpha;  //threashold above which we stop training
+public:
+        SkyNetEarlyStop(unsigned int min_num_iterations, float alpha) : m_opt_val_error(1.0f), m_alpha(alpha), 
+                        m_iteration(0), m_min_num_iterations(min_num_iterations)  
+        {
+        } 
+
+        bool earlyStop( std::vector<float>& weights, float val_error)
+        {
+            // TODO: verify if this works
+            if(val_error < m_opt_val_error ) {
+                m_weights = weights;
+                m_opt_val_error = val_error;
+            }
+            float gen_loss = val_error/m_opt_val_error - 1.0f;
+            printf("GenLoss[%d]: %f\n",m_iteration,gen_loss);
+
+            ++m_iteration;
+            // TODO: temporary solution
+            if(m_iteration > m_min_num_iterations) {
+                return true;
+            } 
+
+            return false;
+        }
+};
+
 /// This module can check if specific key was pressed 
 /// if specific key was pressed then call operator returns true
 class SkynetTerminalInterface
