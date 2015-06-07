@@ -91,7 +91,7 @@ public:
 
             ++m_iteration;
             // TODO: temporary solution
-            if(m_iteration > m_min_num_iterations) {
+            if((m_iteration > m_min_num_iterations) && (gen_loss > m_alpha)) {
                 return true;
             } 
 

@@ -366,7 +366,7 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
     getAllWeights(all_weights);
     diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
 
-    unsigned int max_iterations = 30000;
+    unsigned int max_iterations = 3000;
     //if(m_gradType == GradientDescentType::STOCHASTIC)
     //{
         //max_iterations *= trainingData.size();
