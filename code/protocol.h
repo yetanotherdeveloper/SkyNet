@@ -73,30 +73,63 @@ private:
         unsigned int m_min_num_iterations; // minimum number of iterations to be processed (we won't stop before getting
                                            //  errors of that much iterations at least
         float m_alpha;  //threashold above which we stop training
+        float m_beta;   //threshold below which training progress is considered not very high
+        unsigned int m_strip_size; //< size of strip within which we evaluate training error progress
+        std::vector<float> m_training_errors; //Holds all training elements of given strip
 public:
         SkyNetEarlyStop(unsigned int min_num_iterations, float alpha) : m_opt_val_error(1.0f), m_alpha(alpha), 
-                        m_iteration(0), m_min_num_iterations(min_num_iterations)  
+                        m_iteration(0), m_min_num_iterations(min_num_iterations), m_strip_size(5), m_beta(0.1)  
         {
+            m_training_errors.resize(m_strip_size, 1.0f);
         } 
 
-        bool earlyStop( std::vector<float>& weights, float val_error)
+        bool earlyStop( std::vector<float>& weights, float val_error, float training_error)
         {
-            // TODO: verify if this works
+            // If recent validation error is lower than optimal(minimal) one recorded
+            // then make it new optimal validation error and store corressponding weights
             if(val_error < m_opt_val_error ) {
                 m_weights = weights;
                 m_opt_val_error = val_error;
             }
-            float gen_loss = val_error/m_opt_val_error - 1.0f;
-            printf("GenLoss[%d]: %f\n",m_iteration,gen_loss);
+
+            // Store training errors from a current strip in a vector
+            // to lateron calculate average / minimal ratio
+            m_training_errors[m_iteration % m_strip_size] = training_error;
 
             ++m_iteration;
-            // TODO: temporary solution
-            if((m_iteration > m_min_num_iterations) && (gen_loss > m_alpha)) {
-                return true;
+
+            // 1. At least minimal number of iterations has to pass to even consider early stopping of training
+            // 2. Make validation / training error validation at the end of strip
+            // 3. Generalization loss has to be higher than threshold (alpha)
+            if((m_iteration > m_min_num_iterations) && (m_iteration % m_strip_size == 0  ) ) {
+
+                if( getTrainingRate() < m_beta )
+                {
+                    float gen_loss = val_error/m_opt_val_error - 1.0f;
+                    printf("GenLoss[%d]: %f\n",m_iteration,gen_loss);
+                    if(gen_loss > m_alpha) {
+                        return true;
+                    }
+                }
             } 
 
             return false;
         }
+private:
+    // Get rate of average training error within a strip to minimum training
+    // error within a strip (minus 1.0)
+    // so it is measure of progress in training error evaluation
+    float getTrainingRate(void)
+    {
+        float sum_errors = m_training_errors[0];
+        float min_error = sum_errors;
+        for( short int i = 1; i < m_strip_size; ++i)
+        {
+            sum_errors += m_training_errors[i];
+            min_error = m_training_errors[i] < min_error ? m_training_errors[i] : min_error;
+        } 
+        return (sum_errors / (m_strip_size * min_error)) - 1.0f;
+    }
 };
 
 /// This module can check if specific key was pressed 

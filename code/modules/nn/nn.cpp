@@ -376,7 +376,7 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
 
     int       i              = 0;
     bool      finish         = false;
-    while( (es.earlyStop(all_weights,getError(validationData)) == false) && (exitter() == false) )
+    while( (es.earlyStop(all_weights,getError(validationData),getError(trainingData)) == false) && (exitter() == false) )
     {
         //float err_before = getError(trainingData);
         if(m_gradType == GradientDescentType::STOCHASTIC)
