@@ -391,11 +391,12 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
         getAllWeights(all_weights);
         diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
     }
-    if( finish == false )
-    {
-        printf(
-            "Warning: Neural Network Learning alogorithm exhusted all iterations. TODO: Make proper termination criteria\n" );
-    }
+    // Get optimal found weights to be final weights
+    es.getOptimalWeights(all_weights);
+    setWeights(all_weights);
+    diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
+
+
     // TODO: temporayr hack till I can get something decent
     return *(new std::vector<float>(3,0.0f) );
 }

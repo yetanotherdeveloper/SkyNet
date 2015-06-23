@@ -145,10 +145,8 @@ void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
         dumpfile << " w" + std::to_string(i);
     }
     // After weights there is an in sample error
-    dumpfile << " Ein" << std::endl;
-
-    // And validation error as a next one
-    dumpfile << " Eval" << std::endl;
+    // and validation error as a next one
+    dumpfile << " Ein" << " Eval" << std::endl;
 
     // This module holds the history of weights (how weights evolved over time
     // number of weights is constant across history
