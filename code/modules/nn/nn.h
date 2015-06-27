@@ -56,8 +56,8 @@ public:
             void setWeight( unsigned int index, float value );
             float getWeight(unsigned int index);
             float getWeightsQuantity();
-            bool updateWeights( const point & input ); // Update weights of Neuron
-            bool updateWeights( const std::vector<float> & input ); // Update weights of Neuron
+            void updateWeights( const point & input ); // Update weights of Neuron
+            void updateWeights( const std::vector<float> & input ); // Update weights of Neuron
         };
 public:
         std::vector<Neuron> m_neurons;
@@ -91,8 +91,8 @@ private:
     float getNetworkOutput(const point &randomSample);
     void getAllWeights(std::vector< float > &all_weights);
     float getSampleClassificationError(const point& sample,float output);
-    bool updateWeights(const point &randomSample);
-    bool updateWeights(const std::vector< point > & trainingData);
+    void updateWeights(const point &randomSample);
+    void updateWeights(const std::vector< point > & trainingData);
 };
 #endif //__NN__
 

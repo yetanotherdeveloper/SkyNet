@@ -171,7 +171,7 @@ float NeuralNetwork::getNetworkOutput(const point &randomSample)
  *            E_in(w(t)) is square error eg. square error on random sample() from training set
  *
  */
-bool NeuralNetwork::updateWeights( const point &randomSample )
+void NeuralNetwork::updateWeights( const point &randomSample )
 {
     // Get final delta: de/ds^l
     std::vector< float >             input;
@@ -226,15 +226,10 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
         }
     }
 
-
-    //TODO : finish can be used to check if enough big update of weights was made 
-    //
-    // Finish rule is that we end when no single neuron was updated above theta value
-    bool finish = true;
     // update first layer
     for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
     {
-        finish = m_layers[0].m_neurons[j].updateWeights( randomSample ) && finish;
+        m_layers[0].m_neurons[j].updateWeights( randomSample );
     }
 
     // update hidden layers
@@ -243,10 +238,9 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
         for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
         {
             // pass as input to neurons of given layer an output of previous layer
-            finish = m_layers[i].m_neurons[j].updateWeights( neurons_outputs[i - 1] ) && finish;
+            m_layers[i].m_neurons[j].updateWeights( neurons_outputs[i - 1] );
         }
     }
-    return finish;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -261,14 +255,13 @@ bool NeuralNetwork::updateWeights( const point &randomSample )
  *            E_in(w(t)) is square error eg. square error on random sample() from training set
  *
  */
-bool NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
+void NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
 {
     // Get final delta: de/ds^l
     std::vector< float >             input;
     std::vector< float >             output;
     std::vector<std::vector<float> > neurons_outputs;    // All outputs are here 0 - first layer, 1 - first hidden..
 
-    bool finish = true;
     // init vector of layers with vector of outputs for each layer
     for(unsigned int m = 0; m < m_layers.size(); ++m) {
         neurons_outputs.push_back(input);
@@ -335,7 +328,7 @@ bool NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
         // update first layer
         for( unsigned int j = 0; j < m_layers[0].m_neurons.size(); ++j )
         {
-            finish = m_layers[0].m_neurons[j].updateWeights( trainingData[s] ) && finish;
+            m_layers[0].m_neurons[j].updateWeights( trainingData[s] );
         }
 
         // update hidden layers
@@ -344,14 +337,10 @@ bool NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
             for( unsigned int j = 0; j < m_layers[i].m_neurons.size(); ++j )
             {
                 // pass as input to neurons of given layer an output of previous layer
-                finish = m_layers[i].m_neurons[j].updateWeights( neurons_outputs[i - 1] ) && finish;
+                m_layers[i].m_neurons[j].updateWeights( neurons_outputs[i - 1] );
             }
         }
-
-
     }   //s
-
-    return finish;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -367,23 +356,18 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
     diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
 
     unsigned int max_iterations = 3000;
-    //if(m_gradType == GradientDescentType::STOCHASTIC)
-    //{
-        //max_iterations *= trainingData.size();
-    //}
 
     SkyNetEarlyStop es(max_iterations, 0.4f);
 
     int       i              = 0;
-    bool      finish         = false;
     while( (es.earlyStop(all_weights,getError(validationData),getError(trainingData)) == false) && (exitter() == false) )
     {
         //float err_before = getError(trainingData);
         if(m_gradType == GradientDescentType::STOCHASTIC)
         {
-            finish = updateWeights( trainingData[sample_index( rd )] );
+            updateWeights( trainingData[sample_index( rd )] );
         } else {
-            finish = updateWeights( trainingData );
+            updateWeights( trainingData );
         }
 
         //float err_after = getError(trainingData);
@@ -560,7 +544,7 @@ float NeuralNetwork::NeuralLayer::Neuron::getWeightsQuantity()
 
 //TODO: Make it a template not a copy of functions
 
-bool NeuralNetwork::NeuralLayer::Neuron::updateWeights( const point & input )
+void NeuralNetwork::NeuralLayer::Neuron::updateWeights( const point & input )
 {
     float dw0,dw1,dw2;
     // w <-- w - theta * x^(l-1)*Delta^l
@@ -572,19 +556,10 @@ bool NeuralNetwork::NeuralLayer::Neuron::updateWeights( const point & input )
     m_weights[0] += dw0;
     m_weights[1] += dw1;
     m_weights[2] += dw2;
-
-    // sum of updates to weights is less then our flatness value then
-    // we decalre that no progress is made
-    if( dw0 * dw0 + dw1 * dw1 + dw2 * dw2 <= s_flatness )
-    {
-        return true;
-    }
-
-    return false;
 }
 
 
-bool NeuralNetwork::NeuralLayer::Neuron::updateWeights( const std::vector<float> & input )
+void NeuralNetwork::NeuralLayer::Neuron::updateWeights( const std::vector<float> & input )
 {
     float dw0,dw1,dw2;
     // w <-- w - theta * x^(l-1)*Delta^l
@@ -596,13 +571,4 @@ bool NeuralNetwork::NeuralLayer::Neuron::updateWeights( const std::vector<float>
     m_weights[0] += dw0;
     m_weights[1] += dw1;
     m_weights[2] += dw2;
-
-    // sum of updates to weights is less then our flatness value then
-    // we decalre that no progress is made
-    if( dw0 * dw0 + dw1 * dw1 + dw2 * dw2 <= s_flatness )
-    {
-        return true;
-    }
-
-    return false;
 }
