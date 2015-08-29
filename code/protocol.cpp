@@ -166,7 +166,7 @@ void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
     script << "set output \"" << "weights_and_errors.png\"" << std::endl;
     script << "set title \"In-sample and Validation errors: E_in(iteration), E_val(iteration)"  << std::endl;
     script << "plot \"" << "weights_and_errors.txt" << "\" using "<<  std::to_string(m_history[0].m_weights.size() + 1) << " title \"In sample Error\"," << "\"" << "weights_and_errors.txt" << "\" using "<<  std::to_string(m_history[0].m_weights.size() + 2) << " title \"Validation Error\""<< std::endl;
-    script << "set terminal wxt" << std::endl;
+    script << "set terminal x11" << std::endl;
     script << "set output " << std::endl;
     script << "replot" << std::endl;
 }

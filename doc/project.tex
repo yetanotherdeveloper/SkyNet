@@ -118,40 +118,36 @@ So in file with weights we have a name of algorithm (first line starting with \#
 based on this info we can resume training of specific algorithm using given weights from file as starting weights.
 
 \section{Stopping Ciriteria}
-Implement Early stop method\\
-Things to do:
-\begin{enumerate}
-\item Create validation set next to test and training sets
-\item Implement calcullating of validation error and dumping it into file with training error 
-\item Draw a chart of training error and validation error to see when overfitting starts 
-\end{enumerate}
+Early stopping module is checking validation error every (strip size). Minimal (optimal) Validation error is being
+stored and it corressponding weights. stopping criteria that when training error (average training error . divided by minimal training error
+within considered strip) is not decreasing, then if current validation error is significantly bigger than so far found minimal validation error then
+we can finish training.
 
-Next Step: Compile, test , verify validation and training error progress 
-Next Step: clean stuff up, (remove finish references)
-Next Step: Verify generated of General loss earl stop
-Next Step: Describe here used algorithm
-
-
-
+\section{MNIST training}
+Next Steps:
+\begin{itemize}
+\item draw MNIST characters
+\item add automatic download of MNIST (python sript)
+\item integrate mnist loading/displaying
+\item start implemnting MNIST test 
+\end{itemize}
 
 \section{Installation}
 \subsection{Building with GCC for generation of clang\_complete\_config}
 \begin{verbatim}
-CXX='/home/jczaja/.vim/bundle/clang_complete/bin/cc_args.py g++'   cmake ../code/
+cmake ../code/
 make VERBOSE=1
-make copy_clang_complete
 \end{verbatim}
 \subsection{Building with Clang}
 \begin{verbatim}
-CXX='/home/jczaja/.vim/bundle/clang_complete/bin/cc_args.py clang++'   cmake ../code/
+CXX=clang++  cmake ../code/
 make VERBOSE=1
-make copy_clang_complete
 \end{verbatim}
 
 
 \section{TODO}
 \begin{itemize}
-\item make proper stopping criteria
+\item modules are to be meant NN models eg. applications of alogithms
 \item Make exceptions,errors handling for SKyNetOpenCLHelper module
 \item Compilation flags for kernels should come from SkyNet module alond with device send or generate flags itself in helper
 \item make common module handling init of opencl and kernel/program building

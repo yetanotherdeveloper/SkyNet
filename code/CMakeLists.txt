@@ -54,7 +54,7 @@ endforeach(subdir)
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 find_library(OPENCL_LIB OpenCL PATHS lib/opencl)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-find_library(OPENCL_LIB OpenCL PATHS /usr/lib)
+find_library(OPENCL_LIB cl PATHS /usr/lib64/beignet)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 add_executable(skynet ${SOURCE})
