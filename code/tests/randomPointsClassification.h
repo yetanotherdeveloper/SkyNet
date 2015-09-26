@@ -1,5 +1,6 @@
 #ifndef __RANDOM_POINTS_CLASSIFFICATION__
 #define __RANDOM_POINTS_CLASSIFFICATION__
+#include "tests.h"
 #include <vector>
 #include <protocol.h>
 /*! Object represting an instance of random point classification class
@@ -8,7 +9,7 @@
  *
    !*/
 
-class randomPointsClassification
+class randomPointsClassification 
 {
     private:
         float              m_minX, m_maxX;
@@ -39,4 +40,6 @@ class randomPointsClassification
         int classifyPoint(const point& sample, const std::vector<float> &weights);
         int classifyPoint(const point& sample);
 };
+
+
 #endif //__RANDOM_POINTS_CLASSIFFICATION__

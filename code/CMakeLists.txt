@@ -15,7 +15,7 @@ if(${CMAKE_BUILD_TYPE} MATCHES Debug)
 add_definitions(-DDEBUG)
 endif()
 
-set(SOURCE main.cpp protocol.cpp skynet.cpp tests/randomPointsClassification.cpp)
+set(SOURCE main.cpp protocol.cpp skynet.cpp tests/randomPointsClassification.cpp  tests/mnistClassification.cpp)
 include_directories(./)
 include_directories(./../)  # external headers (opencl) lies here
 

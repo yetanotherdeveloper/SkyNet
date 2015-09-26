@@ -1,6 +1,8 @@
 #include <random>
 #include <cassert>
 #include "randomPointsClassification.h"
+#include "mnistClassification.h"
+#include "tests.h"
 #include "os_inc.h"
 
 
@@ -193,4 +195,7 @@ void randomPointsClassification::makeRandomFunctions(unsigned int nrLines)
         m_fweights.push_back(r1y - r2y);            //A
         m_fweights.push_back(r2x - r1x);            //B
     }
+}
+namespace {
+auto a = TestsRegistry::inst().addTest("Random points");
 }

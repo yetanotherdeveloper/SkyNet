@@ -9,8 +9,9 @@
 #include "skynet.h"
 #include "os_inc.h"
 #include "tests/randomPointsClassification.h"
+#include "tests/tests.h"
 
-SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodules(false), m_enableModule(0), m_moduleToLoad("") 
+SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodules(false), m_printTests(false), m_enableModule(0), m_moduleToLoad("") 
 {
     SKYNET_INFO("Skynet Initializing...\n\n");
 
@@ -25,6 +26,7 @@ SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodul
         LoadModules(std::string("./modules") );
         LoadModules(std::string("/usr/share/skynet/modules") );
         PrintModules();
+        PrintTests();
     }
     catch(std::string err)
     {
@@ -50,6 +52,15 @@ SkyNet::~SkyNet()
     
 }
 //////////////////////////////////////////////////////////////////// 
+void SkyNet::PrintTests()
+{
+    if(m_printTests == true)
+    {
+        SKYNET_INFO("\n List of found Machine learning tests:\n\n");
+        TestsRegistry::inst().printTests(); 
+    }
+}
+//////////////////////////////////////////////////////////////////// 
 void SkyNet::PrintModules()
 {
     if(m_printmodules == true)
@@ -64,7 +75,7 @@ void SkyNet::PrintModules()
 //////////////////////////////////////////////////////////////////// 
 void SkyNet::PrintHelp()
 {
-    printf("SkyNet [--help] [--list_modules] [--resume=<Path to file with stored weights eg. final_weights.txt>]  [--module <number of module to be loaded>]\n");
+    printf("SkyNet [--help] [--list_tests] [--list_modules] [--resume=<Path to file with stored weights eg. final_weights.txt>]  [--module=<number of module to be loaded>]  [--test=<number of test to be executed>] \n");
     return;
 }
 //////////////////////////////////////////////////////////////////// 
@@ -82,6 +93,8 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
                                  {"module", required_argument, nullptr, 2 },
                                  {"list_modules", no_argument, nullptr, 4 },
                                  {"resume", required_argument, nullptr, 8 },
+                                 {"test", required_argument, nullptr, 16 },
+                                 {"list_tests", no_argument, nullptr, 32 },
                                  {0,0,0,0}};
     do
     {
@@ -104,6 +117,11 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
         } else if (c==8) {
             m_moduleToLoad = getModuleToLoad(optarg);
             SKYNET_INFO("Resuming Training for: %s\n",m_moduleToLoad.c_str());
+        } else if (c==16) {
+            m_testToExecute = std::stoi(optarg);
+        } else if (c==32) {
+            m_printTests = true;
+            m_terminated = true;
         }
     }
     while(c != -1);
