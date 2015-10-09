@@ -196,6 +196,13 @@ void randomPointsClassification::makeRandomFunctions(unsigned int nrLines)
         m_fweights.push_back(r2x - r1x);            //B
     }
 }
+
+
+
 namespace {
-auto a = TestsRegistry::inst().addTest("Random points");
+void runTest(void)
+{
+    std::cout << "Random points Test executing!" << std::endl;
+}
+auto a = TestsRegistry::inst().addTest("Random points", runTest);
 }

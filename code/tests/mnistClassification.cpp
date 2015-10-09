@@ -6,5 +6,10 @@ mnistClassification::mnistClassification(std::string mnist_dirname)
 }
 
 namespace {
-auto a = TestsRegistry::inst().addTest("MNIST");
+
+void runTest(void)
+{
+    std::cout << "MNIST Test executing!" << std::endl;
+}
+auto a = TestsRegistry::inst().addTest("MNIST",runTest);
 }

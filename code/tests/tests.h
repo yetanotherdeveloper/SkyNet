@@ -3,6 +3,11 @@
 
 #include <iostream>
 #include <vector>
+#include <utility>
+#include <cassert>
+
+// Callback function , that each test should be providing  
+typedef void (*runTestCallback)(void);
 
 // Here I'm writting singleton object for keeping tests
 class TestsRegistry
@@ -14,18 +19,37 @@ public:
         return instance;
     }
 
-    bool addTest(std::string testName)
+    bool addTest(std::string testName, runTestCallback start_test_routine)
     {
-        m_testsRegistry.push_back(testName); 
+        m_testsRegistry.push_back(std::make_pair(testName,start_test_routine)); 
         return true;
     }
 
     void printTests()
     {
-        for(auto& test: m_testsRegistry ) 
+        unsigned short i = 1;
+        for(auto& registered_test : m_testsRegistry) 
         {
-            std::cout << test << std::endl;
+            std::cout << i++ << ". "<< registered_test.first << std::endl;
         }
+    }
+
+    void executeTest(unsigned short test_id = 0)
+    {
+        if(test_id == 0)
+        {
+            // Execute all tests
+            for(auto& test_to_execute : m_testsRegistry)
+            {
+                test_to_execute.second();
+            }
+        } else {
+            // Execute selected test
+            // test_id is from 1 to number of tests
+            // so we need to subtract one to get actual entry in registry
+            assert(test_id <= m_testsRegistry.size());
+            m_testsRegistry[test_id-1].second();
+        }    
     }
 
 private:
@@ -34,7 +58,7 @@ private:
         m_testsRegistry.clear();
     }
 
-    std::vector<std::string> m_testsRegistry;
+    std::vector<std::pair<std::string,runTestCallback>> m_testsRegistry;
 };
 
 #endif

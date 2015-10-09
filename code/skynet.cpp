@@ -11,7 +11,8 @@
 #include "tests/randomPointsClassification.h"
 #include "tests/tests.h"
 
-SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodules(false), m_printTests(false), m_enableModule(0), m_moduleToLoad("") 
+SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodules(false), m_printTests(false), m_enableModule(0), 
+                                               m_moduleToLoad(""), m_testToExecute(0)  
 {
     SKYNET_INFO("Skynet Initializing...\n\n");
 
@@ -336,6 +337,11 @@ void SkyNet::RunTests()
     {
         return;
     }
+
+    TestsRegistry::inst().executeTest(m_testToExecute);
+   
+    // TODO: Move everything below into run test routines 
+
     // diagnostic results are stored in directory named after process ID
     SkyNetDiagnostic diagnostic;
     // Just run all tests
