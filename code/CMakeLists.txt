@@ -34,6 +34,20 @@ else()
 fatal("OpenMP support missing in compiler")
 endif()
 
+find_package(ImageMagick COMPONENTS Magick++)
+
+if(ImageMagick_Magick++_FOUND)
+message("INCLUDES: ${ImageMagick_INCLUDE_DIRS}")
+message("LIBS: ${ImageMagick_LIBRARIES}")
+else()
+message(fatal "No Magic++ of ImageMagic found")
+endif()
+
+include_directories(${ImageMagick_INCLUDE_DIRS})
+
+
+
+
 include_directories("/usr/include")
 include_directories("/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include")
 
@@ -58,7 +72,7 @@ find_library(OPENCL_LIB cl PATHS /usr/lib64/beignet)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 add_executable(skynet ${SOURCE})
-target_link_libraries(skynet dl ${OPENCL_LIB})
+target_link_libraries(skynet dl ${OPENCL_LIB} ${ImageMagick_LIBRARIES})
 
 install(TARGETS skynet DESTINATION bin)
 
