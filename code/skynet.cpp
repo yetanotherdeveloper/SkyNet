@@ -16,7 +16,6 @@ SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodul
 {
     SKYNET_INFO("Skynet Initializing...\n\n");
 
-    SKYNET_DEBUG("Processing command line\n");
     try {
         ProcessCommandLine(argc,argv);
 
