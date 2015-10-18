@@ -53,6 +53,21 @@ SkyNet::~SkyNet()
     
 }
 //////////////////////////////////////////////////////////////////// 
+const std::vector<SkyNet::classificationModule>& SkyNet::getClassificationModules(void)    
+{
+    static std::vector<SkyNet::classificationModule> classifier;
+    classifier.clear();
+
+    // if no specific module was pointed out, then
+    // return reference to list of all modules
+    if(m_enableModule == 0) {
+        return m_classifiers;
+    } else {
+        classifier.push_back(m_classifiers[m_enableModule - 1]);
+        return classifier;
+    }
+}
+//////////////////////////////////////////////////////////////////// 
 void SkyNet::PrintTests()
 {
     if(m_printTests == true)
@@ -338,35 +353,7 @@ void SkyNet::RunTests()
         return;
     }
 
-    TestsRegistry::inst().executeTest(m_testToExecute);
+    TestsRegistry::inst().executeTest(*this, m_testToExecute);
    
-    // TODO: Move everything below into run test routines 
-
-    // diagnostic results are stored in directory named after process ID
-    SkyNetDiagnostic diagnostic;
-    // Just run all tests
-    randomPointsClassification rpc(100,2);
-    std::vector<classificationModule>::iterator it;
-    unsigned short                              module_lpr = 1;
-    SkynetTerminalInterface                     exitter('q');
-    for(it = m_classifiers.begin(); it != m_classifiers.end(); ++it) {
-        // Run all modules or only then one indicated by cli option: --module
-        if( (m_enableModule == 0) || (module_lpr == m_enableModule) )
-        {
-            diagnostic.reset();
-            SKYNET_INFO("Running OCL test against: %s\n",it->module->About().c_str() );
-            // Pass Input data , and initial weights to RunCL , RunRef functions
-            //it->module->RunCL();
-            rpc.setWeights(it->module->RunRef(rpc.getTrainingData(), rpc.getValidationData(), diagnostic, exitter ) );
-            // TODO: Check next two lines, what is the point of them? Clean stuff up
-            SKYNET_INFO("In-sample error: %f Out-of-sample error: %f\n",  rpc.validate(it->module->getClassification(rpc.getTrainingData() ) ),rpc.verify(it->module->getClassification(rpc.getTestingData() ) ) );
-            SKYNET_INFO("GetError: %f\n",it->module->getError(rpc.getTrainingData() ) );
-            diagnostic.makeWeightsAnalysis(it->module->About());
-            diagnostic.saveWeightsToFile(it->module->About());
-            diagnostic.makeTrainingAnalysis(it->module->About(),rpc.getTrainingData(), rpc.getTargetWeights(),rpc.getWeights() );
-            diagnostic.makeGeneralizationAnalysis(it->module->About(),rpc.getTestingData(), rpc.getTargetWeights(),rpc.getWeights() );
-        }
-        ++module_lpr;
-    }
 }
 

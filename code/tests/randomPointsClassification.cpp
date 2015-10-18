@@ -200,9 +200,30 @@ void randomPointsClassification::makeRandomFunctions(unsigned int nrLines)
 
 
 namespace {
-void runTest(void)
+void runTest(SkyNet& skynet_instance)
 {
     std::cout << "Random points Test executing!" << std::endl;
+    SkyNetDiagnostic diagnostic;
+    randomPointsClassification rpc(100,2);
+    SkynetTerminalInterface                     exitter('q');
+
+    // diagnostic results are stored in directory named after process ID
+    auto classifiers = skynet_instance.getClassificationModules();
+
+    for(auto& classifier : classifiers) 
+    {
+        diagnostic.reset();
+        SKYNET_INFO("Running Random points classification test against: %s\n",classifier.module->About().c_str() );
+        // Pass Input data , and initial weights to RunCL , RunRef functions
+        rpc.setWeights(classifier.module->RunRef(rpc.getTrainingData(), rpc.getValidationData(), diagnostic, exitter ) );
+        // TODO: Check next two lines, what is the point of them? Clean stuff up
+        SKYNET_INFO("In-sample error: %f Out-of-sample error: %f\n",  rpc.validate(classifier.module->getClassification(rpc.getTrainingData() ) ),rpc.verify(classifier.module->getClassification(rpc.getTestingData() ) ) );
+        SKYNET_INFO("GetError: %f\n",classifier.module->getError(rpc.getTrainingData() ) );
+        diagnostic.makeWeightsAnalysis(classifier.module->About());
+        diagnostic.saveWeightsToFile(classifier.module->About());
+        diagnostic.makeTrainingAnalysis(classifier.module->About(),rpc.getTrainingData(), rpc.getTargetWeights(),rpc.getWeights() );
+        diagnostic.makeGeneralizationAnalysis(classifier.module->About(),rpc.getTestingData(), rpc.getTargetWeights(),rpc.getWeights() );
+    }
 }
 auto a = TestsRegistry::inst().addTest("Random points", runTest);
 }

@@ -13,6 +13,7 @@ namespace cl
 
 class SkyNet
 {
+public:
     typedef struct
     {
         ISkyNetClassificationProtocol* module;
@@ -23,6 +24,9 @@ public:
     SkyNet(int argc, char *const *argv);
     ~SkyNet();
     void RunTests();
+
+    const std::vector<classificationModule>& getClassificationModules(void);    
+
 private:
     void LoadModules(std::string modulesDirectoryName);
     void InitDevices();
