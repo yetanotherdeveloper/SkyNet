@@ -26,6 +26,7 @@ public:
     void RunTests();
 
     const std::vector<classificationModule>& getClassificationModules(void);    
+    const std::string& getMnistDataDir(void);
 
 private:
     void LoadModules(std::string modulesDirectoryName);
@@ -44,6 +45,7 @@ private:
     unsigned short m_enableModule; 
     unsigned short m_testToExecute; 
     std::string m_moduleToLoad;
+    std::string m_mnist_dir;        //< Directory holding MNIST data
     std::vector< float > m_moduleWeights;   //< serialized Weights for given module (to be used for initialization of learning for this module)
 
 };

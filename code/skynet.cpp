@@ -67,6 +67,11 @@ const std::vector<SkyNet::classificationModule>& SkyNet::getClassificationModule
     }
 }
 //////////////////////////////////////////////////////////////////// 
+const std::string& SkyNet::getMnistDataDir(void)
+{
+    return m_mnist_dir;
+}
+//////////////////////////////////////////////////////////////////// 
 void SkyNet::PrintTests()
 {
     if(m_printTests == true)
@@ -90,7 +95,7 @@ void SkyNet::PrintModules()
 //////////////////////////////////////////////////////////////////// 
 void SkyNet::PrintHelp()
 {
-    printf("SkyNet [--help] [--list_tests] [--list_modules] [--resume=<Path to file with stored weights eg. final_weights.txt>]  [--module=<number of module to be loaded>]  [--test=<number of test to be executed>] \n");
+    printf("SkyNet [--help] [--list_tests] [--list_modules] [--resume=<Path to file with stored weights eg. final_weights.txt>]  [--module=<number of module to be loaded>]  [--test=<number of test to be executed>] [--mnist-data=<directory where MNIST datas are.>]\n");
     return;
 }
 //////////////////////////////////////////////////////////////////// 
@@ -110,6 +115,7 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
                                  {"resume", required_argument, nullptr, 8 },
                                  {"test", required_argument, nullptr, 16 },
                                  {"list_tests", no_argument, nullptr, 32 },
+                                 {"mnist-data", required_argument, nullptr, 64 },
                                  {0,0,0,0}};
     do
     {
@@ -137,6 +143,8 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
         } else if (c==32) {
             m_printTests = true;
             m_terminated = true;
+        } else if (c==64) {
+            m_mnist_dir = optarg;
         }
     }
     while(c != -1);

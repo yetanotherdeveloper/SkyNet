@@ -8,7 +8,7 @@
 #include <memory>
 #include <cassert>
 
-void mnistClassification::load_mnist(std::vector<std::unique_ptr<float>> &images,std::vector<char> &labels, std::string images_file, std::string labels_file)
+unsigned int  mnistClassification::load_mnist(std::vector<std::unique_ptr<float>> &images,std::vector<char> &labels, std::string images_file, std::string labels_file)
 {
     images.clear();
     labels.clear();
@@ -16,7 +16,9 @@ void mnistClassification::load_mnist(std::vector<std::unique_ptr<float>> &images
     std::ifstream ifs(labels_file.c_str(), std::ifstream::binary); 
     if(ifs.good() == false)
     {
-        throw std::runtime_error("Error opening MNIST labels file");
+        throw std::runtime_error("""Error opening MNIST labels file."
+                                    "please use --mnist-data to specify"
+                                    "directory with mnist data");
     } 
 
     auto block_to_int = [](unsigned char* block) 
@@ -62,9 +64,13 @@ void mnistClassification::load_mnist(std::vector<std::unique_ptr<float>> &images
     u_int32_t num_cols = block_to_int(int_read); 
     std::cout << "  Number of Cols: " << num_cols << std::endl;
 
+    if( num_items != num_images)
+    {
+        throw std::runtime_error(" Error number of read labels does not match number of read images.");
+    }
+
     std::unique_ptr<unsigned char> single_image_raw(new unsigned char[num_rows*num_cols]);
 
-    // rewind read position onto where start_idx
     for(unsigned int i=0; i<num_items;++i)
     {
         iifs.read((char*)single_image_raw.get(),sizeof(char)*num_cols*num_rows);        
@@ -77,6 +83,8 @@ void mnistClassification::load_mnist(std::vector<std::unique_ptr<float>> &images
             
     }
     iifs.close();
+
+    return num_items;
 }
 
 void mnistClassification::showImage(const float* mnist_image)
@@ -99,8 +107,12 @@ void mnistClassification::showImage(const float* mnist_image)
 
 mnistClassification::mnistClassification(std::string mnist_dirname)
 {
+    m_num_train_items = load_mnist(m_train_images,m_train_labels,mnist_dirname+"/train-images-idx3-ubyte",mnist_dirname+"/train-labels-idx1-ubyte");
 
-    load_mnist(m_train_images,m_train_labels,"../data/mnist/train-images-idx3-ubyte","../data/mnist/train-labels-idx1-ubyte");
+    m_num_test_items = load_mnist(m_test_images,m_test_labels,mnist_dirname+"/train-images-idx3-ubyte",mnist_dirname+"/train-labels-idx1-ubyte");
+
+    // diagnostic code to draw mnist image
+    //showImage(m_train_images[0].get());
 }
 
 namespace {
@@ -109,11 +121,12 @@ void runTest(SkyNet& skynet_instance)
 {
     std::cout << "MNIST Test executing!" << std::endl;
 
+    mnistClassification mnist_test(skynet_instance.getMnistDataDir());
     auto classifiers = skynet_instance.getClassificationModules();
 
     for(auto& classifier : classifiers) 
     {
-    
+        //TODO: execution of mnist Test    
     }
 }
 auto a = TestsRegistry::inst().addTest("MNIST",runTest);
