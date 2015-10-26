@@ -1,23 +1,17 @@
-#include <CL/cl.hpp>
 #include "svm.h"
 
-extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const pdevice)
+extern "C" ISkyNetClassificationProtocol* CreateModule()
 {
-    return new SupportVectorMachine(pdevice);
+    return new SupportVectorMachine();
 }
 
 
-SupportVectorMachine::SupportVectorMachine(const cl::Device* const pdevice) : m_about("Support Vector Machine"), m_pdevice(pdevice)
+SupportVectorMachine::SupportVectorMachine() : m_about("Support Vector Machine") 
 {
-
     m_weights = std::vector<float>(3,0.0f);
 }
 SupportVectorMachine::~SupportVectorMachine()
 {
-    //delete m_context;
-    //m_context = NULL;
-    //delete m_queue;
-    //m_queue = NULL;
 }
 
 void SupportVectorMachine::setWeights(std::vector< float > &initial_weights)
@@ -55,9 +49,9 @@ const std::vector<float> & SupportVectorMachine::RunCL(const std::vector<point> 
 }
 
 
-const std::vector<float> & SupportVectorMachine::RunRef(const std::vector<point> & trainingData,const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
+void SupportVectorMachine::RunRef(const std::vector<point> & trainingData,const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
 {
-    return m_weights;
+    return;
 }
 
 

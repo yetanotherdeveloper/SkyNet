@@ -7,13 +7,13 @@
 #include <pwd.h>
 
 
-typedef ISkyNetClassificationProtocol* (*pCreateModule)(const cl::Device* const pdevice);
+typedef ISkyNetClassificationProtocol* (*pCreateModule)();
 
 /* Linux specific code of loading potential module
  *
  * return: pointer on created module, NULL if loading failed
  */
-ISkyNetClassificationProtocol* SkyNetOS::LoadModule(std::string moduleName, void** plibHandle, const cl::Device *const pdevice)
+ISkyNetClassificationProtocol* SkyNetOS::LoadModule(std::string moduleName, void** plibHandle)
 {
     *plibHandle = NULL;
     pCreateModule pCM = NULL;
@@ -41,7 +41,7 @@ ISkyNetClassificationProtocol* SkyNetOS::LoadModule(std::string moduleName, void
     }
 
     // call CreateModule
-    return pCM(pdevice);
+    return pCM();
 }
 
 void SkyNetOS::ReleaseModule(ISkyNetClassificationProtocol** pModule,void** pLibHandle)

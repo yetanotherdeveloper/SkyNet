@@ -1,49 +1,24 @@
 #include "gd.h"
-#include <CL/cl.hpp>
 
-static std::string kernelSource = "__kernel void dodaj(float veciu) \
-                                   {  \
-                                            veciu = 1.0f; \
-                                   }";
-
-extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const pdevice)
+extern "C" ISkyNetClassificationProtocol* CreateModule()
 {
-    return new GradientDescent(pdevice);
+    return new GradientDescent();
 }
 
 /*! Build kernels , initialize data
  *
  */
-GradientDescent::GradientDescent(const cl::Device* const pdevice) : m_about(GradientDescent::composeAboutString(pdevice) ), m_pdevice(pdevice), m_theta(0.1) , m_flatness(0.0000001f)
+GradientDescent::GradientDescent() : m_about(GradientDescent::composeAboutString() ), m_theta(0.1) , m_flatness(0.0000001f)
 
 {
-    cl_int err;
-
-    // TODO:
-    // - create command queue
-    // - build programs, make kernels
-    // - store device, command queue, context
-    m_pContext = SkyNetOpenCLHelper::createCLContext(pdevice);
-
-    std::vector<cl::Device> context_devices;
-    m_pContext->getInfo(CL_CONTEXT_DEVICES,&context_devices);
-
-    m_pCommandQueue = SkyNetOpenCLHelper::createCLCommandQueue( *m_pContext, *pdevice);
-
-    m_plaKernel = SkyNetOpenCLHelper::makeKernels(*m_pContext, *pdevice, kernelSource, "dodaj" );
-
-    //TODO: error handling section
-
     m_weights = std::vector<float>(3,0.0f);
 }
 
 
-std::string GradientDescent::composeAboutString(const cl::Device* const pdevice)
+std::string GradientDescent::composeAboutString()
 {
     std::string aboutString;
-    pdevice->getInfo(CL_DEVICE_NAME, &aboutString);
-    aboutString.insert(0,"Gradient Descent Algorithm (");
-    aboutString.append(")");
+    aboutString.insert(0,"Gradient Descent Algorithm");
     return aboutString;
 }
 
@@ -126,8 +101,7 @@ float GradientDescent::getError(const std::vector<point> & data)
 }
 
 
-// TODO: move this constant to some other area or make it derived based on number of training  points
-const std::vector<float> & GradientDescent::RunRef(const std::vector<point> & trainingData,  const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)              
+void GradientDescent::RunRef(const std::vector<point> & trainingData,  const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)              
 {
     const int max_iterations = 1000*trainingData.size();
     int i=0;
@@ -145,14 +119,12 @@ const std::vector<float> & GradientDescent::RunRef(const std::vector<point> & tr
     if(finish == false) {
         printf("Warning: Gradient Descent Learning alogorithm exhusted all iterations. TODO: Make proper termination criteria\n");
     }
-    return m_weights;
+    return;
 }
 
 const std::vector<float> & GradientDescent::RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
 {
     float testValue = 0.0f;
-    m_plaKernel->setArg(0,&testValue);
-    m_pCommandQueue->enqueueTask(*m_plaKernel);
 }
 
 

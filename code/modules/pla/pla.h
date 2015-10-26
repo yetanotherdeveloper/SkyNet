@@ -15,21 +15,17 @@ class PerceptronLearningAlgorithm : public ISkyNetClassificationProtocol
 {
 private:
     std::string                       m_about;
-    std::unique_ptr<cl::Context>      m_pContext;
-    std::unique_ptr<cl::CommandQueue> m_pCommandQueue;
-    std::unique_ptr<cl::Kernel>       m_plaKernel;
-    const cl::Device *const           m_pdevice;
     std::vector<float>                m_weights;
     std::vector<int>                  m_classification;   /// Last results of classification query (getClassification)
 public:
-    PerceptronLearningAlgorithm(const cl::Device * const pdevice);
+    PerceptronLearningAlgorithm();
     ~PerceptronLearningAlgorithm();
     void RunCL();
     void setWeights(std::vector< float > &initial_weights);
     const std::vector<float> & RunCL(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
-    const std::vector<float> & RunRef(const std::vector<point> & trainingData,const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+    void RunRef(const std::vector<point> & trainingData,const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
     const std::string About() const;
-    static std::string composeAboutString(const cl::Device* const pdevice);
+    static std::string composeAboutString();
     float getError(const std::vector<point> & data);
     std::vector<int> & getClassification(const std::vector<point> & data);
 private:

@@ -2,14 +2,7 @@
 #define __SKYNET__
 #include <string>
 #include <vector>
-#include <CL/cl.hpp>
 #include "protocol.h"
-
-namespace cl
-{
-    class Context;
-    class CommandQueue;
-}
 
 class SkyNet
 {
@@ -30,7 +23,6 @@ public:
 
 private:
     void LoadModules(std::string modulesDirectoryName);
-    void InitDevices();
     void ProcessCommandLine(int argc, char *const *argv);
     std::string getModuleToLoad(char *fileToLoad);
     void PrintHelp();
@@ -38,7 +30,6 @@ private:
     void PrintTests();
 private:
     std::vector<classificationModule> m_classifiers;
-    std::vector<cl::Device> m_devices;
     bool m_terminated;  //< No further work to be done. Just finish gracefully
     bool m_printmodules;//< Whether to print found modules
     bool m_printTests; //<Whether to print available tests

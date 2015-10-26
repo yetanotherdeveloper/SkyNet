@@ -5,7 +5,7 @@
 #include <fcntl.h>      // file control
 #include <string>
 #include <memory>
-#include <CL/cl.hpp>
+#include <vector>
 
 // Note: Module should export following function:
 //extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const pdevice)
@@ -52,16 +52,6 @@ private:
 };
 
 typedef void (SkyNetDiagnostic::*fp_storeWeights)(const std::vector<float> &weights);
-
-class SkyNetOpenCLHelper
-{
-private:
-    static cl_int err;
-public:
-    static std::unique_ptr<cl::Context> createCLContext(const cl::Device* pdevice);
-    static std::unique_ptr<cl::CommandQueue> createCLCommandQueue( const cl::Context& context, const cl::Device& device);
-    static std::unique_ptr<cl::Kernel> makeKernels(const cl::Context & context,const cl::Device & target_device, const std::string & kernelSource, const std::string kernelName);
-};
 
 /// This module is implementing early stop algorithm
 class SkyNetEarlyStop
@@ -189,7 +179,7 @@ public:
     virtual ~ISkyNetClassificationProtocol() {
     };
     virtual const std::vector<float> & RunCL(const std::vector<point> &, SkyNetDiagnostic &, SkynetTerminalInterface& ) = 0;
-    virtual const std::vector<float> & RunRef(const std::vector<point> &, const std::vector<point> &, SkyNetDiagnostic &, SkynetTerminalInterface&) = 0;
+    virtual void RunRef(const std::vector<point> &, const std::vector<point> &, SkyNetDiagnostic &, SkynetTerminalInterface&) = 0;
     virtual float getError(const std::vector<point> & data)                                                             = 0;
     virtual std::vector<int> & getClassification(const std::vector<point> & data)                                       = 0;
     virtual const std::string About() const                                                                             = 0;

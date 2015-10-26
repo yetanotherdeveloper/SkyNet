@@ -17,20 +17,16 @@ private:
     std::string                         m_about;
     float                               m_theta; /// learning grade
     float                               m_flatness; /// Value below which sum of weights updates, we declare as flat
-    std::unique_ptr< cl::Context >      m_pContext;
-    std::unique_ptr< cl::CommandQueue > m_pCommandQueue;
-    std::unique_ptr< cl::Kernel >       m_plaKernel;
-    const cl::Device *const             m_pdevice;
     std::vector< float >                m_weights;
     std::vector<int>                    m_classification;   /// Last results of classification query (getClassification)
 public:
-    StochasticGradientDescent( const cl::Device * const pdevice );
+    StochasticGradientDescent();
     ~StochasticGradientDescent();
     const std::vector<float> & RunCL(const std::vector<point> &, SkyNetDiagnostic &, SkynetTerminalInterface& exitter);
-    const std::vector< float > & RunRef(const std::vector<point> & trainingData,const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+    void RunRef(const std::vector<point> & trainingData,const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
     const std::string About() const;
     void setWeights(std::vector< float > &initial_weights);
-    static std::string composeAboutString( const cl::Device *const pdevice );
+    static std::string composeAboutString();
     float getError(const std::vector<point> & data);
     std::vector<int> & getClassification(const std::vector<point> & data);
 private:

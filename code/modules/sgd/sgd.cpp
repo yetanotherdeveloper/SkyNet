@@ -1,50 +1,26 @@
 #include "sgd.h"
-#include <CL/cl.hpp>
 #include <random>
 
-static std::string kernelSource = "__kernel void dodaj(float veciu) \
-                                   {  \
-                                            veciu = 1.0f; \
-                                   }";
-
-extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const pdevice)
+extern "C" ISkyNetClassificationProtocol* CreateModule()
 {
-    return new StochasticGradientDescent(pdevice);
+    return new StochasticGradientDescent();
 }
 
 /*! Build kernels , initialize data
  *
  */
-StochasticGradientDescent::StochasticGradientDescent(const cl::Device* const pdevice) : m_about(StochasticGradientDescent::composeAboutString(pdevice) ), m_pdevice(pdevice),
+StochasticGradientDescent::StochasticGradientDescent() : m_about(StochasticGradientDescent::composeAboutString() ), 
                                                      m_theta(0.1), m_flatness(0.0000001f)
 {
-    cl_int err;
-
-    // TODO:
-    // - create command queue
-    // - build programs, make kernels
-    // - store device, command queue, context
-    m_pContext = SkyNetOpenCLHelper::createCLContext(pdevice);
-
-    std::vector<cl::Device> context_devices;
-    m_pContext->getInfo(CL_CONTEXT_DEVICES,&context_devices);
-
-    m_pCommandQueue = SkyNetOpenCLHelper::createCLCommandQueue( *m_pContext, *pdevice);
-
-    m_plaKernel = SkyNetOpenCLHelper::makeKernels(*m_pContext, *pdevice, kernelSource, "dodaj" );
-
-    //TODO: error handling section
     m_weights = std::vector<float>(3,0.0f);
 
 }
 
 
-std::string StochasticGradientDescent::composeAboutString(const cl::Device* const pdevice)
+std::string StochasticGradientDescent::composeAboutString()
 {
     std::string aboutString;
-    pdevice->getInfo(CL_DEVICE_NAME, &aboutString);
-    aboutString.insert(0,"Stochastic Gradient Descent Algorithm (");
-    aboutString.append(")");
+    aboutString.insert(0,"Stochastic Gradient Descent Algorithm ");
     return aboutString;
 }
 
@@ -121,7 +97,7 @@ bool StochasticGradientDescent::updateWeights(const point &randomSample)
 
 
 // TODO: move this constant to some other area or make it derived based on number of training  points
-const std::vector<float> & StochasticGradientDescent::RunRef(const std::vector<point> & trainingData, const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)              
+void StochasticGradientDescent::RunRef(const std::vector<point> & trainingData, const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)              
 {
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() -1 );
     std::random_device rd;
@@ -148,15 +124,13 @@ const std::vector<float> & StochasticGradientDescent::RunRef(const std::vector<p
     if(finish == false) {
         printf("Warning: Stochastic Gradient Descent Learning alogorithm exhusted all iterations. TODO: Make proper termination criteria\n");
     }
-    return m_weights;
+    return;
 }
 
 
 const std::vector<float> & StochasticGradientDescent::RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
 {
     float testValue = 0.0f;
-    m_plaKernel->setArg(0,&testValue);
-    m_pCommandQueue->enqueueTask(*m_plaKernel);
 }
 
 

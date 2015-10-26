@@ -70,21 +70,17 @@ private:
     std::vector<NeuralLayer>            m_layers;  /// Layers of Neural Network
     std::vector<int>                    m_classification;   /// Last results of classification query (getClassification)
     std::string                         m_about;
-    std::unique_ptr< cl::Context >      m_pContext;
-    std::unique_ptr< cl::CommandQueue > m_pCommandQueue;
-    std::unique_ptr< cl::Kernel >       m_plaKernel;
-    const cl::Device *const             m_pdevice;
     GradientDescentType                 m_gradType;
 public:
-    NeuralNetwork( const cl::Device * const pdevice, unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype = GradientDescentType::STOCHASTIC);
+    NeuralNetwork( unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype = GradientDescentType::STOCHASTIC);
     ~NeuralNetwork();
     const std::vector<float> & RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
-    const std::vector< float > & RunRef(const std::vector<point> & trainingData, 
+    void RunRef(const std::vector<point> & trainingData, 
                                         const std::vector<point> &validationData,
                                         SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
     void setWeights(std::vector< float > &initial_weights);
     const std::string About() const;
-    static std::string composeAboutString( const cl::Device *const pdevice );
+    static std::string composeAboutString();
     float getError(const std::vector<point> & data);
     std::vector<int> & getClassification(const std::vector<point> & data);
 private:

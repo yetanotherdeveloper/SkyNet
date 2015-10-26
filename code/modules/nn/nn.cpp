@@ -1,46 +1,21 @@
 #include "nn.h"
-#include <CL/cl.hpp>
 #include <random>
 #include <cmath>
 #include <limits>
 #include <cassert>
 
-static std::string kernelSource =
-    "__kernel void dodaj(float veciu) \
-                                   {  \
-                                            veciu = 1.0f; \
-                                   }";
-
-extern "C" ISkyNetClassificationProtocol *CreateModule( const cl::Device *const pdevice )
+extern "C" ISkyNetClassificationProtocol *CreateModule()
 {
-    return new NeuralNetwork( pdevice, 2, 2, GradientDescentType::STOCHASTIC );  // Just for testing, architecture depends heavily on problem we are to
+    return new NeuralNetwork( 2, 2, GradientDescentType::STOCHASTIC );  // Just for testing, architecture depends heavily on problem we are to
                                                 // solve
 }
 
 /*! Build kernels , initialize data
  *
  */
-NeuralNetwork::NeuralNetwork( const cl::Device *const pdevice, unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype) : 
-                              m_about( NeuralNetwork::composeAboutString( pdevice ) ), m_pdevice( pdevice ), m_gradType(gdtype)
+NeuralNetwork::NeuralNetwork( unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype) : 
+                              m_about( NeuralNetwork::composeAboutString() ), m_gradType(gdtype)
 {
-    cl_int err;
-
-    // TODO:
-    // - create command queue
-    // - build programs, make kernels
-    // - store device, command queue, context
-    m_pContext = SkyNetOpenCLHelper::createCLContext( pdevice );
-
-    std::vector< cl::Device > context_devices;
-    m_pContext->getInfo( CL_CONTEXT_DEVICES, &context_devices );
-
-    m_pCommandQueue = SkyNetOpenCLHelper::createCLCommandQueue( *m_pContext, *pdevice );
-
-    m_plaKernel = SkyNetOpenCLHelper::makeKernels( *m_pContext, *pdevice, kernelSource, "dodaj" );
-
-    //TODO: error handling section
-
-
     // Create Neural Network infrastructure
     /* Here we create topology of Neural Network. This will be adjusted in the future
      *  regarding the probem we use Neural Network to solve
@@ -62,12 +37,10 @@ NeuralNetwork::NeuralNetwork( const cl::Device *const pdevice, unsigned int nrIn
 }
 
 
-std::string NeuralNetwork::composeAboutString( const cl::Device *const pdevice )
+std::string NeuralNetwork::composeAboutString()
 {
     std::string aboutString;
-    pdevice->getInfo( CL_DEVICE_NAME, &aboutString );
-    aboutString.insert( 0, "Neural Network Algorithm (" );
-    aboutString.append( ")" );
+    aboutString.insert( 0, "Neural Network Algorithm " );
     return aboutString;
 }
 
@@ -344,7 +317,7 @@ void NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
-const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &trainingData,
+void NeuralNetwork::RunRef( const std::vector< point > &trainingData,
                                                     const std::vector<point>   &validationData,
                                                     SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter)
 {
@@ -380,9 +353,7 @@ const std::vector< float > & NeuralNetwork::RunRef( const std::vector< point > &
     setWeights(all_weights);
     diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
 
-
-    // TODO: temporayr hack till I can get something decent
-    return *(new std::vector<float>(3,0.0f) );
+    return;
 }
 
 
@@ -391,8 +362,6 @@ const std::vector< float > & NeuralNetwork::RunCL( const std::vector< point > &t
                                                    SkynetTerminalInterface& exitter)
 {
     float testValue = 0.0f;
-    m_plaKernel->setArg( 0, &testValue );
-    m_pCommandQueue->enqueueTask( *m_plaKernel );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////
 void NeuralNetwork::setWeights(std::vector< float > &initial_weights)

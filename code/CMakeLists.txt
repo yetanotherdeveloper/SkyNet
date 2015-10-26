@@ -65,14 +65,8 @@ foreach(subdir ${subdirs_list})
     add_subdirectory(${subdir}) 
 endforeach(subdir)
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-find_library(OPENCL_LIB OpenCL PATHS lib/opencl)
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-find_library(OPENCL_LIB cl PATHS /usr/lib64/beignet)
-endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
 add_executable(skynet ${SOURCE})
-target_link_libraries(skynet dl ${OPENCL_LIB} ${ImageMagick_LIBRARIES})
+target_link_libraries(skynet dl ${ImageMagick_LIBRARIES})
 
 install(TARGETS skynet DESTINATION bin)
 

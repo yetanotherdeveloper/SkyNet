@@ -16,15 +16,10 @@
 #include <string>
 class ISkyNetClassificationProtocol;
 
-namespace cl
-{
-    class Device;
-}
-
 class SkyNetOS
 {
     public:
-        static ISkyNetClassificationProtocol* LoadModule(std::string moduleName, void** plibHandle,const cl::Device *const pdevice); 
+        static ISkyNetClassificationProtocol* LoadModule(std::string moduleName, void** plibHandle); 
         static void ReleaseModule(ISkyNetClassificationProtocol** pModule,void** pLibHandle);
         static unsigned int getPID();
         static bool CreateDirectory(const std::string& dirname);

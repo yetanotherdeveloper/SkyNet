@@ -215,8 +215,7 @@ void runTest(SkyNet& skynet_instance)
         diagnostic.reset();
         SKYNET_INFO("Running Random points classification test against: %s\n",classifier.module->About().c_str() );
         // Pass Input data , and initial weights to RunCL , RunRef functions
-        rpc.setWeights(classifier.module->RunRef(rpc.getTrainingData(), rpc.getValidationData(), diagnostic, exitter ) );
-        // TODO: Check next two lines, what is the point of them? Clean stuff up
+        classifier.module->RunRef(rpc.getTrainingData(), rpc.getValidationData(), diagnostic, exitter );
         SKYNET_INFO("In-sample error: %f Out-of-sample error: %f\n",  rpc.validate(classifier.module->getClassification(rpc.getTrainingData() ) ),rpc.verify(classifier.module->getClassification(rpc.getTestingData() ) ) );
         SKYNET_INFO("GetError: %f\n",classifier.module->getError(rpc.getTrainingData() ) );
         diagnostic.makeWeightsAnalysis(classifier.module->About());

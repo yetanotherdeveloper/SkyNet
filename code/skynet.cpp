@@ -4,7 +4,6 @@
 #include <stack>
 #include <iostream>
 #include <fstream>
-#include <CL/cl.hpp>
 
 #include "skynet.h"
 #include "os_inc.h"
@@ -20,7 +19,6 @@ SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodul
         ProcessCommandLine(argc,argv);
 
         SKYNET_INFO("Initializing computing devices:\n");
-        InitDevices();
 
         SKYNET_INFO("Loading Modules:\n");
         LoadModules(std::string("./modules") );
@@ -179,119 +177,6 @@ std::string SkyNet::getModuleToLoad(char *fileToLoad)
     return module_name.substr(1); 
 }
 //////////////////////////////////////////////////////////////////// 
-// Scan available computing devices
-//
-//
-void SkyNet::InitDevices()
-{
-    std::vector<cl::Platform> platforms;
-    std::vector<cl::Device> devices;
-    std::string platform_param_value;    
-    std::string device_param_string_value;    
-    std::vector<size_t> device_param_numeric_value;    
-    cl_device_id device;
-    cl_ulong global_mem_size;
-    cl_uint addr_size;
-    cl_bool device_param_bool_value;
-
-    if( cl::Platform::get(&platforms) != CL_SUCCESS) {
-        SKYNET_DEBUG("ERROR: No computing platforms found!\n");
-        return;
-    }
-
-    // List platforms capabilities
-
-    for(std::vector<cl::Platform>::iterator plat_it = platforms.begin(); plat_it != platforms.end(); ++plat_it ) {
-
-        plat_it->getInfo(CL_PLATFORM_NAME, &platform_param_value);
-        SKYNET_DEBUG("\nPlatform: %s\n",platform_param_value.c_str());
-
-        plat_it->getInfo(CL_PLATFORM_VENDOR, &platform_param_value);
-        SKYNET_DEBUG("   vendor: %s\n",platform_param_value.c_str());
-
-        plat_it->getInfo(CL_PLATFORM_VERSION, &platform_param_value);
-        SKYNET_DEBUG("   version: %s\n",platform_param_value.c_str());
-
-        plat_it->getInfo(CL_PLATFORM_PROFILE, &platform_param_value);
-        SKYNET_DEBUG("   profile: %s\n",platform_param_value.c_str());
-
-        plat_it->getInfo(CL_PLATFORM_EXTENSIONS, &platform_param_value);
-        SKYNET_DEBUG("   extensions: %s\n",platform_param_value.c_str());
-
-        // Now for given platform get list of devices and their capabilities
-
-        if( plat_it->getDevices(CL_DEVICE_TYPE_ALL, &devices ) == CL_SUCCESS ) {
-        
-            for(std::vector<cl::Device>::iterator device_it = devices.begin(); device_it != devices.end(); ++device_it) {
-                device_it->getInfo(CL_DEVICE_NAME, &device_param_string_value);
-                SKYNET_DEBUG("   Device: %s\n",device_param_string_value.c_str());
-
-                device_it->getInfo(CL_DEVICE_VENDOR, &device_param_string_value);
-                SKYNET_DEBUG("       vendor: %s\n",device_param_string_value.c_str());
-
-                device_it->getInfo(CL_DEVICE_EXTENSIONS, &device_param_string_value);
-                SKYNET_DEBUG("       extensions: %s\n",device_param_string_value.c_str());
-
-                device_it->getInfo(CL_DEVICE_VERSION, &device_param_string_value);
-                SKYNET_DEBUG("       device version: %s\n",device_param_string_value.c_str());
-
-                device_it->getInfo(CL_DRIVER_VERSION, &device_param_string_value);
-                SKYNET_DEBUG("       driver version: %s\n",device_param_string_value.c_str());
-
-                device_it->getInfo(CL_DEVICE_OPENCL_C_VERSION, &device_param_string_value);
-                SKYNET_DEBUG("       OpenCL C Version: %s\n",device_param_string_value.c_str());
-
-                device_it->getInfo(CL_DEVICE_PROFILE, &device_param_string_value);
-                SKYNET_DEBUG("       profile: %s\n",device_param_string_value.c_str());
-
-                device_it->getInfo(CL_DEVICE_GLOBAL_MEM_SIZE, &global_mem_size);
-                SKYNET_DEBUG("       global memory size: %lu\n",global_mem_size);
-
-                device_it->getInfo(CL_DEVICE_ADDRESS_BITS, &addr_size);
-                SKYNET_DEBUG("       address space size: %d\n",addr_size);
-
-                device_it->getInfo(CL_DEVICE_MAX_WORK_ITEM_SIZES, &device_param_numeric_value);
-                SKYNET_DEBUG("       max_work_item_sizes: %d x %d x %d\n",device_param_numeric_value[0],device_param_numeric_value[1],device_param_numeric_value[2]);
-
-                device_it->getInfo(CL_DEVICE_AVAILABLE, &device_param_bool_value);
-                SKYNET_DEBUG("       availability: %d\n",device_param_bool_value);
-
-                device_it->getInfo(CL_DEVICE_COMPILER_AVAILABLE, &device_param_bool_value);
-                SKYNET_DEBUG("       compiler availability: %d\n",device_param_bool_value);
-
-                device_it->getInfo(CL_DEVICE_ADDRESS_BITS, &addr_size);
-                SKYNET_DEBUG("       address space size: %d\n",addr_size);
-            }
-   
-
- 
-        } else {
-            SKYNET_DEBUG("      No Devices found at platform!\n");
-        }
-
-    }
-
-    // temporary get Any GPU device to run some tests
-    // lateron will change it to running tasks against all devices (separate threads), for comparison
-    // or selected device basedo n commandline
-    for(std::vector<cl::Platform>::iterator plat_it = platforms.begin(); plat_it != platforms.end(); ++plat_it ) {
-
-        if( plat_it->getDevices(CL_DEVICE_TYPE_GPU, &m_devices ) == CL_SUCCESS ) {
-            (m_devices.begin())->getInfo(CL_DEVICE_NAME, &device_param_string_value);
-            SKYNET_DEBUG(" HARDCODED GPU DEVICE to be used (temporary)  Device: %s\n",device_param_string_value.c_str());
-            return;
-        }
-    }
-    // If no GPU device is found then pick anything
-    for(std::vector<cl::Platform>::iterator plat_it = platforms.begin(); plat_it != platforms.end(); ++plat_it ) {
-        if( plat_it->getDevices(CL_DEVICE_TYPE_ALL, &m_devices ) == CL_SUCCESS ) {
-            (m_devices.begin())->getInfo(CL_DEVICE_NAME, &device_param_string_value);
-            SKYNET_DEBUG(" Chosen DEVICE to be used (temporary)  Device: %s\n",device_param_string_value.c_str());
-            return;
-        }
-    }
-}
-
 /* Scan directory with modules and loadem all */
 void SkyNet::LoadModules(std::string modulesDirectoryName)
 {
@@ -313,7 +198,7 @@ void SkyNet::LoadModules(std::string modulesDirectoryName)
             // regular file, check if this is DSO and load
             case DT_REG:
                 entryName = entry->d_name;
-                module    = SkyNetOS::LoadModule(modulesDirectoryName + std::string("/") + entryName,&libHandle,&(m_devices[0]));
+                module    = SkyNetOS::LoadModule(modulesDirectoryName + std::string("/") + entryName,&libHandle);
                 if(module != NULL) {
                     // based on identity assign to proper module holders
                     id = module->Identify();
