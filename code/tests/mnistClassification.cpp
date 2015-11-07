@@ -122,7 +122,9 @@ void runTest(SkyNet& skynet_instance)
     std::cout << "MNIST Test executing!" << std::endl;
 
     mnistClassification mnist_test(skynet_instance.getMnistDataDir());
+    SkyNetDiagnostic diagnostic;
     auto classifiers = skynet_instance.getClassificationModules();
+    SkynetTerminalInterface                     exitter('q');
 
     for(auto& classifier : classifiers) 
     {
