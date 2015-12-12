@@ -104,7 +104,9 @@ void SkyNetDiagnostic::makeWeightsAnalysis(const std::string& dirName)
 
 
 void SkyNetDiagnostic::makeAnalysis(const std::string& dirName,const std::string& dataFilename, const std::string& scriptFilename,
-                                    const std::vector<point> & set, const std::vector<float> &targetWeights,
+                                    const std::vector<std::vector<float>> & setData,
+                                    const std::vector<int>  &setLabels,
+                                    const std::vector<float> &targetWeights,
                                     const std::vector<float> &learnedWeights)
 {
     if(learnedWeights.empty() )
@@ -121,9 +123,9 @@ void SkyNetDiagnostic::makeAnalysis(const std::string& dirName,const std::string
     std::ofstream dumpfile(m_dumpDirName + "/" + dirName + "/" + dataFilename, std::ios::trunc);
     dumpfile << "#x y class" << std::endl;
 
-    for(unsigned int i = 0; i < set.size(); ++i)
+    for(unsigned int i = 0; i < setData.size(); ++i)
     {
-        dumpfile << set[i].x << " " << set[i].y << " " << set[i].classification << std::endl;
+        dumpfile << setData[i][0] << " " << setData[i][1] << " " << setLabels[i] << std::endl;
     }
     // Generate gnuplot script drawing a validation chart
     // presenting points as well as target function and learned(trained) function
@@ -147,15 +149,20 @@ void SkyNetDiagnostic::makeAnalysis(const std::string& dirName,const std::string
 }
 
 
-void SkyNetDiagnostic::makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & set,
-                                            const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights)
+void SkyNetDiagnostic::makeTrainingAnalysis(const std::string& dirName,
+                                            const std::vector<std::vector<float>> & setData,
+                                            const std::vector<int>  &setLabels,
+                                            const std::vector<float> &targetWeights,
+                                            const std::vector<float> &learnedWeights)
 {
-    makeAnalysis(dirName,"trainingData.txt","validation.plot",set,targetWeights,learnedWeights);
+    makeAnalysis(dirName,"trainingData.txt","validation.plot",setData, setLabels, targetWeights,learnedWeights);
 }
 
 
-void SkyNetDiagnostic::makeGeneralizationAnalysis(const std::string& dirName,const std::vector<point> & set,
+void SkyNetDiagnostic::makeGeneralizationAnalysis(const std::string& dirName,
+                                                  const std::vector<std::vector<float>> & setData,
+                                                  const std::vector<int>  &setLabels,
                                                   const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights)
 {
-    makeAnalysis(dirName,"testingData.txt","verification.plot",set,targetWeights,learnedWeights);
+    makeAnalysis(dirName,"testingData.txt","verification.plot",setData, setLabels, targetWeights,learnedWeights);
 }

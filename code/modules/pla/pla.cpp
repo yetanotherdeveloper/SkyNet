@@ -1,12 +1,7 @@
 #include "pla.h"
 #include <cmath>
 
-static std::string kernelSource = "__kernel void dodaj(float veciu) \
-                                   {  \
-                                            veciu = 1.0f; \
-                                   }";
-
-extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const pdevice)
+extern "C" ISkyNetClassificationProtocol* CreateModule()
 {
     return new PerceptronLearningAlgorithm();
 }
@@ -27,10 +22,10 @@ std::string PerceptronLearningAlgorithm::composeAboutString()
 }
 
 
-std::vector<int> & PerceptronLearningAlgorithm::getClassification(const std::vector<point> & data)
+std::vector<int> & PerceptronLearningAlgorithm::getClassification(const std::vector<std::vector<float>> & data)
 {
     m_classification.clear();
-    // each data point has corressponding classification info
+    // each data std::vector<float> has corressponding classification info
     // so we can reserve space upfront
     m_classification.reserve(data.size());
 
@@ -42,9 +37,9 @@ std::vector<int> & PerceptronLearningAlgorithm::getClassification(const std::vec
 }
 
 
-int PerceptronLearningAlgorithm::classifyPoint(const point &rpoint)
+int PerceptronLearningAlgorithm::classifyPoint(const std::vector<float> &rpoint)
 {
-    return rpoint.x * m_weights[1] + m_weights[2] * rpoint.y + m_weights[0] >= 0.0f ? 1 : -1;
+    return rpoint[0] * m_weights[1] + m_weights[2] * rpoint[1] + m_weights[0] >= 0.0f ? 1 : -1;
 }
 
 void PerceptronLearningAlgorithm::setWeights(std::vector< float > &initial_weights)
@@ -55,15 +50,17 @@ void PerceptronLearningAlgorithm::setWeights(std::vector< float > &initial_weigh
     }
 }
 
-// routine to calculate classification and pick missclassiffied point
-bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point> & trainingData, const point** output)
+// routine to calculate classification and pick missclassiffied std::vector<float>
+bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<std::vector<float>> & trainingData, const std::vector<int> &trainingLabels, const std::vector<float>** outputData, const int** outputLabel)
 {
-    std::vector<point>::const_iterator it;
-    for(it = trainingData.begin(); it != trainingData.end(); ++it) {
 
-        if( classifyPoint(*it) * it->classification < 0)
+    for(unsigned int i=0; i < trainingData.size(); ++i)
+    {
+
+        if( classifyPoint( trainingData[i] ) * trainingLabels[i] < 0)
         {
-            *output = &(*it);
+            *outputData = &(trainingData[i]);
+            *outputLabel = &(trainingLabels[i]);
             return true;
         }
     }
@@ -74,48 +71,53 @@ bool PerceptronLearningAlgorithm::getMisclassifiedPoint(const std::vector<point>
  *  Square error is used as error measure eg
  *  (perceptron_value - sample_classification )^2
  */
-float PerceptronLearningAlgorithm::getSampleClassificationError( const point& sample, float output )
+float PerceptronLearningAlgorithm::getSampleClassificationError( const int sample, float output )
 {
-    return powf( (output - ( float )sample.classification), 2.0f );
+    return powf( (output - ( float )sample), 2.0f );
 }
 
-float PerceptronLearningAlgorithm::getError(const std::vector<point> & data)
+float PerceptronLearningAlgorithm::getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels)
 {
     // TODO: adjust capacity
     float total_error = 0.0f;
 
-    // Send each point through NN and get classification error for it
+    // Send each std::vector<float> through NN and get classification error for it
     // later on all errors are summed up and divided by number of samples
     for( unsigned int k = 0; k < data.size(); ++k )
     {
-        total_error += getSampleClassificationError( data[k], classifyPoint(data[k]) );
+        total_error += getSampleClassificationError( labels[k], classifyPoint(data[k]) ); // TODO: this is wrong!!
     }
     return total_error / ( float )data.size();
 }
 
 
 // Update weights according the rule: w_k+1 <-- w_k + y_t*x_t
-void PerceptronLearningAlgorithm::updateWeights(const point& rpoint)
+void PerceptronLearningAlgorithm::updateWeights(const std::vector<float>& rpoint, const int classification)
 {
-   m_weights[0] = m_weights[0] + (float)rpoint.classification; 
-   m_weights[1] = m_weights[1] + (float)rpoint.classification*rpoint.x; 
-   m_weights[2] = m_weights[2] + (float)rpoint.classification*rpoint.y; 
+   m_weights[0] = m_weights[0] + (float)classification; 
+   m_weights[1] = m_weights[1] + (float)classification*rpoint[0]; 
+   m_weights[2] = m_weights[2] + (float)classification*rpoint[1]; 
 }
 
-void PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData, const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)              
+void PerceptronLearningAlgorithm::RunRef( const std::vector< std::vector<float> > &trainingData,
+                                          const std::vector<int> &trainingLabels,
+                                          const std::vector<std::vector<float>>   &validationData,
+                                          const std::vector<int> &validationLabels,
+                                          SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter)
 {
     const int max_iterations = 1000*trainingData.size();
-    const point* misclassified = nullptr;
+    const std::vector<float>* misclassifiedData = nullptr;
+    const int* misclassifiedLabel = nullptr;
     int i=0;
     bool finish = false;
-    diagnostic.storeWeightsAndError(m_weights,getError(trainingData), getError(validationData) );
+    diagnostic.storeWeightsAndError(m_weights,getError(trainingData,trainingLabels), getError(validationData,validationLabels) );
     while((i<max_iterations)&&(finish == false))  {
-        finish = !getMisclassifiedPoint(trainingData,&misclassified);
+        finish = !getMisclassifiedPoint(trainingData,trainingLabels,&misclassifiedData,&misclassifiedLabel);
         // Check if user want to cease learning
         finish = finish || exitter();
         if(finish == false) {
-            updateWeights(*misclassified);
-            diagnostic.storeWeightsAndError(m_weights,getError(trainingData), getError(validationData) );
+            updateWeights(*misclassifiedData,*misclassifiedLabel);
+            diagnostic.storeWeightsAndError(m_weights,getError(trainingData,trainingLabels), getError(validationData,validationLabels) );
             ++i;
         }
     } 
@@ -126,7 +128,7 @@ void PerceptronLearningAlgorithm::RunRef(const std::vector<point> & trainingData
 }
 
 
-const std::vector<float> & PerceptronLearningAlgorithm::RunCL(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
+const std::vector<float> & PerceptronLearningAlgorithm::RunCL(const std::vector<std::vector<float>> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
 {
     float testValue = 0.0f;
 }

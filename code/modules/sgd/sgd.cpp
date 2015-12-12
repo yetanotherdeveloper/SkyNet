@@ -25,8 +25,9 @@ std::string StochasticGradientDescent::composeAboutString()
 }
 
 
-float StochasticGradientDescent::getError(const std::vector<point> & data)
+float StochasticGradientDescent::getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels)
 {
+    //TODO: Implement it
     return 1.0f;
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -38,10 +39,10 @@ void StochasticGradientDescent::setWeights(std::vector< float > &initial_weights
     }
 }
 ////////////////////////////////////////////////////////////////////////////
-std::vector<int> & StochasticGradientDescent::getClassification(const std::vector<point> & data)
+std::vector<int> & StochasticGradientDescent::getClassification(const std::vector<std::vector<float>> & data)
 {
     m_classification.clear();
-    // each data point has corressponding classification info
+    // each data std::vector<float> has corressponding classification info
     // so we can reserve space upfront
     m_classification.reserve(data.size());
 
@@ -51,7 +52,7 @@ std::vector<int> & StochasticGradientDescent::getClassification(const std::vecto
 
         for(unsigned int i = 0; i < m_weights.size(); i += 3)
         {
-            result *= (m_weights[i+1] * data[k].x + m_weights[i+2] * data[k].y + m_weights[i]);
+            result *= (m_weights[i+1] * data[k][0] + m_weights[i+2] * data[k][1] + m_weights[i]);
         }
         m_classification.push_back(result > 0.0f ? 1 : -1);
     }
@@ -70,14 +71,14 @@ std::vector<int> & StochasticGradientDescent::getClassification(const std::vecto
  *            E_in(w(t)) is square error eg. square error on random sample() from training set
  *
  */ 
-bool StochasticGradientDescent::updateWeights(const point &randomSample)
+bool StochasticGradientDescent::updateWeights(const std::vector<float> &randomSample, int label)
 {
     // TODO: make it working for any dimentions not just two
     // Perform gradient descent on given (assuming random) sample
     float dw0,dw1,dw2;
-    dw0 = -m_theta*2.0*(randomSample.x * m_weights[1] + m_weights[2] * randomSample.y + m_weights[0] - randomSample.classification);                // gradient per w0
-    dw1 = dw0*randomSample.x; // gradient per w1
-    dw2 = dw0*randomSample.y; // gradient per w2
+    dw0 = -m_theta*2.0*(randomSample[0] * m_weights[1] + m_weights[2] * randomSample[1] + m_weights[0] - label);                // gradient per w0
+    dw1 = dw0*randomSample[0]; // gradient per w1
+    dw2 = dw0*randomSample[1]; // gradient per w2
 
     m_weights[0] += dw0;
     m_weights[1] += dw1;
@@ -96,8 +97,12 @@ bool StochasticGradientDescent::updateWeights(const point &randomSample)
 }
 
 
-// TODO: move this constant to some other area or make it derived based on number of training  points
-void StochasticGradientDescent::RunRef(const std::vector<point> & trainingData, const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)              
+// TODO: move this constant to some other area or make it derived based on number of training  std::vector<float>s
+void StochasticGradientDescent::RunRef( const std::vector< std::vector<float> > &trainingData,
+             const std::vector<int> &trainingLabels,
+             const std::vector<std::vector<float>>   &validationData,
+             const std::vector<int> &validationLabels,
+             SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter)
 {
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() -1 );
     std::random_device rd;
@@ -108,7 +113,8 @@ void StochasticGradientDescent::RunRef(const std::vector<point> & trainingData, 
     //TODO: Store proper error
     diagnostic.storeWeightsAndError(m_weights,0.0f,0.0f);
     while((i<max_iterations)&&(finish == false))  {
-        finish = updateWeights(trainingData[sample_index(rd)]);
+        auto ridx = sample_index(rd);
+        finish = updateWeights(trainingData[ridx],trainingLabels[ridx]);
         //TODO: Store proper error
         diagnostic.storeWeightsAndError(m_weights,0.0f, 0.0f);
         // Check if user want to cease learning
@@ -128,7 +134,7 @@ void StochasticGradientDescent::RunRef(const std::vector<point> & trainingData, 
 }
 
 
-const std::vector<float> & StochasticGradientDescent::RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
+const std::vector<float> & StochasticGradientDescent::RunCL(const std::vector<std::vector<float>> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
 {
     float testValue = 0.0f;
 }

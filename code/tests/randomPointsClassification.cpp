@@ -21,11 +21,11 @@ randomPointsClassification::randomPointsClassification(unsigned int N, unsigned 
     //makeFixedFunction( -1.0f, 0.0f, 1.0f, -2.0f ); // temporar diagnostic solution
 
     // Generate learning data
-    generateSet( m_trainingSet, N );
+    generateSet( m_trainingData, m_trainingLabels, N );
     // Generate validation set (used for early stopping)
-    generateSet( m_validationSet, N/2 );
+    generateSet( m_validationData, m_validationLabels, N/2 );
     // Generate data for testing generalization
-    generateSet( m_testingSet, N );
+    generateSet( m_testingData, m_testingLabels, N );
 }
 
 const std::vector<float> & randomPointsClassification::getTargetWeights()
@@ -47,7 +47,7 @@ void randomPointsClassification::setWeights( const std::vector< float > &weights
 /// Validate input classification data through training sets
 float randomPointsClassification::validate(const std::vector<int> & classification)
 {
-    return getErrorRate( m_trainingSet, classification );
+    return getErrorRate( classification, m_trainingLabels );
 }
 
 
@@ -56,98 +56,107 @@ float randomPointsClassification::validate(const std::vector<int> & classificati
  */
 float randomPointsClassification::verify( const std::vector<int> & classification)
 {
-    return getErrorRate( m_testingSet, classification );
+    return getErrorRate( classification, m_testingLabels );
 }
 
 /*!  Caluculate error of learning
  * by iterating through traiing set and comparing its learned classification with
  * the one used for learning. if they are diffrent then increase error rate
  */
-float randomPointsClassification::getErrorRate(const std::vector<point> &samples,  const std::vector<int> & classification)
+float randomPointsClassification::getErrorRate(const std::vector<int> & classification, const std::vector<int> & expected_classification)
 {
     unsigned int                         error_rate = 0;
-    std::vector< point >::const_iterator it;
+    std::vector< std::vector<float> >::const_iterator it;
 
     // If number of samples does not corresspond to number of classification data then
     // something is very wrong and we return max error rate: 1.0
-    if( classification.size() != samples.size())
+    if( classification.size() != expected_classification.size())
     {
-        assert(classification.size() == samples.size());
-        SKYNET_INFO("Error: classification data size and samples data size do differ!\n");
+        assert(classification.size() == expected_classification.size());
+        SKYNET_INFO("Error: classification data size and expected classification data size do differ!\n");
         return 1.0f; 
     }
 
-    for(unsigned int i =0; i< samples.size(); ++i) 
+    for(unsigned int i =0; i< classification.size(); ++i) 
     {
-        if(  classification[i]  != samples[i].classification)
+        if( classification[i]  != expected_classification[i])
         {
             ++error_rate;
         }
     }
     
-    return error_rate/(float)samples.size();
+    return error_rate/(float)expected_classification.size();
 }
 ///////////////////////////////////////////////////////////////////////////
-const std::vector< point > & randomPointsClassification::getValidationData()
+const std::vector< std::vector<float> > & randomPointsClassification::getValidationData()
 {
-    return m_validationSet;
+    return m_validationData;
 }
 ////////////////////////////////////////////////////////////////////////////
-const std::vector< point > & randomPointsClassification::getTrainingData()
+const std::vector< int > & randomPointsClassification::getValidationLabels()
 {
-    return m_trainingSet;
+    return m_validationLabels;
 }
-
-
-const std::vector<point> & randomPointsClassification::getTestingData()
+////////////////////////////////////////////////////////////////////////////
+const std::vector< std::vector<float> > & randomPointsClassification::getTrainingData()
 {
-    return m_testingSet;
+    return m_trainingData;
 }
-
-
-/// sign(A*x + B*y +C) where x,y are above chosen by random points
-int randomPointsClassification::classifyPoint( const point& sample, const std::vector< float > &weights )
+////////////////////////////////////////////////////////////////////////////
+const std::vector<int> & randomPointsClassification::getTrainingLabels()
 {
-    return ( weights[1] * sample.x + weights[2] * sample.y + weights[0] >= 0.0f ) ? 1 : -1;
+    return m_trainingLabels;
 }
+////////////////////////////////////////////////////////////////////////////
+
+const std::vector<std::vector<float>> & randomPointsClassification::getTestingData()
+{
+    return m_testingData;
+}
+////////////////////////////////////////////////////////////////////////////
+const std::vector<int> & randomPointsClassification::getTestingLabels()
+{
+    return m_testingLabels;
+}
+////////////////////////////////////////////////////////////////////////////
 
 /*! there is a number of separating lines. We classify given point
  *  as +1 class if multiplication  of all (An*x + Bn*y +Cn)
  *  where x,y are above chosen by random points, for n <1..nrLines>
  *  is negative. This should give as intresting set
  */
-int randomPointsClassification::classifyPoint(const point& sample)
+int randomPointsClassification::classifyPoint(const std::vector<float>& sample)
 {
     float result = 1.0f;
 
     for(unsigned int i = 0; i < m_fweights.size(); i += 3)
     {
-        result *= (m_fweights[i+1] * sample.x + m_fweights[i+2] * sample.y + m_fweights[i]);
+        result *= (m_fweights[i+1] * sample[0] + m_fweights[i+2] * sample[1] + m_fweights[i]);
     }
     return result < 0.0f ? -1 : 1;  //temporary hack
 }
 
-void randomPointsClassification::generateSet( std::vector< point > &set, unsigned int N )
+void randomPointsClassification::generateSet( std::vector< std::vector<float> > &data, std::vector<int> &labels , unsigned int N )
 {
-    set.clear();
+    data.clear();
+    data.resize(N);
+    labels.clear();
 
     // Get N random points
     std::uniform_real_distribution< float > randx( m_minX, m_maxX );
     std::uniform_real_distribution< float > randy( m_minY, m_maxY );
     std::random_device rd;
 
-    point randPoint;
+    std::vector<float> randPoint;
     for( int i = 0; i < N; ++i )
     {
         // get point
-        randPoint.x = randx( rd );
-        randPoint.y = randy( rd );
+        data[i].push_back(randx( rd ));
+        data[i].push_back(randy( rd ));
         // get its classification value eg.
-        randPoint.classification = classifyPoint(randPoint);
+        labels.push_back(classifyPoint(data[i]));
         //SKYNET_DEBUG("point[%d]: x=%f y=%f class=%d\n",i,randPoint.x,randPoint.y,randPoint.classification);
-        set.push_back(randPoint);
     }
-
 }
 
 
@@ -215,14 +224,28 @@ void runTest(SkyNet& skynet_instance)
         diagnostic.reset();
         SKYNET_INFO("Running Random points classification test against: %s\n",classifier.module->About().c_str() );
         // Pass Input data , and initial weights to RunCL , RunRef functions
-        classifier.module->RunRef(rpc.getTrainingData(), rpc.getValidationData(), diagnostic, exitter );
+        classifier.module->RunRef(rpc.getTrainingData(), 
+                                  rpc.getTrainingLabels(),
+                                  rpc.getValidationData(),
+                                  rpc.getValidationLabels(), 
+                                  diagnostic,
+                                  exitter );
         SKYNET_INFO("In-sample error: %f Out-of-sample error: %f\n",  rpc.validate(classifier.module->getClassification(rpc.getTrainingData() ) ),rpc.verify(classifier.module->getClassification(rpc.getTestingData() ) ) );
-        SKYNET_INFO("GetError: %f\n",classifier.module->getError(rpc.getTrainingData() ) );
+        SKYNET_INFO("GetError: %f\n",classifier.module->getError(rpc.getTrainingData(), rpc.getTrainingLabels() ) );
         diagnostic.makeWeightsAnalysis(classifier.module->About());
         diagnostic.saveWeightsToFile(classifier.module->About());
-        diagnostic.makeTrainingAnalysis(classifier.module->About(),rpc.getTrainingData(), rpc.getTargetWeights(),rpc.getWeights() );
-        diagnostic.makeGeneralizationAnalysis(classifier.module->About(),rpc.getTestingData(), rpc.getTargetWeights(),rpc.getWeights() );
+        diagnostic.makeTrainingAnalysis(classifier.module->About(),
+                                        rpc.getTrainingData(),
+                                        rpc.getTrainingLabels(), 
+                                        rpc.getTargetWeights(),
+                                        rpc.getWeights() );
+        diagnostic.makeGeneralizationAnalysis(classifier.module->About(),
+                                              rpc.getTestingData(), 
+                                              rpc.getTestingLabels(),
+                                              rpc.getTargetWeights(),
+                                              rpc.getWeights() );
     }
 }
+        int classifyPoint(const std::vector<float>& sample, const std::vector<float> &weights);
 auto a = TestsRegistry::inst().addTest("Random points", runTest);
 }

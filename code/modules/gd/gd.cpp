@@ -23,7 +23,7 @@ std::string GradientDescent::composeAboutString()
 }
 
 
-std::vector<int> & GradientDescent::getClassification(const std::vector<point> & data)
+std::vector<int> & GradientDescent::getClassification(const std::vector<std::vector<float>> & data)
 {
     m_classification.clear();
     // each data point has corressponding classification info
@@ -36,7 +36,7 @@ std::vector<int> & GradientDescent::getClassification(const std::vector<point> &
 
         for(unsigned int i = 0; i < m_weights.size(); i += 3)
         {
-            result *= (m_weights[i+1] * data[k].x + m_weights[i+2] * data[k].y + m_weights[i]);
+            result *= (m_weights[i+1] * data[k][0] + m_weights[i+2] * data[k][1] + m_weights[i]);
         }
         m_classification.push_back(result > 0.0f ? 1 : -1);
     }
@@ -57,20 +57,20 @@ std::vector<int> & GradientDescent::getClassification(const std::vector<point> &
  *            divided by number of samples 
  *
  */ 
-bool GradientDescent::updateWeights( const std::vector< point > & trainingData )
+bool GradientDescent::updateWeights( const std::vector< std::vector<float> > & trainingData, const std::vector<int>& classificationData )
 {
     float                                dw0, dw1, dw2, tmpVal;
-    std::vector< point >::const_iterator it;
+    std::vector< std::vector<float> >::const_iterator it;
 
     dw0 = 0.0f;
     dw1 = 0.0f;
     dw2 = 0.0f;
-    for( it = trainingData.begin(); it != trainingData.end(); ++it )
+    for( int i=0; i< trainingData.size(); ++i )
     {
-        tmpVal = -m_theta * 2.0 * ( it->x * m_weights[1] + m_weights[2] * it->y + m_weights[0] - it->classification );
+        tmpVal = -m_theta * 2.0 * ( trainingData[i][0] * m_weights[1] + m_weights[2] * trainingData[i][1] + m_weights[0] - classificationData[i] );
         dw0   += tmpVal;         // gradient per w0
-        dw1   += tmpVal * it->x; // gradient per w1
-        dw2   += tmpVal * it->y; // gradient per w2
+        dw1   += tmpVal * trainingData[i][0]; // gradient per w1
+        dw2   += tmpVal * trainingData[i][1]; // gradient per w2
     }
 
     m_weights[0] += dw0/trainingData.size();
@@ -95,20 +95,25 @@ void GradientDescent::setWeights(std::vector< float > &initial_weights)
     }
 }
 ////////////////////////////////////////////////////////////////////////////
-float GradientDescent::getError(const std::vector<point> & data)
+float GradientDescent::getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels)
 {
+    //TODO: implement it
     return 1.0f;
 }
 
 
-void GradientDescent::RunRef(const std::vector<point> & trainingData,  const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)              
+void GradientDescent::RunRef( const std::vector< std::vector<float> > &trainingData,
+                              const std::vector<int> &trainingLabels,
+                              const std::vector<std::vector<float>>   &validationData,
+                              const std::vector<int> &validationLabels,
+                              SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter)
 {
     const int max_iterations = 1000*trainingData.size();
     int i=0;
     bool finish = false;
     diagnostic.storeWeightsAndError(m_weights,0.0f,0.0f);
     while((i<max_iterations)&&(finish == false))  {
-        finish = updateWeights(trainingData);
+        finish = updateWeights(trainingData,trainingLabels);
         //TODO: Store proper error
         diagnostic.storeWeightsAndError(m_weights,0.0f,0.0f);
         finish = finish || exitter();
@@ -122,7 +127,7 @@ void GradientDescent::RunRef(const std::vector<point> & trainingData,  const std
     return;
 }
 
-const std::vector<float> & GradientDescent::RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
+const std::vector<float> & GradientDescent::RunCL(const std::vector<std::vector<float>> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
 {
     float testValue = 0.0f;
 }

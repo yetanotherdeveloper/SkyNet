@@ -22,10 +22,10 @@ void SupportVectorMachine::setWeights(std::vector< float > &initial_weights)
     }
 }
 
-std::vector<int> & SupportVectorMachine::getClassification(const std::vector<point> & data)
+std::vector<int> & SupportVectorMachine::getClassification(const std::vector<std::vector<float>> & data)
 {
     m_classification.clear();
-    // each data point has corressponding classification info
+    // each data std::vector<float> has corressponding classification info
     // so we can reserve space upfront
     m_classification.reserve(data.size());
 
@@ -38,18 +38,23 @@ std::vector<int> & SupportVectorMachine::getClassification(const std::vector<poi
     return m_classification;
 }
 
-float SupportVectorMachine::getError(const std::vector<point> & data)
+float SupportVectorMachine::getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels)
 {
     return 1.0f;
 }
 
 
-const std::vector<float> & SupportVectorMachine::RunCL(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
+const std::vector<float> & SupportVectorMachine::RunCL(const std::vector<std::vector<float>> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
 {
 }
 
 
-void SupportVectorMachine::RunRef(const std::vector<point> & trainingData,const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter)
+void SupportVectorMachine::RunRef( const std::vector< std::vector<float> > &trainingData,
+             const std::vector<int> &trainingLabels,
+             const std::vector<std::vector<float>>   &validationData,
+             const std::vector<int> &validationLabels,
+             SkyNetDiagnostic       &diagnostic, 
+             SkynetTerminalInterface& exitter)
 {
     return;
 }

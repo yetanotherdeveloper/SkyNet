@@ -19,11 +19,15 @@ private:
 public:
     SupportVectorMachine();
     ~SupportVectorMachine();
-    const std::vector<float> & RunCL(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
-    void RunRef(const std::vector<point> & trainingData, const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+    const std::vector<float> & RunCL(const std::vector<std::vector<float>> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+    void RunRef( const std::vector< std::vector<float> > &trainingData,
+                 const std::vector<int> &trainingLabels,
+                 const std::vector<std::vector<float>>   &validationData,
+                 const std::vector<int> &validationLabels,
+                 SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter);
     void setWeights(std::vector< float > &initial_weights);
-    float getError(const std::vector<point> & data);
-    std::vector<int> & getClassification(const std::vector<point> & data);
+    float getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels);
+    std::vector<int> & getClassification(const std::vector<std::vector<float>> & data);
     void About();
     const std::string About() const;
 };

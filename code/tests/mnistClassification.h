@@ -15,8 +15,8 @@ public:
     mnistClassification(std::string mnist_dirname);
     // Release resources
     ~mnistClassification() {};
-    const std::vector<point> &getTrainingData();    //TODO: change returned type
-    const std::vector<point> &getTestingData();
+    const std::vector<std::vector<float>> &getTrainingData();    //TODO: change returned type
+    const std::vector<std::vector<float>> &getTestingData();
 private:
     mnistClassification()
     {

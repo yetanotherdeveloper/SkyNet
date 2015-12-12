@@ -45,14 +45,14 @@ std::string NeuralNetwork::composeAboutString()
 }
 
 
-std::vector<int> & NeuralNetwork::getClassification(const std::vector<point> & data)
+std::vector<int> & NeuralNetwork::getClassification(const std::vector<std::vector<float>> & data)
 {
     m_classification.clear();
-    // each data point has corressponding classification info
+    // each data std::vector<float> has corressponding classification info
     // so we can reserve space upfront
     m_classification.reserve(data.size() );
 
-    // Send each point through NN and get classification error for it
+    // Send each std::vector<float> through NN and get classification error for it
     // later on all errors are summed up and divided by number of samples
     for( unsigned int k = 0; k < data.size(); ++k )
     {
@@ -66,9 +66,9 @@ std::vector<int> & NeuralNetwork::getClassification(const std::vector<point> & d
  *  Square error is used as error measure eg
  *  (NN_classification_value - sample_classification )^2
  */
-float NeuralNetwork::getSampleClassificationError( const point& sample, float output )
+float NeuralNetwork::getSampleClassificationError( const int sample, float output )
 {
-    return powf( (output - ( float )sample.classification), 2.0f );
+    return powf( (output - ( float )sample), 2.0f );
 }
 
 
@@ -91,23 +91,23 @@ void NeuralNetwork::getAllWeights(std::vector< float > &all_weights)
 
 
 // Get Error based on current state of neural network
-float NeuralNetwork::getError( const std::vector< point > & data )
+float NeuralNetwork::getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels   )
 {
     // TODO: adjust capacity
     float total_error = 0.0f;
 
-    // Send each point through NN and get classification error for it
+    // Send each std::vector<float> through NN and get classification error for it
     // later on all errors are summed up and divided by number of samples
     for( unsigned int k = 0; k < data.size(); ++k )
     {
-        total_error += getSampleClassificationError( data[k], getNetworkOutput(data[k]) );
+        total_error += getSampleClassificationError( labels[k], getNetworkOutput(data[k]) );
     }
     return total_error / ( float )data.size();
 
 }
 
 
-float NeuralNetwork::getNetworkOutput(const point &randomSample)
+float NeuralNetwork::getNetworkOutput(const std::vector<float> &randomSample)
 {
     std::vector< float > input;
     std::vector< float > output;
@@ -144,7 +144,7 @@ float NeuralNetwork::getNetworkOutput(const point &randomSample)
  *            E_in(w(t)) is square error eg. square error on random sample() from training set
  *
  */
-void NeuralNetwork::updateWeights( const point &randomSample )
+void NeuralNetwork::updateWeights( const std::vector<float> &randomSample, const int correspondingLabel )
 {
     // Get final delta: de/ds^l
     std::vector< float >             input;
@@ -178,7 +178,7 @@ void NeuralNetwork::updateWeights( const point &randomSample )
     assert( output.size() == 1 );
     // Set Final(top level neuron) delta: 2*(tanh(s) - y)*(1 - tanh**2(s))
     // d(tanh(s))/ds = 1 - tanh**2(s)
-    m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 2.0f*( output[0] - (float)randomSample.classification )*(1.0f - output[0] * output[0]) );
+    m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 2.0f*( output[0] - (float)correspondingLabel )*(1.0f - output[0] * output[0]) );
 
     // BACKPROPAGATE delta backwards (lower NN layers)
     // starting from previous to highest layer
@@ -228,7 +228,8 @@ void NeuralNetwork::updateWeights( const point &randomSample )
  *            E_in(w(t)) is square error eg. square error on random sample() from training set
  *
  */
-void NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
+void NeuralNetwork::updateWeights(const std::vector< std::vector<float> > & trainingData, 
+                                                    const std::vector<int> &trainingLabels)
 {
     // Get final delta: de/ds^l
     std::vector< float >             input;
@@ -273,7 +274,7 @@ void NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
         assert( output.size() == 1 );
         // Set Final(top level neuron) delta: 2*(tanh(s) - y)*(1 - tanh**2(s))
         // d(tanh(s))/ds = 1 - tanh**2(s)
-        m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 2.0f*( output[0] - (float)trainingData[s].classification )*(1.0f - output[0] * output[0]) );
+        m_layers[m_layers.size() - 1].m_neurons[0].setDelta( 2.0f*( output[0] - (float)trainingLabels[s])*(1.0f - output[0] * output[0]) );
 
         // BACKPROPAGATE delta backwards (lower NN layers)
         // starting from previous to highest layer
@@ -317,8 +318,10 @@ void NeuralNetwork::updateWeights(const std::vector< point > & trainingData)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
-void NeuralNetwork::RunRef( const std::vector< point > &trainingData,
-                                                    const std::vector<point>   &validationData,
+void NeuralNetwork::RunRef( const std::vector< std::vector<float> > &trainingData,
+                                                    const std::vector<int> &trainingLabels,
+                                                    const std::vector<std::vector<float>>   &validationData,
+                                                    const std::vector<int> &validationLabels,
                                                     SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter)
 {
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() - 1 );
@@ -326,38 +329,45 @@ void NeuralNetwork::RunRef( const std::vector< point > &trainingData,
 
     std::vector<float> all_weights;
     getAllWeights(all_weights);
-    diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
+    diagnostic.storeWeightsAndError(all_weights,getError(trainingData,trainingLabels), getError(validationData,validationLabels) );
 
     unsigned int max_iterations = 3000;
 
     SkyNetEarlyStop es(max_iterations, 0.4f);
 
     int       i              = 0;
-    while( (es.earlyStop(all_weights,getError(validationData),getError(trainingData)) == false) && (exitter() == false) )
+    while( (es.earlyStop(all_weights,
+                         getError(validationData, validationLabels),
+                         getError(trainingData, trainingLabels)) == false) && (exitter() == false) )
     {
         //float err_before = getError(trainingData);
         if(m_gradType == GradientDescentType::STOCHASTIC)
         {
-            updateWeights( trainingData[sample_index( rd )] );
+            auto sample_idx = sample_index( rd );
+            updateWeights( trainingData[sample_idx], trainingLabels[sample_idx] );
         } else {
-            updateWeights( trainingData );
+            updateWeights( trainingData, trainingLabels );
         }
 
         //float err_after = getError(trainingData);
 
         getAllWeights(all_weights);
-        diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
+        diagnostic.storeWeightsAndError(all_weights,
+                                        getError(trainingData, trainingLabels), 
+                                        getError(validationData, validationLabels) );
     }
     // Get optimal found weights to be final weights
     es.getOptimalWeights(all_weights);
     setWeights(all_weights);
-    diagnostic.storeWeightsAndError(all_weights,getError(trainingData), getError(validationData) );
+    diagnostic.storeWeightsAndError(all_weights,
+                                    getError(trainingData, trainingLabels), 
+                                    getError(validationData, validationLabels) );
 
     return;
 }
 
 
-const std::vector< float > & NeuralNetwork::RunCL( const std::vector< point > &trainingData,
+const std::vector< float > & NeuralNetwork::RunCL( const std::vector< std::vector<float> > &trainingData,
                                                    SkyNetDiagnostic           &diagnostic,
                                                    SkynetTerminalInterface& exitter)
 {
@@ -465,15 +475,6 @@ float NeuralNetwork::NeuralLayer::Neuron::getOutput( const std::vector< float > 
 }
 
 
-// This is only for tests operating on point data (input = 2 )
-float NeuralNetwork::NeuralLayer::Neuron::getOutput( const point & input )
-{
-    m_output = ( float )tanh( ( float )(m_weights[0] + m_weights[1] * input.x + m_weights[2] * input.y) );
-    return m_output;
-
-}
-
-
 float NeuralNetwork::NeuralLayer::Neuron::getOutput()
 {
     return m_output;
@@ -510,22 +511,6 @@ float NeuralNetwork::NeuralLayer::Neuron::getWeightsQuantity()
     return m_weights.size();
 }
 
-
-//TODO: Make it a template not a copy of functions
-
-void NeuralNetwork::NeuralLayer::Neuron::updateWeights( const point & input )
-{
-    float dw0,dw1,dw2;
-    // w <-- w - theta * x^(l-1)*Delta^l
-    // iterate through all weights of this neuron and update its weights
-    dw0 = -this->m_delta * s_theta;
-    dw1 = dw0 * input.x;
-    dw2 = dw0 * input.y;
-
-    m_weights[0] += dw0;
-    m_weights[1] += dw1;
-    m_weights[2] += dw2;
-}
 
 
 void NeuralNetwork::NeuralLayer::Neuron::updateWeights( const std::vector<float> & input )

@@ -22,17 +22,31 @@ public:
     ~PerceptronLearningAlgorithm();
     void RunCL();
     void setWeights(std::vector< float > &initial_weights);
-    const std::vector<float> & RunCL(const std::vector<point> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
-    void RunRef(const std::vector<point> & trainingData,const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+    const std::vector<float> & RunCL(const std::vector<std::vector<float>> & trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+
+void RunRef( const std::vector< std::vector<float> > &trainingData,
+             const std::vector<int> &trainingLabels,
+             const std::vector<std::vector<float>>   &validationData,
+             const std::vector<int> &validationLabels,
+             SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter);
+
     const std::string About() const;
     static std::string composeAboutString();
-    float getError(const std::vector<point> & data);
-    std::vector<int> & getClassification(const std::vector<point> & data);
+    float getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels);
+
+    std::vector<int> & getClassification(const std::vector<std::vector<float>> & data);
 private:
-    int  classifyPoint(const point &rpoint);
-    float getSampleClassificationError( const point& sample, float output );
-    void updateWeights(const point& rpoint);
-    bool getMisclassifiedPoint(const std::vector<point> & trainingData, const point** output);
+    int  classifyPoint(const std::vector<float> &rpoint);
+    float getSampleClassificationError( const int sample, float output );
+    void updateWeights(const std::vector<float>& rpoint, const int classification);
+    bool getMisclassifiedPoint(const std::vector<std::vector<float>> & trainingData, 
+                               const std::vector<int> &trainingLabels, 
+                               const std::vector<float>** output);
+
+    bool getMisclassifiedPoint(const std::vector<std::vector<float>> & trainingData, 
+                               const std::vector<int> &trainingLabels,
+                               const std::vector<float>** outputData,
+                               const int** outputLabel);
 };
 #endif //__PLA__
 

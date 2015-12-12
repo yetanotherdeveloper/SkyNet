@@ -49,14 +49,12 @@ public:
             ~Neuron();
             // There are to functions calculating or getting  output as on first layer we have a points as input , on next layers it is floats given as input
             float getOutput();
-            float getOutput(const point & input);
             float getOutput(const std::vector<float> & input);
             void setDelta(float deltaValue);
             float getDelta();
             void setWeight( unsigned int index, float value );
             float getWeight(unsigned int index);
             float getWeightsQuantity();
-            void updateWeights( const point & input ); // Update weights of Neuron
             void updateWeights( const std::vector<float> & input ); // Update weights of Neuron
         };
 public:
@@ -74,21 +72,28 @@ private:
 public:
     NeuralNetwork( unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype = GradientDescentType::STOCHASTIC);
     ~NeuralNetwork();
-    const std::vector<float> & RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
-    void RunRef(const std::vector<point> & trainingData, 
-                                        const std::vector<point> &validationData,
-                                        SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+    const std::vector<float> & RunCL(const std::vector<std::vector<float>> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+
+    void RunRef( const std::vector< std::vector<float> > &trainingData,
+                 const std::vector<int> &trainingLabels,
+                 const std::vector<std::vector<float>>   &validationData,
+                 const std::vector<int> &validationLabels,
+                 SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter);
+
+
     void setWeights(std::vector< float > &initial_weights);
     const std::string About() const;
     static std::string composeAboutString();
-    float getError(const std::vector<point> & data);
-    std::vector<int> & getClassification(const std::vector<point> & data);
+    float getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels);
+
+    std::vector<int> & getClassification(const std::vector<std::vector<float>> & data);
 private:
-    float getNetworkOutput(const point &randomSample);
+    float getNetworkOutput(const std::vector<float> &randomSample);
     void getAllWeights(std::vector< float > &all_weights);
-    float getSampleClassificationError(const point& sample,float output);
-    void updateWeights(const point &randomSample);
-    void updateWeights(const std::vector< point > & trainingData);
+    float getSampleClassificationError(const int sample,float output);
+    void updateWeights( const std::vector<float> &randomSample, const int correspondingLabel );
+    void updateWeights(const std::vector< std::vector<float> > & trainingData, 
+                                                    const std::vector<int> &trainingLabels);
 };
 #endif //__NN__
 

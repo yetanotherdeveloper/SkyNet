@@ -22,17 +22,22 @@ private:
 public:
     GradientDescent();
     ~GradientDescent();
-    const std::vector<float> & RunCL(const std::vector<point> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
-    void RunRef(const std::vector<point> & trainingData, const std::vector<point> &validationData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+    const std::vector<float> & RunCL(const std::vector<std::vector<float>> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
+    void RunRef( const std::vector< std::vector<float> > &trainingData,
+                 const std::vector<int> &trainingLabels,
+                 const std::vector<std::vector<float>>   &validationData,
+                 const std::vector<int> &validationLabels,
+                 SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter);
+
     const std::string About() const;
     void setWeights(std::vector< float > &initial_weights);
     static std::string composeAboutString();
-    float getError(const std::vector<point> & data);
-    std::vector<int> & getClassification(const std::vector<point> & data);
+    float getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels);
+    std::vector<int> & getClassification(const std::vector<std::vector<float>> & data);
 private:
-    float  classifyPoint( const point &rpoint );
-    float getPartialErrorDerivative( const point &rpoint );
-    bool updateWeights(const std::vector<point> & trainingData);
+    float classifyPoint( const std::vector<float> &rpoint );
+    float getPartialErrorDerivative( const std::vector<float> &rpoint );
+    bool updateWeights( const std::vector< std::vector<float> > & trainingData, const std::vector<int>& classificationData );
 };
 #endif //__GD__
 

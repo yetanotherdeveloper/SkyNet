@@ -10,11 +10,6 @@
 // Note: Module should export following function:
 //extern "C" ISkyNetClassificationProtocol* CreateModule(const cl::Device* const pdevice)
 
-struct point {
-    float x;                        //! first coord of point
-    float y;                        //! second coord of point
-    int classification;             //! +1 or -1 meaning the classification area
-};
 
 
 class SkyNetDiagnostic
@@ -41,13 +36,20 @@ public:
     void storeWeightsAndError(const std::vector<float> &weights, float in_error, float val_error);
     void makeWeightsAnalysis(const std::string& dirName);
     void saveWeightsToFile(const std::string& dirName);
-    void makeTrainingAnalysis(const std::string& dirName,const std::vector<point> & set,
-                              const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights);
-    void makeGeneralizationAnalysis(const std::string& dirName,const std::vector<point> & set,
+    void makeTrainingAnalysis(const std::string& dirName,
+                              const std::vector<std::vector<float>> & setData,
+                              const std::vector<int>  &setLabels,
+                              const std::vector<float> &targetWeights,
+                              const std::vector<float> &learnedWeights);
+    void makeGeneralizationAnalysis(const std::string& dirName,
+                                    const std::vector<std::vector<float>> & setData,
+                                    const std::vector<int>  &setLabels,
                                     const std::vector<float> &targetWeights,const std::vector<float> &learnedWeights);
 private:
     void makeAnalysis(const std::string& dirName,const std::string& dataFilename, const std::string& scriptFilename,
-                      const std::vector<point> & set, const std::vector<float> &targetWeights,
+                      const std::vector<std::vector<float>> & setData,
+                      const std::vector<int>  &setLabels,
+                      const std::vector<float> &targetWeights,
                       const std::vector<float> &learnedWeights);
 };
 
@@ -178,10 +180,15 @@ class ISkyNetClassificationProtocol
 public:
     virtual ~ISkyNetClassificationProtocol() {
     };
-    virtual const std::vector<float> & RunCL(const std::vector<point> &, SkyNetDiagnostic &, SkynetTerminalInterface& ) = 0;
-    virtual void RunRef(const std::vector<point> &, const std::vector<point> &, SkyNetDiagnostic &, SkynetTerminalInterface&) = 0;
-    virtual float getError(const std::vector<point> & data)                                                             = 0;
-    virtual std::vector<int> & getClassification(const std::vector<point> & data)                                       = 0;
+    virtual const std::vector<float> & RunCL(const std::vector<std::vector<float>> &, SkyNetDiagnostic &, SkynetTerminalInterface& ) = 0;
+    virtual void RunRef( const std::vector< std::vector<float> > &trainingData,
+                 const std::vector<int> &trainingLabels,
+                 const std::vector<std::vector<float>>   &validationData,
+                 const std::vector<int> &validationLabels,
+                 SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter) = 0;
+
+    virtual float getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels)       = 0;
+    virtual std::vector<int> & getClassification(const std::vector<std::vector<float>> & data)                                       = 0;
     virtual const std::string About() const                                                                             = 0;
     virtual void setWeights(std::vector< float > &all_weights)                                                          = 0;
     std::string Identify()
