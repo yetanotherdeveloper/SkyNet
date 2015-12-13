@@ -45,25 +45,25 @@ void randomPointsClassification::setWeights( const std::vector< float > &weights
 }
 
 /// Validate input classification data through training sets
-float randomPointsClassification::validate(const std::vector<int> & classification)
+void randomPointsClassification::validate(const std::vector<int> & classification)
 {
-    return getErrorRate( classification, m_trainingLabels );
+    std::cout << "Training error: " + getErrorRate( classification, m_trainingLabels ) << std::endl;
 }
 
 
 /*! Verification: calculate out of sample error eg. calculate error using
  * samples set not used for training
  */
-float randomPointsClassification::verify( const std::vector<int> & classification)
+void randomPointsClassification::verify( const std::vector<int> & classification)
 {
-    return getErrorRate( classification, m_testingLabels );
+    std::cout << "Testing error: " +getErrorRate( classification, m_testingLabels ) << std::endl;
 }
 
 /*!  Caluculate error of learning
  * by iterating through traiing set and comparing its learned classification with
  * the one used for learning. if they are diffrent then increase error rate
  */
-float randomPointsClassification::getErrorRate(const std::vector<int> & classification, const std::vector<int> & expected_classification)
+std::string randomPointsClassification::getErrorRate(const std::vector<int> & classification, const std::vector<int> & expected_classification)
 {
     unsigned int                         error_rate = 0;
     std::vector< std::vector<float> >::const_iterator it;
@@ -74,7 +74,7 @@ float randomPointsClassification::getErrorRate(const std::vector<int> & classifi
     {
         assert(classification.size() == expected_classification.size());
         SKYNET_INFO("Error: classification data size and expected classification data size do differ!\n");
-        return 1.0f; 
+        return  std::to_string(expected_classification.size()) + "out of " + std::to_string(expected_classification.size());
     }
 
     for(unsigned int i =0; i< classification.size(); ++i) 
@@ -85,7 +85,7 @@ float randomPointsClassification::getErrorRate(const std::vector<int> & classifi
         }
     }
     
-    return error_rate/(float)expected_classification.size();
+    return std::to_string(error_rate) + "out of " + std::to_string(expected_classification.size());
 }
 ///////////////////////////////////////////////////////////////////////////
 const std::vector< std::vector<float> > & randomPointsClassification::getValidationData()
@@ -230,7 +230,8 @@ void runTest(SkyNet& skynet_instance)
                                   rpc.getValidationLabels(), 
                                   diagnostic,
                                   exitter );
-        SKYNET_INFO("In-sample error: %f Out-of-sample error: %f\n",  rpc.validate(classifier.module->getClassification(rpc.getTrainingData() ) ),rpc.verify(classifier.module->getClassification(rpc.getTestingData() ) ) );
+        rpc.validate(classifier.module->getClassification(rpc.getTrainingData()));
+        rpc.verify(classifier.module->getClassification(rpc.getTestingData()));
         SKYNET_INFO("GetError: %f\n",classifier.module->getError(rpc.getTrainingData(), rpc.getTrainingLabels() ) );
         diagnostic.makeWeightsAnalysis(classifier.module->About());
         diagnostic.saveWeightsToFile(classifier.module->About());

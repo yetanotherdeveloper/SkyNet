@@ -34,12 +34,12 @@ class randomPointsClassification
         const std::vector<float> & getWeights();
 		const std::vector<float> & getTargetWeights();
         void setWeights(const std::vector<float> &weights);
-        float validate(const std::vector<int> & classification);
-        float verify(const std::vector<int> & classification);
+        void validate(const std::vector<int> & classification);
+        void verify( const std::vector<int> & classification);
         unsigned int validate();
         unsigned int verify();
     private:
-        float getErrorRate(const std::vector<int> & classification, const std::vector<int> & expected_classification);
+        std::string getErrorRate(const std::vector<int> & classification, const std::vector<int> & expected_classification);
         void generateSet( std::vector< std::vector<float> > &data, std::vector<int> &labels , unsigned int N );
         void makeRandomFunctions(unsigned int nrLines);
         void makeFixedFunction( float x1, float y1, float x2, float y2 );
