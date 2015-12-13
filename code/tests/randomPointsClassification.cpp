@@ -230,9 +230,9 @@ void runTest(SkyNet& skynet_instance)
                                   rpc.getValidationLabels(), 
                                   diagnostic,
                                   exitter );
+        SKYNET_INFO("GetError: %f\n",classifier.module->getError(rpc.getTrainingData(), rpc.getTrainingLabels() ) );
         rpc.validate(classifier.module->getClassification(rpc.getTrainingData()));
         rpc.verify(classifier.module->getClassification(rpc.getTestingData()));
-        SKYNET_INFO("GetError: %f\n",classifier.module->getError(rpc.getTrainingData(), rpc.getTrainingLabels() ) );
         diagnostic.makeWeightsAnalysis(classifier.module->About());
         diagnostic.saveWeightsToFile(classifier.module->About());
         diagnostic.makeTrainingAnalysis(classifier.module->About(),
