@@ -7,8 +7,9 @@
 #include <Magick++.h>
 #include <memory>
 #include <cassert>
+#include "os_inc.h"
 
-unsigned int  mnistClassification::load_mnist(std::vector<std::unique_ptr<float>> &images,std::vector<char> &labels, std::string images_file, std::string labels_file)
+unsigned int  mnistClassification::load_mnist(std::vector<std::vector<float>> &images,std::vector<int> &labels, std::string images_file, std::string labels_file)
 {
     images.clear();
     labels.clear();
@@ -36,11 +37,13 @@ unsigned int  mnistClassification::load_mnist(std::vector<std::unique_ptr<float>
     u_int32_t num_items = block_to_int(int_read); 
     std::cout << "  Number of Items: " << num_items << std::endl;
 
-    // Make vecotr for labels equal to size of number of labels to be hold
+    // Make vector for labels equal to size of number of labels to be hold
     labels.resize(num_items);    
     for(u_int32_t i=0; i<num_items; ++i) 
     {
-        ifs.read(&labels[i],sizeof(char));
+      char single_label; 
+      ifs.read(&single_label,sizeof(char));
+      labels[i] = (int)single_label;
     }
     ifs.close();
 
@@ -75,10 +78,10 @@ unsigned int  mnistClassification::load_mnist(std::vector<std::unique_ptr<float>
     {
         iifs.read((char*)single_image_raw.get(),sizeof(char)*num_cols*num_rows);        
         // convert image to coords of read images (width and height)
-        images.push_back(std::unique_ptr<float>(new float[num_rows*num_cols]));
+        images.emplace_back(num_rows*num_cols);
         for(u_int32_t pix = 0; pix< num_cols*num_rows;++pix)
         {
-            *(images[i].get() + pix) = ((unsigned char)*(single_image_raw.get() +pix))* 1.0f/255.0f; 
+            *(&(images[i][0]) + pix) = ((unsigned char)*(single_image_raw.get() +pix))* 1.0f/255.0f; 
         }
             
     }
@@ -87,7 +90,7 @@ unsigned int  mnistClassification::load_mnist(std::vector<std::unique_ptr<float>
     return num_items;
 }
 
-void mnistClassification::showImage(const float* mnist_image)
+void mnistClassification::showImage(const std::vector<float>& mnist_image)
 {
     Magick::Image test_image(Magick::Geometry(28,28),"black"); 
 
@@ -97,7 +100,7 @@ void mnistClassification::showImage(const float* mnist_image)
         for(u_int32_t x=0; x< 28; ++x)
         {
                 u_int32_t i = y*28+x;
-                float bum = *(mnist_image + i)*QuantumRange;
+                float bum = *(&mnist_image[0] + i)*QuantumRange;
                 test_image.pixelColor(x,y,Magick::Color(bum,bum,bum));
         }
     }
@@ -112,24 +115,113 @@ mnistClassification::mnistClassification(std::string mnist_dirname)
     m_num_test_items = load_mnist(m_test_images,m_test_labels,mnist_dirname+"/train-images-idx3-ubyte",mnist_dirname+"/train-labels-idx1-ubyte");
 
     // diagnostic code to draw mnist image
-    //showImage(m_train_images[0].get());
+    // showImage(m_train_images[0]);
 }
+
+
+const std::vector<std::vector<float>> & mnistClassification::getTrainingData()
+{
+  return const_cast<const std::vector<std::vector<float>>&>(m_train_images);
+}
+
+const std::vector<std::vector<float>> &mnistClassification::getValidationData()
+{
+  // TODO: return Part of training data as validation data
+  return const_cast<const std::vector<std::vector<float>>&>(m_test_images);
+}
+
+const std::vector<std::vector<float>> &mnistClassification::getTestingData()
+{
+  return const_cast<const std::vector<std::vector<float>>&>(m_test_images);
+}
+
+const std::vector<int> &mnistClassification::getTrainingLabels()
+{
+  return const_cast<const std::vector<int>&>(m_train_labels);
+}
+const std::vector<int> &mnistClassification::getValidationLabels()
+{
+  // TODO: return Part of training labels as validation labels
+  return const_cast<const std::vector<int>&>(m_test_labels);
+}
+const std::vector<int> &mnistClassification::getTestingLabels()
+{
+  return const_cast<const std::vector<int>&>(m_test_labels);
+}
+
+/// Validate input classification data through training sets
+void mnistClassification::validate(const std::vector<int> & classification)
+{
+    std::cout << "Training error: " + getErrorRate( classification, m_train_labels ) << std::endl;
+}
+
+
+/*! Verification: calculate out of sample error eg. calculate error using
+ * samples set not used for training
+ */
+void mnistClassification::verify( const std::vector<int> & classification)
+{
+    std::cout << "Testing error: " +getErrorRate( classification, m_test_labels ) << std::endl;
+}
+
+/*!  Caluculate error of learning
+ <C-F2>* by iterating through traiing set and comparing its learned classification with
+ * the one used for learning. if they are diffrent then increase error rate
+ */
+std::string mnistClassification::getErrorRate(const std::vector<int> & classification, const std::vector<int> & expected_classification)
+{
+    unsigned int                         error_rate = 0;
+    std::vector< std::vector<float> >::const_iterator it;
+
+    // If number of samples does not corresspond to number of classification data then
+    // something is very wrong and we return max error rate: 1.0
+    if( classification.size() != expected_classification.size())
+    {
+        assert(classification.size() == expected_classification.size());
+        SKYNET_INFO("Error: classification data size and expected classification data size do differ!\n");
+        return  std::to_string(expected_classification.size()) + "out of " + std::to_string(expected_classification.size());
+    }
+
+    for(unsigned int i =0; i< classification.size(); ++i) 
+    {
+        if( classification[i]  != expected_classification[i])
+        {
+            ++error_rate;
+        }
+    }
+    
+    return std::to_string(error_rate) + " out of " + std::to_string(expected_classification.size());
+}
+
+
 
 namespace {
 
 void runTest(SkyNet& skynet_instance)
 {
-    std::cout << "MNIST Test executing!" << std::endl;
+  std::cout << "MNIST Test executing!" << std::endl;
 
-    mnistClassification mnist_test(skynet_instance.getMnistDataDir());
-    SkyNetDiagnostic diagnostic;
-    auto classifiers = skynet_instance.getClassificationModules();
-    SkynetTerminalInterface                     exitter('q');
+  mnistClassification mnist_test(skynet_instance.getMnistDataDir());
+  SkyNetDiagnostic diagnostic;
+  auto classifiers = skynet_instance.getClassificationModules();
+  SkynetTerminalInterface                     exitter('q');
 
-    for(auto& classifier : classifiers) 
-    {
-        //TODO: execution of mnist Test    
-    }
+  for(auto& classifier : classifiers) 
+  {
+    diagnostic.reset();
+    SKYNET_INFO("Running MNIST training and classification test against: %s\n",classifier.module->About().c_str() );
+
+//    classifier.module->RunRef(mnist_test.getTrainingData(), 
+//                              mnist_test.getTrainingLabels(),
+//                              mnist_test.getValidationData(),
+//                              mnist_test.getValidationLabels(), 
+//                              diagnostic,
+//                              exitter );
+  // TOOO:implement validat and verify
+  mnist_test.validate(classifier.module->getClassification(mnist_test.getTrainingData()));
+  mnist_test.verify(classifier.module->getClassification(mnist_test.getTestingData()));
+
+  }
 }
 auto a = TestsRegistry::inst().addTest("MNIST",runTest);
 }

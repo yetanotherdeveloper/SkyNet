@@ -15,23 +15,32 @@ public:
     mnistClassification(std::string mnist_dirname);
     // Release resources
     ~mnistClassification() {};
-    const std::vector<std::vector<float>> &getTrainingData();    //TODO: change returned type
+    const std::vector<std::vector<float>> &getTrainingData();
+    const std::vector<std::vector<float>> &getValidationData();
     const std::vector<std::vector<float>> &getTestingData();
+    const std::vector<int> &getTrainingLabels();
+    const std::vector<int> &getValidationLabels();
+    const std::vector<int> &getTestingLabels();
+
+    void verify( const std::vector<int> & classification);
+    void validate(const std::vector<int> & classification);
+
 private:
     mnistClassification()
     {
     }
 
     // Load images and corressponding labels. Return number of items read (number of images has to match number of labels )
-    unsigned int load_mnist(std::vector<std::unique_ptr<float>> &images,std::vector<char> &labels, std::string images_file, std::string labels_file);
-    void showImage(const float* mnist_image);
+    unsigned int load_mnist(std::vector<std::vector<float>> &images,std::vector<int> &labels, std::string images_file, std::string labels_file);
+    void showImage(const std::vector<float>& mnist_image);
+    std::string getErrorRate(const std::vector<int> & classification, const std::vector<int> & expected_classification);
 
 private:
-    std::vector<std::unique_ptr<float>> m_train_images;
-    std::vector<char> m_train_labels;
+    std::vector<std::vector<float>> m_train_images;
+    std::vector<int> m_train_labels;
     unsigned int m_num_train_items;
-    std::vector<std::unique_ptr<float>> m_test_images;
-    std::vector<char> m_test_labels;
+    std::vector<std::vector<float>> m_test_images;
+    std::vector<int> m_test_labels;
     unsigned int m_num_test_items;
 };
 
