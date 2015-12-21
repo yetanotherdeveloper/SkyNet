@@ -332,10 +332,11 @@ void NeuralNetwork::RunRef( const std::vector< std::vector<float> > &trainingDat
     diagnostic.storeWeightsAndError(all_weights,getError(trainingData,trainingLabels), getError(validationData,validationLabels) );
 
     unsigned int max_iterations = 3000;
+    unsigned int interval = 1;        // number of iterations after which testing comes and printing
 
     SkyNetEarlyStop es(max_iterations, 0.4f);
 
-    int       i              = 0;
+    unsigned int i = 0;
     while( (es.earlyStop(all_weights,
                          getError(validationData, validationLabels),
                          getError(trainingData, trainingLabels)) == false) && (exitter() == false) )
@@ -349,12 +350,15 @@ void NeuralNetwork::RunRef( const std::vector< std::vector<float> > &trainingDat
             updateWeights( trainingData, trainingLabels );
         }
 
-        //float err_after = getError(trainingData);
-
         getAllWeights(all_weights);
         diagnostic.storeWeightsAndError(all_weights,
                                         getError(trainingData, trainingLabels), 
                                         getError(validationData, validationLabels) );
+      if(i%interval == 0) {
+        std::cout << "It:" << i << " Train Error: " << getError(trainingData, trainingLabels) << " Val Error: " 
+                  << getError(validationData, validationLabels) << std::endl;
+      }
+      ++i;
     }
     // Get optimal found weights to be final weights
     es.getOptimalWeights(all_weights);
@@ -512,7 +516,7 @@ float NeuralNetwork::NeuralLayer::Neuron::getWeightsQuantity()
 }
 
 
-
+// TODO: Neuron got more that two weights in general.. reimplement it
 void NeuralNetwork::NeuralLayer::Neuron::updateWeights( const std::vector<float> & input )
 {
     float dw0,dw1,dw2;

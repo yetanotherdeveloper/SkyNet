@@ -211,15 +211,14 @@ void runTest(SkyNet& skynet_instance)
     diagnostic.reset();
     SKYNET_INFO("Running MNIST training and classification test against: %s\n",classifier.module->About().c_str() );
 
-//    classifier.module->RunRef(mnist_test.getTrainingData(), 
-//                              mnist_test.getTrainingLabels(),
-//                              mnist_test.getValidationData(),
-//                              mnist_test.getValidationLabels(), 
-//                              diagnostic,
-//                              exitter );
-  // TOOO:implement validat and verify
-  mnist_test.validate(classifier.module->getClassification(mnist_test.getTrainingData()));
-  mnist_test.verify(classifier.module->getClassification(mnist_test.getTestingData()));
+    classifier.module->RunRef(mnist_test.getTrainingData(), 
+                              mnist_test.getTrainingLabels(),
+                              mnist_test.getValidationData(),
+                              mnist_test.getValidationLabels(), 
+                              diagnostic,
+                              exitter );
+    mnist_test.validate(classifier.module->getClassification(mnist_test.getTrainingData()));
+    mnist_test.verify(classifier.module->getClassification(mnist_test.getTestingData()));
 
   }
 }
