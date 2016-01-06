@@ -35,7 +35,26 @@ NeuralNetwork::NeuralNetwork( unsigned int nrInputs, unsigned int nrLayers, Grad
     }
 
 }
+/*! Modify number of inputs eg. number of connections to each neuron of first neural layer.
+ *  This is needed for neural network to work with diffrent size of input data
+ */
+void NeuralNetwork::reshape(unsigned int num_inputs)
+{
+    // In case requested number of inputs differ
+    // from existing setting
+    // recreate first neural layer of network with
+    // requested number of settings
+    const unsigned int nrLayers = m_layers.size();
+    const unsigned int current_num_inputs = m_layers[0].m_neurons[0].getWeightsQuantity();
 
+    if(current_num_inputs != num_inputs)
+    {
+      m_layers[0] = NeuralLayer( num_inputs, 
+                                 ( unsigned int )powf( 2.0f,
+                                 ( float )(nrLayers - 1) ),
+                                 NeuronFlags::INIT_RANDOM );
+    }
+}
 
 std::string NeuralNetwork::composeAboutString()
 {
@@ -510,23 +529,19 @@ float NeuralNetwork::NeuralLayer::Neuron::getWeight( unsigned int index )
     return m_weights[index];
 }
 
-float NeuralNetwork::NeuralLayer::Neuron::getWeightsQuantity()
+unsigned int NeuralNetwork::NeuralLayer::Neuron::getWeightsQuantity()
 {
     return m_weights.size();
 }
 
-
-// TODO: Neuron got more that two weights in general.. reimplement it
 void NeuralNetwork::NeuralLayer::Neuron::updateWeights( const std::vector<float> & input )
 {
     float dw0,dw1,dw2;
     // w <-- w - theta * x^(l-1)*Delta^l
     // iterate through all weights of this neuron and update its weights
     dw0 = -this->m_delta * s_theta;
-    dw1 = dw0 * input[0];
-    dw2 = dw0 * input[1];
-
     m_weights[0] += dw0;
-    m_weights[1] += dw1;
-    m_weights[2] += dw2;
+    for(unsigned int i = 1; i < m_weights.size(); ++i) {
+        m_weights[i] += dw0 * input[i-1];
+    }
 }

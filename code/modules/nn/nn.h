@@ -54,7 +54,7 @@ public:
             float getDelta();
             void setWeight( unsigned int index, float value );
             float getWeight(unsigned int index);
-            float getWeightsQuantity();
+            unsigned int getWeightsQuantity();
             void updateWeights( const std::vector<float> & input ); // Update weights of Neuron
         };
 public:
@@ -87,6 +87,8 @@ public:
     float getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels);
 
     std::vector<int> & getClassification(const std::vector<std::vector<float>> & data);
+
+    void reshape(unsigned int num_inputs);
 private:
     float getNetworkOutput(const std::vector<float> &randomSample);
     void getAllWeights(std::vector< float > &all_weights);

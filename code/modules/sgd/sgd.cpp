@@ -16,6 +16,13 @@ StochasticGradientDescent::StochasticGradientDescent() : m_about(StochasticGradi
 
 }
 
+void StochasticGradientDescent::reshape(unsigned int num_inputs)
+{
+  if(m_weights.size() != num_inputs)
+  {
+    m_weights.resize(num_inputs,0.0f);
+  }
+}
 
 std::string StochasticGradientDescent::composeAboutString()
 {

@@ -21,6 +21,13 @@ std::string PerceptronLearningAlgorithm::composeAboutString()
     return aboutString;
 }
 
+void PerceptronLearningAlgorithm::reshape(unsigned int num_inputs)
+{
+  if(m_weights.size() != num_inputs)
+  {
+    m_weights.resize(num_inputs,0.0f);
+  }
+}
 
 std::vector<int> & PerceptronLearningAlgorithm::getClassification(const std::vector<std::vector<float>> & data)
 {
@@ -35,7 +42,6 @@ std::vector<int> & PerceptronLearningAlgorithm::getClassification(const std::vec
     }
     return m_classification;
 }
-
 
 int PerceptronLearningAlgorithm::classifyPoint(const std::vector<float> &rpoint)
 {
@@ -90,13 +96,14 @@ float PerceptronLearningAlgorithm::getError( const std::vector< std::vector<floa
     return total_error / ( float )data.size();
 }
 
-
 // Update weights according the rule: w_k+1 <-- w_k + y_t*x_t
 void PerceptronLearningAlgorithm::updateWeights(const std::vector<float>& rpoint, const int classification)
 {
-   m_weights[0] = m_weights[0] + (float)classification; 
-   m_weights[1] = m_weights[1] + (float)classification*rpoint[0]; 
-   m_weights[2] = m_weights[2] + (float)classification*rpoint[1]; 
+  m_weights[0] = m_weights[0] + (float)classification;
+  for(int i = 1; i<m_weights.size(); ++i )
+  {
+    m_weights[i] = m_weights[i] + (float)classification*rpoint[i-1]; 
+  }  
 }
 
 void PerceptronLearningAlgorithm::RunRef( const std::vector< std::vector<float> > &trainingData,

@@ -34,6 +34,7 @@ public:
     static std::string composeAboutString();
     float getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels);
     std::vector<int> & getClassification(const std::vector<std::vector<float>> & data);
+    void reshape(unsigned int num_inputs);
 private:
     float classifyPoint( const std::vector<float> &rpoint );
     float getPartialErrorDerivative( const std::vector<float> &rpoint );
