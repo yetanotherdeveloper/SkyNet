@@ -21,7 +21,7 @@ std::string PerceptronLearningAlgorithm::composeAboutString()
     return aboutString;
 }
 
-void PerceptronLearningAlgorithm::reshape(unsigned int num_inputs)
+void PerceptronLearningAlgorithm::reshape(unsigned int num_inputs, unsigned int num_categories)
 {
   if(m_weights.size() != num_inputs)
   {

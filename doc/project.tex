@@ -129,10 +129,12 @@ Convert point structure into training + labels. Container for data can be vector
 Next Steps:
 \begin{itemize}
 \item implement test and validation sets
-\item add reshape invokation 
+\item implement change to interface where we gave number of categories to train to
 \item test mnist using nn and PLA
 \end{itemize}
 
+\section{Target Values for Categories}
+Eksperyment, polegajacy na w
 
 
 \section{Tests}
@@ -151,14 +153,12 @@ CXX=clang++  cmake ../code/
 make VERBOSE=1
 \end{verbatim}
 
-
 \section{TODO}
 \begin{itemize}
 \item modules are to be meant NN models eg. applications of alogithms
 \item Make exceptions,errors handling for SKyNetOpenCLHelper module
 \item Compilation flags for kernels should come from SkyNet module alond with device send or generate flags itself in helper
 \item make common module handling init of opencl and kernel/program building
-\item Make a git branches: master and milestone(release)
 \item make/lear proper c++ exceptions usage to handle errors of OpenCL initialization
 \item each module should provide also CPU plain implementation of algorithm
 \item Modules are algorithms and Devices( hardware layer) are to be initialized in SkyNet core

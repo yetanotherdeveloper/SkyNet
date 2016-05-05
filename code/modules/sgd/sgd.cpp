@@ -16,7 +16,7 @@ StochasticGradientDescent::StochasticGradientDescent() : m_about(StochasticGradi
 
 }
 
-void StochasticGradientDescent::reshape(unsigned int num_inputs)
+void StochasticGradientDescent::reshape(unsigned int num_inputs, unsigned int num_categories)
 {
   if(m_weights.size() != num_inputs)
   {

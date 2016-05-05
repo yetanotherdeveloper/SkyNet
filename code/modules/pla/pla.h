@@ -35,7 +35,7 @@ void RunRef( const std::vector< std::vector<float> > &trainingData,
     float getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels);
 
     std::vector<int> & getClassification(const std::vector<std::vector<float>> & data);
-    void reshape(unsigned int num_inputs);
+    void reshape(unsigned int num_inputs, unsigned int num_categories);
 private:
     int  classifyPoint(const std::vector<float> &rpoint);
     float getSampleClassificationError( const int sample, float output );

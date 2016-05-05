@@ -210,8 +210,9 @@ void runTest(SkyNet& skynet_instance)
   {
     diagnostic.reset();
     SKYNET_INFO("Running MNIST training and classification test against: %s\n",classifier.module->About().c_str() );
-
-    classifier.module->RunRef(mnist_test.getTrainingData(), 
+    
+    classifier.module->reshape(28*28, 10);  // TODO: make it less hardcoded
+                              classifier.module->RunRef(mnist_test.getTrainingData(), 
                               mnist_test.getTrainingLabels(),
                               mnist_test.getValidationData(),
                               mnist_test.getValidationLabels(), 

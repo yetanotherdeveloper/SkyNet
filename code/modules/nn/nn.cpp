@@ -38,7 +38,7 @@ NeuralNetwork::NeuralNetwork( unsigned int nrInputs, unsigned int nrLayers, Grad
 /*! Modify number of inputs eg. number of connections to each neuron of first neural layer.
  *  This is needed for neural network to work with diffrent size of input data
  */
-void NeuralNetwork::reshape(unsigned int num_inputs)
+void NeuralNetwork::reshape(unsigned int num_inputs, unsigned int num_categories)
 {
     // In case requested number of inputs differ
     // from existing setting
@@ -54,6 +54,7 @@ void NeuralNetwork::reshape(unsigned int num_inputs)
                                  ( float )(nrLayers - 1) ),
                                  NeuronFlags::INIT_RANDOM );
     }
+    // TODO: Reinitialize weights (other layers)
 }
 
 std::string NeuralNetwork::composeAboutString()
@@ -63,7 +64,7 @@ std::string NeuralNetwork::composeAboutString()
     return aboutString;
 }
 
-
+//TODO: rewrite so it match classification of many categories
 std::vector<int> & NeuralNetwork::getClassification(const std::vector<std::vector<float>> & data)
 {
     m_classification.clear();

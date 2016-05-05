@@ -191,7 +191,7 @@ public:
     virtual std::vector<int> & getClassification(const std::vector<std::vector<float>> & data)                                       = 0;
     virtual const std::string About() const                                                                             = 0;
     virtual void setWeights(std::vector< float > &all_weights)                                                          = 0;
-    virtual void reshape(unsigned int num_inputs)                                                           = 0;
+    virtual void reshape(unsigned int num_inputs, unsigned int num_categories)                                          = 0;
     std::string Identify()
     {
         return std::string("ISkyNetClassificationProtocol");

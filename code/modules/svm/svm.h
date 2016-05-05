@@ -30,7 +30,7 @@ public:
     std::vector<int> & getClassification(const std::vector<std::vector<float>> & data);
     void About();
     const std::string About() const;
-    void reshape(unsigned int num_inputs);
+    void reshape(unsigned int num_inputs, unsigned int num_categories);
 };
 #endif //__SVM__
 

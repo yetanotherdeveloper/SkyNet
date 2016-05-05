@@ -14,7 +14,7 @@ GradientDescent::GradientDescent() : m_about(GradientDescent::composeAboutString
     m_weights = std::vector<float>(3,0.0f);
 }
 
-void GradientDescent::reshape(unsigned int num_inputs)
+void GradientDescent::reshape(unsigned int num_inputs, unsigned int num_categories)
 {
   if(m_weights.size() != num_inputs)
   {

@@ -224,6 +224,7 @@ void runTest(SkyNet& skynet_instance)
         diagnostic.reset();
         SKYNET_INFO("Running Random points classification test against: %s\n",classifier.module->About().c_str() );
         // Pass Input data , and initial weights to RunCL , RunRef functions
+        classifier.module->reshape(2,2);    // Input is two dimensional (x,y) , and two categories are to be chosen from (eg. target values)
         classifier.module->RunRef(rpc.getTrainingData(), 
                                   rpc.getTrainingLabels(),
                                   rpc.getValidationData(),
