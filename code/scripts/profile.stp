@@ -1,0 +1,45 @@
+#Example of running:
+#stap ../scripts/profile.stp  -v --dyninst -c ./skynet --test=2 --mnist-data=../../data/mnist/ --module=1 | c++filt
+
+global timings_start  # Giving size of array here will cause error if size is exceeded , but allow avoid realocation of arrays
+global timings
+global counts
+
+global final_results # Container to combine data from many threads
+
+#@define function_name %( "*mnist*"  %)   # Handy macro to define name of functions to be traced
+
+@define make_entry_and_exit_probe(process_name,func_name) %(
+   
+probe process(@process_name).function(@func_name).call
+{
+  timings_start[ppfunc(),tid()] = gettimeofday_ms()
+  counts[ppfunc()] <<< 1
+}
+
+probe process(@process_name).function(@func_name).return
+{
+  timings[ppfunc(),tid()] += gettimeofday_ms()  - timings_start[ppfunc(),tid()];
+}
+   
+%)
+
+@make_entry_and_exit_probe("*skynet","*mnist*")
+#@make_entry_and_exit_probe("*skynet","*Sky*")
+
+# Tracing functions of shared lib (loaded by dlopen)
+#@make_entry_and_exit_probe("<Absolute path to module to be loaded>","*Neural*::*")
+
+
+probe end
+{
+  # Get per thread results and put them in final container
+  foreach([x,tid] in timings) 
+  {
+    final_results[x] += timings[x,tid]
+  }
+
+  # Presents results
+  printf("\n\nInclusive profiling results:\n")
+  foreach([x] in final_results-) { printf("%s, count: %d total time: %d ms\n",x,@count(counts[x]),final_results[x])}
+}
