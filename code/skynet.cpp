@@ -126,7 +126,7 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
         else if(c == 1)
         {
             PrintHelp();
-            throw std::string("");
+            m_terminated = true;
         } else if(c == 2) 
         {
             m_enableModule = std::stoi(optarg);         

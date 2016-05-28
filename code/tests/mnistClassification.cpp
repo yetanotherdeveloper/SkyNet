@@ -112,8 +112,7 @@ mnistClassification::mnistClassification(std::string mnist_dirname)
 {
     m_num_train_items = load_mnist(m_train_images,m_train_labels,mnist_dirname+"/train-images-idx3-ubyte",mnist_dirname+"/train-labels-idx1-ubyte");
 
-    m_num_test_items = load_mnist(m_test_images,m_test_labels,mnist_dirname+"/train-images-idx3-ubyte",mnist_dirname+"/train-labels-idx1-ubyte");
-
+    m_num_test_items = load_mnist(m_test_images,m_test_labels,mnist_dirname+"/t10k-images-idx3-ubyte",mnist_dirname+"/t10k-labels-idx1-ubyte");
     // diagnostic code to draw mnist image
     // showImage(m_train_images[0]);
 }

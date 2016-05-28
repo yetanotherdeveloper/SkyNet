@@ -117,6 +117,7 @@ From Commandline interface it is possible to resume learning starting from loade
 So in file with weights we have a name of algorithm (first line starting with \#) and weights itself (second line). So
 based on this info we can resume training of specific algorithm using given weights from file as starting weights.
 
+
 \section{Stopping Ciriteria}
 Early stopping module is checking validation error every (strip size). Minimal (optimal) Validation error is being
 stored and it corressponding weights. stopping criteria that when training error (average training error . divided by minimal training error
@@ -125,16 +126,20 @@ we can finish training.
 
 \section{MNIST training}
 Mnist test to be implemented now. First cleanup randomClassification test and based on that by analogy make mnistClassification test.
-Convert point structure into training + labels. Container for data can be vector of vectors of floats
+Convert point structure into training + labels. Container for data can be vector of vectors of floats.
 Next Steps:
 \begin{itemize}
 \item implement test and validation sets
 \item implement change to interface where we gave number of categories to train to
 \item test mnist using nn and PLA
+\item make it faster rarly to check Early stop or openmp for early stop verification
 \end{itemize}
 
+\section{Performance profiling}
+It seems that tracing every possible function introduce huge overhead. 
+
 \section{Target Values for Categories}
-Eksperyment, polegajacy na w
+
 
 
 \section{Tests}
@@ -155,6 +160,8 @@ make VERBOSE=1
 
 \section{TODO}
 \begin{itemize}
+\item stap present wrong results
+\item write unit tests
 \item modules are to be meant NN models eg. applications of alogithms
 \item Make exceptions,errors handling for SKyNetOpenCLHelper module
 \item Compilation flags for kernels should come from SkyNet module alond with device send or generate flags itself in helper

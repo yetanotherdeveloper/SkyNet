@@ -14,6 +14,12 @@ SupportVectorMachine::~SupportVectorMachine()
 {
 }
 
+void SupportVectorMachine::reshape(unsigned int num_inputs, unsigned int num_categories)
+{
+
+}
+
+
 void SupportVectorMachine::setWeights(std::vector< float > &initial_weights)
 {
     for(unsigned int i =0; i< m_weights.size(); ++i) 
