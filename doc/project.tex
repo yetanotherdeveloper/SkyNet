@@ -136,7 +136,21 @@ Next Steps:
 \end{itemize}
 
 \section{Performance profiling}
-It seems that tracing every possible function introduce huge overhead. 
+In scripts directory there is an example system tap file to
+trace performance of selected skynet functions. To take advantage of this script
+System Tap needs to be installed on the system.
+Example command line to start profiling:
+\begin{verbatim}
+stap ../scripts/profile.stp  -v --dyninst -c ./skynet --test=2 --mnist-data=../../data/mnist/ --module=1 | c++filt
+\end{verbatim}
+
+Notes:
+\begin{itemize}
+\item It seems that tracing every possible function introduce huge overhead. 
+\item For profiling of shared objects we need to put absolute path to it in process probe
+\item Overhead increase with the frequency of calls to traced functions
+\item Wildcard is applicable to alphanumeric characters other need to be mentioned separatly
+\end{itemize}
 
 \section{Target Values for Categories}
 
