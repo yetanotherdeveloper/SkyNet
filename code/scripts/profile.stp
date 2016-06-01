@@ -13,13 +13,13 @@ global final_results # Container to combine data from many threads
    
 probe process(@process_name).function(@func_name).call
 {
-  timings_start[ppfunc(),tid()] = gettimeofday_ms()
+  timings_start[ppfunc(),tid()] = gettimeofday_us()
   counts[ppfunc()] <<< 1
 }
 
 probe process(@process_name).function(@func_name).return
 {
-  timings[ppfunc(),tid()] += gettimeofday_ms()  - timings_start[ppfunc(),tid()];
+  timings[ppfunc(),tid()] += gettimeofday_us()  - timings_start[ppfunc(),tid()];
 }
    
 %)
@@ -40,5 +40,5 @@ probe end
 
   # Presents results
   printf("\n\nInclusive profiling results:\n")
-  foreach([x] in final_results-) { printf("%s, count: %d total time: %d ms\n",x,@count(counts[x]),final_results[x])}
+  foreach([x] in final_results-) { printf("%s, count: %d total time: %d us\n",x,@count(counts[x]), final_results[x])}
 }
