@@ -68,6 +68,13 @@ endforeach(subdir)
 add_executable(skynet ${SOURCE})
 target_link_libraries(skynet dl ${ImageMagick_LIBRARIES})
 
+# Copy profile.stp and put absolute path to binary and nn lib
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/profile.stp DESTINATION ${CMAKE_BINARY_DIR})
+file(READ ${CMAKE_BINARY_DIR}/profile.stp PROFILE_STP_STRING)
+string(REPLACE "[DIRNAME_OF_SKYNET_BINARY]" "\"${CMAKE_BINARY_DIR}/skynet\"" PROFILE_STP_STRING ${PROFILE_STP_STRING})
+string(REPLACE "[DIRNAME_OF_NN_SKYNET_MODULE]" "\"${CMAKE_BINARY_DIR}/modules/nn/libnn.so\"" PROFILE_STP_STRING ${PROFILE_STP_STRING})
+file(WRITE ${CMAKE_BINARY_DIR}/profile.stp ${PROFILE_STP_STRING})
+
 install(TARGETS skynet DESTINATION bin)
 
 set(CPACK_STRIP_FILES TRUE)

@@ -24,11 +24,10 @@ probe process(@process_name).function(@func_name).return
    
 %)
 
-@make_entry_and_exit_probe("*skynet","*mnist*")
-#@make_entry_and_exit_probe("*skynet","*Sky*")
+@make_entry_and_exit_probe([DIRNAME_OF_SKYNET_BINARY],"*mnist*")
 
 # Tracing functions of shared lib (loaded by dlopen)
-#@make_entry_and_exit_probe("<Absolute path to module to be loaded>","*Neural*::*")
+@make_entry_and_exit_probe([DIRNAME_OF_NN_SKYNET_MODULE],"*Neural*")
 
 
 probe end
