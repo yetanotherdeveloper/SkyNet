@@ -110,9 +110,10 @@ void PerceptronLearningAlgorithm::RunRef( const std::vector< std::vector<float> 
                                           const std::vector<int> &trainingLabels,
                                           const std::vector<std::vector<float>>   &validationData,
                                           const std::vector<int> &validationLabels,
+                                          unsigned int max_iterations,
                                           SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter)
 {
-    const int max_iterations = 1000*trainingData.size();
+    //const int max_iterations = 1000*trainingData.size();
     const std::vector<float>* misclassifiedData = nullptr;
     const int* misclassifiedLabel = nullptr;
     int i=0;

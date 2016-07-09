@@ -109,12 +109,12 @@ void StochasticGradientDescent::RunRef( const std::vector< std::vector<float> > 
              const std::vector<int> &trainingLabels,
              const std::vector<std::vector<float>>   &validationData,
              const std::vector<int> &validationLabels,
+             unsigned int max_iterations,
              SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter)
 {
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() -1 );
     std::random_device rd;
 
-    const int max_iterations = 1000*trainingData.size();
     int i=0;
     bool finish = false;
     //TODO: Store proper error

@@ -24,6 +24,7 @@ public:
                  const std::vector<int> &trainingLabels,
                  const std::vector<std::vector<float>>   &validationData,
                  const std::vector<int> &validationLabels,
+                 unsigned int max_iterations,
                  SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter);
     void setWeights(std::vector< float > &initial_weights);
     float getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels);

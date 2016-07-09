@@ -229,6 +229,7 @@ void runTest(SkyNet& skynet_instance)
                                   rpc.getTrainingLabels(),
                                   rpc.getValidationData(),
                                   rpc.getValidationLabels(), 
+                                  skynet_instance.getMaxIterations(),
                                   diagnostic,
                                   exitter );
         SKYNET_INFO("GetError: %f\n",classifier.module->getError(rpc.getTrainingData(), rpc.getTrainingLabels() ) );

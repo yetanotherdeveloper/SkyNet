@@ -20,6 +20,7 @@ public:
 
     const std::vector<classificationModule>& getClassificationModules(void);    
     const std::string& getMnistDataDir(void);
+    const unsigned int getMaxIterations(void);
 
 private:
     void LoadModules(std::string modulesDirectoryName);
@@ -33,6 +34,7 @@ private:
     bool m_terminated;  //< No further work to be done. Just finish gracefully
     bool m_printmodules;//< Whether to print found modules
     bool m_printTests; //<Whether to print available tests
+    unsigned int m_max_iterations; //< Maximum iterations to be executed by ML algorithm
     unsigned short m_enableModule; 
     unsigned short m_testToExecute; 
     std::string m_moduleToLoad;

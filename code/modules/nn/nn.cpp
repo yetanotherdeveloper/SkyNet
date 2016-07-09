@@ -342,6 +342,7 @@ void NeuralNetwork::RunRef( const std::vector< std::vector<float> > &trainingDat
                                                     const std::vector<int> &trainingLabels,
                                                     const std::vector<std::vector<float>>   &validationData,
                                                     const std::vector<int> &validationLabels,
+                                                    unsigned int max_iterations,
                                                     SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter)
 {
     std::uniform_int_distribution< int > sample_index( 0, trainingData.size() - 1 );
@@ -351,13 +352,14 @@ void NeuralNetwork::RunRef( const std::vector< std::vector<float> > &trainingDat
     getAllWeights(all_weights);
     diagnostic.storeWeightsAndError(all_weights,getError(trainingData,trainingLabels), getError(validationData,validationLabels) );
 
-    unsigned int max_iterations = 3000;
     unsigned int interval = 1;        // number of iterations after which testing comes and printing
 
-    SkyNetEarlyStop es(max_iterations, 0.4f);
+    const unsigned int min_iterations = 1000; // Find better way of defining minimum iterations to be done
+    SkyNetEarlyStop es(min_iterations,max_iterations, 0.4f);
 
-    unsigned int i = 0;
-    while( (es.earlyStop(all_weights,
+    unsigned int i = 1;
+    while( (es.earlyStop(i,
+                         all_weights,
                          getError(validationData, validationLabels),
                          getError(trainingData, trainingLabels)) == false) && (exitter() == false) )
     {

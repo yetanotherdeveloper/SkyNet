@@ -61,21 +61,28 @@ class SkyNetEarlyStop
 private:
         std::vector<float> m_weights;
         float m_opt_val_error;
-        unsigned int m_iteration;          // Current number of iterations processed
         unsigned int m_min_num_iterations; // minimum number of iterations to be processed (we won't stop before getting
                                            //  errors of that much iterations at least
+        unsigned int m_max_num_iterations; //< maximum number of iterations to be executed (no more than this value is to be done)
         float m_alpha;  //threashold above which we stop training
         float m_beta;   //threshold below which training progress is considered not very high
         unsigned int m_strip_size; //< size of strip within which we evaluate training error progress
         std::vector<float> m_training_errors; //Holds all training elements of given strip
 public:
-    SkyNetEarlyStop(unsigned int min_num_iterations, float alpha) : m_opt_val_error(1.0f), m_alpha(alpha), 
-                    m_iteration(0), m_min_num_iterations(min_num_iterations), m_strip_size(5), m_beta(0.1)  
+    SkyNetEarlyStop(unsigned int min_num_iterations,
+                    unsigned int max_num_iterations,
+                    float alpha) :
+                                    m_opt_val_error(1.0f),
+                                    m_alpha(alpha), 
+                                    m_min_num_iterations(min_num_iterations),
+                                    m_max_num_iterations(max_num_iterations),
+                                    m_strip_size(5),
+                                    m_beta(0.1)  
     {
         m_training_errors.resize(m_strip_size, 1.0f);
     } 
 
-    bool earlyStop( std::vector<float>& weights, float val_error, float training_error)
+    bool earlyStop( const unsigned int it, std::vector<float>& weights, float val_error, float training_error)
     {
         // If recent validation error is lower than optimal(minimal) one recorded
         // then make it new optimal validation error and store corressponding weights
@@ -86,22 +93,25 @@ public:
 
         // Store training errors from a current strip in a vector
         // to lateron calculate average / minimal ratio
-        m_training_errors[m_iteration % m_strip_size] = training_error;
+        m_training_errors[it % m_strip_size] = training_error;
 
-        ++m_iteration;
+        // No more iterations than given maximum is to be executed
+        if(it > m_max_num_iterations) {
+          return true;
+        }
 
         // 1. At least minimal number of iterations has to pass to even consider early stopping of training
         // 2. Training error drop shuld be at least equal to beta
         // 3. Make validation / training error validation at the end of strip
         // 4. Generalization loss has to be higher than threshold (alpha)
-        if((m_iteration > m_min_num_iterations) && (m_iteration % m_strip_size == 0  ) ) {
+        if((it > m_min_num_iterations) && (it % m_strip_size == 0  ) ) {
 
             float in_err_drop = getTrainingRate(); 
             if( in_err_drop < m_beta )
             {
                 printf("InErr drop: %f\n",in_err_drop);
                 float gen_loss = val_error/m_opt_val_error - 1.0f;
-                printf("GenLoss[%d]: %f\n",m_iteration,gen_loss);
+                printf("GenLoss[%d]: %f\n",it,gen_loss);
                 if(gen_loss > m_alpha) {
                     return true;
                 }
@@ -185,6 +195,7 @@ public:
                  const std::vector<int> &trainingLabels,
                  const std::vector<std::vector<float>>   &validationData,
                  const std::vector<int> &validationLabels,
+                 unsigned int max_iterations,
                  SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter) = 0;
 
     virtual float getError( const std::vector< std::vector<float> > & data,  const std::vector<int> & labels)       = 0;

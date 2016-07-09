@@ -141,7 +141,7 @@ trace performance of selected skynet functions. To take advantage of this script
 System Tap needs to be installed on the system.
 Example command line to start profiling:
 \begin{verbatim}
-stap ../scripts/profile.stp  -v --dyninst -c ./skynet --test=2 --mnist-data=../../data/mnist/ --module=1 | c++filt
+stap profile.stp -v --dyninst -c ./skynet --test=2 --mnist-data=../../data/mnist/ --module=1 | c++filt
 \end{verbatim}
 
 Notes:

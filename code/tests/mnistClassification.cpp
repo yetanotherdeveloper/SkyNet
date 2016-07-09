@@ -215,6 +215,7 @@ void runTest(SkyNet& skynet_instance)
                               mnist_test.getTrainingLabels(),
                               mnist_test.getValidationData(),
                               mnist_test.getValidationLabels(), 
+                              skynet_instance.getMaxIterations(),
                               diagnostic,
                               exitter );
     mnist_test.validate(classifier.module->getClassification(mnist_test.getTrainingData()));

@@ -59,6 +59,7 @@ void SupportVectorMachine::RunRef( const std::vector< std::vector<float> > &trai
              const std::vector<int> &trainingLabels,
              const std::vector<std::vector<float>>   &validationData,
              const std::vector<int> &validationLabels,
+             unsigned int max_iterations,
              SkyNetDiagnostic       &diagnostic, 
              SkynetTerminalInterface& exitter)
 {

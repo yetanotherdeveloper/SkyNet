@@ -113,9 +113,9 @@ void GradientDescent::RunRef( const std::vector< std::vector<float> > &trainingD
                               const std::vector<int> &trainingLabels,
                               const std::vector<std::vector<float>>   &validationData,
                               const std::vector<int> &validationLabels,
+                              unsigned int max_iterations,
                               SkyNetDiagnostic           &diagnostic, SkynetTerminalInterface& exitter)
 {
-    const int max_iterations = 1000*trainingData.size();
     int i=0;
     bool finish = false;
     diagnostic.storeWeightsAndError(m_weights,0.0f,0.0f);

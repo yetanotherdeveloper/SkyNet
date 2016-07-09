@@ -10,17 +10,15 @@
 #include "tests/randomPointsClassification.h"
 #include "tests/tests.h"
 
-SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodules(false), m_printTests(false), m_enableModule(0), 
-                                               m_moduleToLoad(""), m_testToExecute(0)  
+SkyNet::SkyNet(int argc, char *const *argv) :  m_terminated(false), m_printmodules(false), m_printTests(false), m_max_iterations(100), 
+                                               m_enableModule(0), m_moduleToLoad(""), m_testToExecute(0)  
 {
-    SKYNET_INFO("Skynet Initializing...\n\n");
+    SKYNET_DEBUG("Skynet Initializing...\n\n");
 
     try {
         ProcessCommandLine(argc,argv);
 
-        SKYNET_INFO("Initializing computing devices:\n");
-
-        SKYNET_INFO("Loading Modules:\n");
+        SKYNET_DEBUG("Loading Modules:\n");
         LoadModules(std::string("./modules") );
         LoadModules(std::string("/usr/share/skynet/modules") );
         PrintModules();
@@ -93,7 +91,17 @@ void SkyNet::PrintModules()
 //////////////////////////////////////////////////////////////////// 
 void SkyNet::PrintHelp()
 {
-    printf("SkyNet [--help] [--list_tests] [--list_modules] [--resume=<Path to file with stored weights eg. final_weights.txt>]  [--module=<number of module to be loaded>]  [--test=<number of test to be executed>] [--mnist-data=<directory where MNIST datas are.>]\n");
+    printf( R"help(
+  SkyNet [--help]
+         [--list_tests]
+         [--list_modules]
+         [--resume=<Path to file with stored weights eg. final_weights.txt>]
+         [--module=<number of module to be loaded>]
+         [--test=<number of test to be executed>]
+         [--mnist-data=<directory where MNIST datas are.>]
+         [--max_iterations=<maximum number of iterations to be executed>]
+
+         )help");
     return;
 }
 //////////////////////////////////////////////////////////////////// 
@@ -114,6 +122,7 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
                                  {"test", required_argument, nullptr, 16 },
                                  {"list_tests", no_argument, nullptr, 32 },
                                  {"mnist-data", required_argument, nullptr, 64 },
+                                 {"max_iterations", required_argument, nullptr, 128 },
                                  {0,0,0,0}};
     do
     {
@@ -143,6 +152,8 @@ void SkyNet::ProcessCommandLine(int argc, char *const *argv)
             m_terminated = true;
         } else if (c==64) {
             m_mnist_dir = optarg;
+        } else if (c==128) {
+            m_max_iterations = std::stoi(optarg);
         }
     }
     while(c != -1);
@@ -175,6 +186,11 @@ std::string SkyNet::getModuleToLoad(char *fileToLoad)
     }
     // Return first line read starting from second character (to omit '#' that starts the line in a file)
     return module_name.substr(1); 
+}
+//////////////////////////////////////////////////////////////////// 
+const unsigned int SkyNet::getMaxIterations(void)
+{
+  return m_max_iterations;
 }
 //////////////////////////////////////////////////////////////////// 
 /* Scan directory with modules and loadem all */
