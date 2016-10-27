@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(skynet)
+enable_testing()
 macro(getsubdirlist result curdir)
     file(GLOB items RELATIVE ${curdir} ${curdir}/modules/*)
     set(dirlist "")
@@ -76,6 +77,13 @@ string(REPLACE "[DIRNAME_OF_NN_SKYNET_MODULE]" "\"${CMAKE_BINARY_DIR}/modules/nn
 file(WRITE ${CMAKE_BINARY_DIR}/profile.stp ${PROFILE_STP_STRING})
 
 install(TARGETS skynet DESTINATION bin)
+
+
+# Unit Tests creation
+add_executable(test_commandline tests/test_commandline.cpp skynet.cpp os/linux/os_inc.cpp)
+
+target_link_libraries(test_commandline gtest dl)
+add_test(NAME test_commandline COMMAND ./test_commandline ) #TODO add working directory
 
 set(CPACK_STRIP_FILES TRUE)
 set(CPACK_GENERATOR "RPM")
