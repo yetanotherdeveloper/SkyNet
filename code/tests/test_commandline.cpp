@@ -16,10 +16,8 @@ TEST(test_max_iterations, test_commandline)
   EXPECT_EQ(max_iterations,m_skynet.getMaxIterations());
 }
 
-
 int main(int argc, char** argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
-	printf("Hello ULT World!\n");
   RUN_ALL_TESTS();
 }

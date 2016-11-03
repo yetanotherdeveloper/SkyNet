@@ -14,4 +14,10 @@ add_definitions(-std=c++11)
 
 add_library(nn SHARED ${SOURCE})
 
+# Unit Tests creation
+add_executable(test_nn ${CMAKE_CURRENT_SOURCE_DIR}/test_nn.cpp)
+
+target_link_libraries(test_nn gtest nn dl)
+add_test(NAME test_nn COMMAND ./test_nn ) #TODO add working directory
+
 install(TARGETS nn DESTINATION share/skynet/modules)
