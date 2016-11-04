@@ -6,14 +6,14 @@
 
 extern "C" ISkyNetClassificationProtocol *CreateModule()
 {
-    return new NeuralNetwork( 2, 2, GradientDescentType::STOCHASTIC );  // Just for testing, architecture depends heavily on problem we are to
+    return new NeuralNetwork( 2, 2, GradientDescentType::STOCHASTIC);  // Just for testing, architecture depends heavily on problem we are to
                                                 // solve
 }
 
 /*! Build kernels , initialize data
  *
  */
-NeuralNetwork::NeuralNetwork( unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype) : 
+NeuralNetwork::NeuralNetwork( unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype, NeuronFlags flags) : 
                               m_about( NeuralNetwork::composeAboutString() ), m_gradType(gdtype)
 {
     // Create Neural Network infrastructure
@@ -31,7 +31,7 @@ NeuralNetwork::NeuralNetwork( unsigned int nrInputs, unsigned int nrLayers, Grad
         m_layers.push_back( NeuralLayer( nrInputs,
                                          ( unsigned int )powf( 2.0f,
                                                                ( float )(nrLayers - i - 1) ),
-                                         NeuronFlags::INIT_RANDOM ) );
+                                          flags) );
     }
 
 }

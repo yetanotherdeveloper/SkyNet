@@ -17,17 +17,16 @@ class Kernel;
  * BATCH -- all available samples
  */
 enum class GradientDescentType {STOCHASTIC, BATCH};
-
-class NeuralNetwork : public ISkyNetClassificationProtocol
-{
 /*! This enum represents the way we initialize weights of neuron
  *  Note: Only INIT_RANDOM is to be ultimately used
  *  INIT_ONE and INIT_ZERO are added just for diagnostic purposes
  *  Having weights iniitialized to any fixed value (0,1 or any other)
  *  increase a danager of falling into local minimum
  */
-    enum class NeuronFlags {INIT_RANDOM, INIT_ZERO, INIT_ONE};
+enum class NeuronFlags {INIT_RANDOM, INIT_ZERO, INIT_ONE};
 
+class NeuralNetwork : public ISkyNetClassificationProtocol
+{
     /// Struct representing single layer of Neural Network
     struct NeuralLayer
     {
@@ -70,7 +69,7 @@ private:
     std::string                         m_about;
     GradientDescentType                 m_gradType;
 public:
-    NeuralNetwork( unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype = GradientDescentType::STOCHASTIC);
+    NeuralNetwork( unsigned int nrInputs, unsigned int nrLayers, GradientDescentType gdtype = GradientDescentType::STOCHASTIC, NeuronFlags flags = NeuronFlags::INIT_RANDOM);
     ~NeuralNetwork();
     const std::vector<float> & RunCL(const std::vector<std::vector<float>> &trainingData, SkyNetDiagnostic &diagnostic, SkynetTerminalInterface& exitter);
 
