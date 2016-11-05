@@ -496,7 +496,7 @@ float NeuralNetwork::NeuralLayer::Neuron::getOutput( const std::vector< float > 
     {
         output += m_weights[i + 1] * input[i];
     }
-    m_output = ( float )tanh( output );
+    m_output = ( float )tanh( output ); // TODO: make non-linearity a separate layer
     return m_output;
 }
 

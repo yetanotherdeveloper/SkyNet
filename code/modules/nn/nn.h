@@ -89,8 +89,8 @@ public:
     std::vector<int> & getClassification(const std::vector<std::vector<float>> & data);
 
     void reshape(unsigned int num_inputs, unsigned int num_categories);
-private:
     float getNetworkOutput(const std::vector<float> &randomSample);
+private:
     void getAllWeights(std::vector< float > &all_weights);
     float getSampleClassificationError(const int sample,float output);
     void updateWeights( const std::vector<float> &randomSample, const int correspondingLabel );

@@ -53,9 +53,7 @@ performa validation, verification
 
 So, module will be given data and commandqueue to send kernel to, context and device that compilation is taking place against
 
-There will be a module handling OpenCL :
-Implementing SkyNetOpenCLHelper module , which is opencl interacting routines to creat context, buildp rograms, kernels etc. and handling errors
-
+Module of neural net is to have architecture created depending on the interface it is implementing
 
 Charts module. Module to generate , dump data. Can also draw gnuplot script.
 Scheme of working:
@@ -154,9 +152,15 @@ Notes:
 
 
 \section{Unit Tests}
+Test files are stored along the module they are related to and for core skynet unit tests there are in tests directory.
+Calling all unit tests showing results:
+\begin{verbatim}
+ctest --verbose -R
+\end{verbatim}
+
+Next Steps: 
 \begin{itemize}
-\item Changes to CMakeLists to enable unit testing
-\item Unit test for commandline
+\item Unit test for gradient computation of NeuralNetowrk module
 \end{itemize}
 
 \section{Target Values for Categories}
@@ -181,6 +185,7 @@ make VERBOSE=1
 
 \section{TODO}
 \begin{itemize}
+\item make non-linearity a separate layer
 \item write unit tests
 \item modules are to be meant NN models eg. applications of alogithms
 \item Make exceptions,errors handling for SKyNetOpenCLHelper module
